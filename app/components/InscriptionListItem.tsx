@@ -1,24 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { type Address } from "viem";
 import { useTokenStore } from "../helpers/useTokenStore";
 import { useTransaction } from "../helpers/useTransaction";
 import ModalSend from "./ModalSend";
 import ModalActions from "./ModalActions";
 import BaseInscription from "./BaseInscription";
-
-type Seed = {
-  seed: bigint;
-  isDynamic: boolean;
-  owner: Address;
-};
-
-type Inscription = {
-  seed: Seed;
-  svg?: string;
-  meta?: Record<string, unknown>;
-};
+import { type Inscription } from "../helpers/types";
 
 type Props = {
   inscription: Inscription;

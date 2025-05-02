@@ -1,17 +1,7 @@
 "use client";
 
 import InscriptionListItem from "./InscriptionListItem";
-
-type Seed = {
-  seed: bigint;
-  isDynamic: boolean;
-};
-
-type Inscription = {
-  seed: Seed;
-  svg?: string;
-  [key: string]: unknown;
-};
+import { type Inscription } from "../helpers/types";
 
 type InscriptionListProps = {
   inscriptions: Inscription[];
