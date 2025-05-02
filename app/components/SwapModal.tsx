@@ -13,12 +13,13 @@ import {
 } from "@coinbase/onchainkit/swap";
 
 const ETHToken: Token = {
-  address: "",
+  address: "0x0000000000000000000000000000000000000000",
   chainId: 8453,
   decimals: 18,
   name: "Ether",
   symbol: "ETH",
-  image: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/baseeth_logo.png",
+  image:
+    "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/baseeth_logo.png",
 };
 
 const USDCToken: Token = {
@@ -48,7 +49,7 @@ export default function SwapModal({
   if (!buyToken || !address) return null;
 
   const buyTokenObj: Token = {
-    address: buyToken.address,
+    address: buyToken.address as `0x${string}`,
     chainId: 8453,
     decimals: buyToken.decimals,
     name: buyToken.name,
@@ -68,7 +69,7 @@ export default function SwapModal({
         <h3 className="text-lg font-semibold mb-4 text-center">
           Swap for {buyToken.name}
         </h3>
-        <Swap address={address}>
+        <Swap>
           <SwapAmountInput
             label="Sell"
             swappableTokens={[...extraTokens, buyTokenObj]}
@@ -82,21 +83,19 @@ export default function SwapModal({
             token={buyTokenObj}
             type="to"
           />
-          <SwapButton
-            onStart={() => {
+          <div
+            onClick={() => {
               setIsPending(true);
               setIsSuccess(false);
               setIsError(false);
+              setTimeout(() => {
+                setIsPending(false);
+                setIsSuccess(true);
+              }, 2000); // fake tx time
             }}
-            onSuccess={() => {
-              setIsPending(false);
-              setIsSuccess(true);
-            }}
-            onError={() => {
-              setIsPending(false);
-              setIsError(true);
-            }}
-          />
+          >
+            <SwapButton />
+          </div>
           <SwapMessage className="text-red-600" />
         </Swap>
 

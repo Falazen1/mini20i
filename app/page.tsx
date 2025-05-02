@@ -15,17 +15,6 @@ import { Address } from "viem";
 import { useTokenStore } from "./helpers/useTokenStore";
 import SwapModal from "./components/SwapModal";
 
-type Token = {
-  name: string;
-  address: string;
-  symbol: string;
-  banner: string;
-  logo: string;
-  about: string;
-  key: "froggi" | "fungi" | "pepi";
-  decimals: number;
-};
-
 type Inscription = {
   id: string;
   svg: string;
@@ -48,7 +37,6 @@ export default function Page() {
   const [activeInfo, setActiveInfo] = useState<string | null>(null);
   const [isSwapOpen, setIsSwapOpen] = useState(false);
   const [swapTokenKey, setSwapTokenKey] = useState<"froggi" | "fungi" | "pepi" | null>(null);
-  
   useEffect(() => {
     if (!address) return;
 
@@ -58,7 +46,7 @@ export default function Page() {
       for (const token of tokens) {
         if (!["froggi", "fungi", "pepi"].includes(token.key)) continue;
 
-        const abi = abis[token.key];
+        const abi = abis[token.key as "froggi" | "fungi" | "pepi"];
         const contractAddress = token.address as `0x${string}`;
         const fn = getFunctionNames(token.key);
         const list: Inscription[] = [];

@@ -5,7 +5,7 @@ import {
   waitForTransactionReceipt,
 } from "@wagmi/core";
 import { useWalletClient } from "wagmi";
-import { parseUnits, type Address } from "viem";
+import { parseUnits, type Address, type Abi } from "viem";
 import { STABILIZER_ADDRESS } from "./constants";
 import { config } from "./wagmiConfig";
 import stabilizeAbi from "./abi/stabilizer.json";
@@ -13,7 +13,7 @@ import { base } from "viem/chains";
 
 export const tokenRef: {
   tokenAddress?: `0x${string}`;
-  abiComputed?: any;
+  abiComputed?: Abi;
   tokenDecimals?: number;
 } = {};
 
@@ -21,8 +21,13 @@ export function useTransaction() {
   const { data: walletClient } = useWalletClient();
 
   function ensureTokenRefs() {
-    if (!tokenRef.tokenAddress || !tokenRef.abiComputed || !tokenRef.tokenDecimals)
+    if (
+      !tokenRef.tokenAddress ||
+      !tokenRef.abiComputed ||
+      tokenRef.tokenDecimals === undefined
+    ) {
       throw new Error("Token data not initialized. Call setTokenByKey() first.");
+    }
   }
 
   async function approveIfNeeded(owner: Address, amount: bigint) {
@@ -53,7 +58,8 @@ export function useTransaction() {
 
   async function stabilizeInscription(owner: Address, rawAmount: bigint) {
     ensureTokenRefs();
-    const parsed = parseUnits(rawAmount.toString(), tokenRef.tokenDecimals);
+    const decimals = tokenRef.tokenDecimals as number;
+    const parsed = parseUnits(rawAmount.toString(), decimals);
     await approveIfNeeded(owner, parsed);
 
     if (!walletClient) throw new Error("Wallet not connected");
@@ -72,7 +78,8 @@ export function useTransaction() {
 
   async function destabilizeInscription(owner: Address, rawAmount: bigint) {
     ensureTokenRefs();
-    const parsed = parseUnits(rawAmount.toString(), tokenRef.tokenDecimals);
+    const decimals = tokenRef.tokenDecimals as number;
+    const parsed = parseUnits(rawAmount.toString(), decimals);
     await approveIfNeeded(owner, parsed * 2n);
 
     if (!walletClient) throw new Error("Wallet not connected");
@@ -91,9 +98,10 @@ export function useTransaction() {
 
   async function combineInscriptions(owner: Address, amounts: bigint[]) {
     ensureTokenRefs();
+    const decimals = tokenRef.tokenDecimals as number;
 
     const parsed = amounts.map((a) =>
-      parseUnits(a.toString(), tokenRef.tokenDecimals)
+      parseUnits(a.toString(), decimals)
     );
     const total = parsed.reduce((a, b) => a + b, 0n);
     await approveIfNeeded(owner, total);
