@@ -34,5 +34,7 @@ export default function ImagePng({ svgString }: Props) {
     renderPng();
   }, [svgString]);
 
+  // eslint-disable-next-line @next/next/no-img-element
   return <img ref={imgRef} alt="inscription-rendered-png" />;
+
 }

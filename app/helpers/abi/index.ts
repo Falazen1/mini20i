@@ -4,10 +4,12 @@ import jelli from './jelli.json'
 import froggi from './froggi.json'
 import truffi from './truffi.json'
 
-export default {
+const abiHelpers = {
   fungi,
   pepi,
   jelli,
   froggi,
   truffi
-}
+};
+
+export default abiHelpers;

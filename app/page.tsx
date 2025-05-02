@@ -14,6 +14,7 @@ import { useTransaction } from "./helpers/useTransaction";
 import { Address } from "viem";
 import { useTokenStore } from "./helpers/useTokenStore";
 import SwapModal from "./components/SwapModal";
+import Image from "next/image";
 
 type Inscription = {
   id: string;
@@ -262,25 +263,29 @@ export default function Page() {
           </p>
 
           <div className="relative w-full flex justify-center gap-4">
-            <img
-              onClick={() => setActiveFilter("all")}
-              src="https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg"
-              alt="All Projects"
-              className={`h-14 w-14 rounded-full border cursor-pointer hover:opacity-80 ${activeFilter === "all" ? "ring-2 ring-black" : ""}`}
-            />
+          <Image
+  onClick={() => setActiveFilter("all")}
+  src="https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg"
+  alt="All Projects"
+  width={56}
+  height={56}
+  className={`h-14 w-14 rounded-full border cursor-pointer hover:opacity-80 ${activeFilter === "all" ? "ring-2 ring-black" : ""}`}
+/>
             {visibleTokens.map((t) => {
               const logo = t.key === "pepi"
                 ? "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/pepi_logo.jpg"
                 : t.logo;
 
               return (
-                <img
-                  key={t.key}
-                  onClick={() => setActiveFilter(t.key)}
-                  src={logo}
-                  alt={t.name}
-                  className={`h-14 w-14 rounded-full border cursor-pointer hover:opacity-80 ${activeFilter === t.key ? "ring-2 ring-black" : ""}`}
-                />
+<Image
+  key={t.key}
+  onClick={() => setActiveFilter(t.key)}
+  src={logo}
+  alt={t.name}
+  width={56}
+  height={56}
+  className={`h-14 w-14 rounded-full border cursor-pointer hover:opacity-80 ${activeFilter === t.key ? "ring-2 ring-black" : ""}`}
+/>
               );
             })}
 
@@ -313,9 +318,11 @@ export default function Page() {
                   {activeFilter === "all" && (
                     <h3 className="text-xl font-semibold mt-6">{token.name}</h3>
                   )}
-<img
+<Image
   src={token.banner}
   alt={`${token.name} banner`}
+  width={1024}
+  height={360}
   className="w-full max-h-[420px] md:max-h-[360px] object-contain rounded shadow mt-3 cursor-pointer"
 />
 
@@ -441,13 +448,16 @@ onClick={() =>
   
 >
   <div className="w-full aspect-square relative">
-    <img
-      src={token.key === "pepi"
-        ? "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/pepi_logo.jpg"
-        : token.logo}
-      alt={`${token.name} placeholder`}
-      className="w-full h-full object-contain opacity-60"
-    />
+  <Image
+  src={
+    token.key === "pepi"
+      ? "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/pepi_logo.jpg"
+      : token.logo
+  }
+  alt={`${token.name} placeholder`}
+  fill
+  className="object-contain opacity-60"
+/>
     <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
       <div className="text-sm font-medium bg-white/25 backdrop-blur-sm px-3 py-3 rounded text-gray-800 shadow">
         <div>{inscriptions[token.key]?.length ? "Get more" : "No tokens found!"}</div>

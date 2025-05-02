@@ -74,13 +74,13 @@ export function useTokenStore() {
 
       const ins = await getInscriptionsByAddress(address);
       setBalanceUnits(balance as bigint);
-      setInscriptions(ins); // ✅ Fix: properly typed Inscription[]
+      setInscriptions(ins); 
       setInitializing(false);
     }
   }
 
   function init() {
-    // legacy stub — no-op
+    // legacy stub — no-op.
   }
   
   
@@ -94,7 +94,7 @@ export function useTokenStore() {
     tokenAddress,
     tokenDecimals,
     setTokenByKey,
-    init, // <-- add this line
+    init,
   };
   
 }
