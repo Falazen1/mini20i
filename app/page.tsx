@@ -1,0 +1,559 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useAccount, useConnect } from "wagmi";
+import { readContract } from "@wagmi/core";
+import { config } from "./helpers/wagmiConfig";
+import abis from "./helpers/abi";
+import tokens from "./helpers/tokens.json";
+import { TELEGRAM_URL } from "./helpers/constants";
+import Topnav from "./components/Topnav";
+import { getFunctionNames } from "./helpers/abi/mapping";
+import { type Seed } from "./helpers/types";
+import { useTransaction } from "./helpers/useTransaction";
+import { Address } from "viem";
+import { useTokenStore } from "./helpers/useTokenStore";
+import SwapModal from "./components/SwapModal";
+
+type Token = {
+  name: string;
+  address: string;
+  symbol: string;
+  banner: string;
+  logo: string;
+  about: string;
+  key: "froggi" | "fungi" | "pepi";
+  decimals: number;
+};
+
+type Inscription = {
+  id: string;
+  svg: string;
+  seed: string;
+  type: "Dynamic" | "Stable";
+};
+
+export default function Page() {
+  const { address } = useAccount();
+  const { connect, connectors } = useConnect();
+  const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
+  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [selectedInscription, setSelectedInscription] = useState<Inscription | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [combineMode, setCombineMode] = useState(false);
+  const [combineList, setCombineList] = useState<Inscription[]>([]);
+  const { stabilizeInscription, destabilizeInscription, combineInscriptions } = useTransaction();
+  const tokenStore = useTokenStore();
+  const [activeInfo, setActiveInfo] = useState<string | null>(null);
+  const [isSwapOpen, setIsSwapOpen] = useState(false);
+  const [swapTokenKey, setSwapTokenKey] = useState<"froggi" | "fungi" | "pepi" | null>(null);
+  
+  useEffect(() => {
+    if (!address) return;
+
+    async function loadInscriptions() {
+      const results: Record<string, Inscription[]> = {};
+
+      for (const token of tokens) {
+        if (!["froggi", "fungi", "pepi"].includes(token.key)) continue;
+
+        const abi = abis[token.key];
+        const contractAddress = token.address as `0x${string}`;
+        const fn = getFunctionNames(token.key);
+        const list: Inscription[] = [];
+
+        try {
+          const dynamic = await readContract(config, {
+            abi,
+            address: contractAddress,
+            functionName: fn.sporesDegree,
+            args: [address],
+          }) as Seed;
+
+          if (dynamic.seed && dynamic.seed !== 0n) {
+            const svg = await readContract(config, {
+              abi,
+              address: contractAddress,
+              functionName: "getSvg",
+              args: [dynamic],
+            }) as string;
+
+            list.push({
+              id: `${token.key}-dynamic`,
+              svg,
+              seed: dynamic.seed.toString(),
+              type: "Dynamic",
+            });
+          }
+        } catch {}
+
+        try {
+          const count = await readContract(config, {
+            abi,
+            address: contractAddress,
+            functionName: fn.mushroomCount,
+            args: [address],
+          }) as bigint;
+
+          for (let i = 0n; i < count; i++) {
+            try {
+              const seed = await readContract(config, {
+                abi,
+                address: contractAddress,
+                functionName: fn.mushroomOfOwnerByIndex,
+                args: [address, i],
+              }) as Seed;
+
+              const svg = await readContract(config, {
+                abi,
+                address: contractAddress,
+                functionName: "getSvg",
+                args: [seed],
+              }) as string;
+
+              list.push({
+                id: `${token.key}-stable-${i}`,
+                svg,
+                seed: seed.seed.toString(),
+                type: "Stable",
+              });
+            } catch {}
+          }
+        } catch {}
+
+        results[token.key] = list;
+      }
+
+      setInscriptions(results);
+    }
+
+    loadInscriptions();
+  }, [address, successMessage]);
+
+  const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi"].includes(t.key));
+  const activeToken = visibleTokens.find((t) => t.key === activeFilter);
+
+  async function handleClick(
+    key: "froggi" | "fungi" | "pepi",
+    action: "stabilize" | "destabilize" | "combine",
+    seed: string
+  ) {
+    try {
+      setIsProcessing(true);
+      setSuccessMessage("");
+      await tokenStore.setTokenByKey(key);
+      const value = BigInt(seed);
+      const user = address as Address;
+
+      if (action === "stabilize") await stabilizeInscription(user, value);
+      if (action === "destabilize") await destabilizeInscription(user, value);
+      if (action === "combine") {
+        const seeds = combineList.length > 0 ? combineList.map(i => BigInt(i.seed)) : [value];
+        await combineInscriptions(user, seeds);
+        setCombineList([]);
+        setCombineMode(false);
+      }
+
+      setSuccessMessage(`${action.charAt(0).toUpperCase() + action.slice(1)} successful.`);
+    } catch (e) {
+      console.error(e);
+      setSuccessMessage("Transaction failed.");
+    } finally {
+      setIsProcessing(false);
+      setSelectedInscription(null);
+    }
+  }
+
+  return (
+    <>
+      {isProcessing && (
+        <div className="fixed inset-0 z-[9999] bg-black bg-opacity-70 flex items-center justify-center">
+          <div className="bg-white px-6 py-4 rounded shadow text-center text-lg">Processing transaction...</div>
+        </div>
+      )}
+      {successMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] bg-green-100 text-green-800 px-4 py-2 rounded shadow">
+          {successMessage}
+        </div>
+      )}
+{combineMode && (
+  <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 overflow-auto">
+    <div className="bg-white rounded-lg p-6 shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+      <h2 className="text-lg font-semibold mb-4">Select Inscriptions to Combine</h2>
+      <p className="text-sm mb-2">Select at least 2 stable inscriptions to enable combination.</p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+        {visibleTokens
+          .flatMap((token) => inscriptions[token.key] || [])
+          .filter((i) =>
+            combineList.length === 0
+              ? false
+              : i.id.startsWith(combineList.at(0)!.id.split("-")[0])
+          )
+          
+          .map((insc) => {
+            const isSelected = combineList.some((i) => i.id === insc.id);
+            return (
+              <div
+                key={insc.id}
+                onClick={() =>
+                  setCombineList((prev) =>
+                    isSelected
+                      ? prev.filter((i) => i.id !== insc.id)
+                      : [...prev, insc]
+                  )
+                }
+                className={`border rounded shadow p-2 bg-white cursor-pointer ${
+                  isSelected ? "ring-2 ring-blue-500" : ""
+                }`}
+              >
+                <div
+                  className="aspect-square w-full mb-1"
+                  dangerouslySetInnerHTML={{ __html: insc.svg }}
+                />
+                <div className="text-xs text-gray-400">Seed: {insc.seed}</div>
+              </div>
+            );
+          })}
+      </div>
+
+      {combineList.length < 2 && (
+        <p className="text-sm text-red-600 mb-4">You must select at least 2 inscriptions.</p>
+      )}
+      <div className="flex justify-between mt-4">
+        <button
+          onClick={() => {
+            setCombineMode(false);
+            setCombineList([]);
+          }}
+          className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
+        >
+          Cancel
+        </button>
+        <button
+          disabled={combineList.length < 2}
+          onClick={() =>
+            handleClick(
+              combineList[0].id.split("-")[0] as "froggi" | "fungi" | "pepi",
+              "combine",
+              "0"
+            )
+          }
+          className={`px-4 py-2 text-sm rounded ${
+            combineList.length < 2
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-blue-500 text-white"
+          }`}
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+{isSwapOpen && swapTokenKey && (
+  <SwapModal
+    tokenKey={swapTokenKey}
+    onClose={() => {
+      setIsSwapOpen(false);
+      setSwapTokenKey(null);
+    }}
+  />
+)}
+
+      <Topnav />
+      <div className="px-4 max-w-6xl mx-auto mb-28">
+        <div className="text-center px-4 mt-10 mb-4">
+          <h1 className="text-4xl font-semibold">Mini 20i</h1>
+          <p className="text-sm text-gray-600 mt-1">View, manage, and swap Inscriptions</p>
+        </div>
+
+        <div className="flex flex-col items-center gap-2 mb-6">
+          <p className="text-lg text-gray-700 font-semibold mb-2">
+            {activeFilter === "all" ? "All" : `$${activeToken?.name}`}
+          </p>
+
+          <div className="relative w-full flex justify-center gap-4">
+            <img
+              onClick={() => setActiveFilter("all")}
+              src="https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg"
+              alt="All Projects"
+              className={`h-14 w-14 rounded-full border cursor-pointer hover:opacity-80 ${activeFilter === "all" ? "ring-2 ring-black" : ""}`}
+            />
+            {visibleTokens.map((t) => {
+              const logo = t.key === "pepi"
+                ? "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/pepi_logo.jpg"
+                : t.logo;
+
+              return (
+                <img
+                  key={t.key}
+                  onClick={() => setActiveFilter(t.key)}
+                  src={logo}
+                  alt={t.name}
+                  className={`h-14 w-14 rounded-full border cursor-pointer hover:opacity-80 ${activeFilter === t.key ? "ring-2 ring-black" : ""}`}
+                />
+              );
+            })}
+
+            {!address && (
+              <div className="absolute z-[9999] bg-black bg-opacity-70 -top-16 -bottom-4 -left-4 -right-4 flex items-center justify-center text-white text-center px-4 transform translate-y-6">
+                <div
+                  className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition"
+                  onClick={() => connect({ connector: connectors[0] })}
+                >
+                  <p className="text-lg font-semibold mb-2">Wallet Required</p>
+                  <p className="text-sm">Click here to connect your wallet.</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <p className="text-sm text-gray-600 text-center max-w-xl mt-2">
+            {activeFilter === "all"
+              ? "Browse all your Inscriptions or select by project"
+              : activeToken?.about}
+          </p>
+        </div>
+
+        {address && (
+          <div className="flex flex-col gap-12">
+            {visibleTokens
+              .filter((token) => activeFilter === "all" || token.key === activeFilter)
+              .map((token) => (
+                <div key={token.key}>
+                  {activeFilter === "all" && (
+                    <h3 className="text-xl font-semibold mt-6">{token.name}</h3>
+                  )}
+<img
+  src={token.banner}
+  alt={`${token.name} banner`}
+  className="w-full max-h-[420px] md:max-h-[360px] object-contain rounded shadow mt-3 cursor-pointer"
+/>
+
+{activeFilter === token.key && (
+  <div className="mt-4">
+    <div className="flex gap-3 mb-2">
+      <button
+onClick={() =>
+  setActiveInfo((prev) =>
+    prev === `progression-${token.key}` ? null : `progression-${token.key}`
+  )
+}
+        className="px-4 py-2 text-sm rounded bg-gray-100 text-gray-800 hover:bg-gray-200 shadow"
+      >
+        Progression
+      </button>
+      <button
+onClick={() =>
+  setActiveInfo((prev) =>
+    prev === `levels-${token.key}` ? null : `levels-${token.key}`
+  )
+}
+        className="px-4 py-2 text-sm rounded bg-gray-100 text-gray-800 hover:bg-gray-200 shadow"
+      >
+        Levels
+      </button>
+    </div>
+
+    {(activeInfo === `progression-${token.key}` || activeInfo === `levels-${token.key}`) && (
+      <div className="bg-gray-50 border border-gray-200 rounded p-4 text-sm text-gray-700 leading-relaxed space-y-1">
+  {(() => {
+    const raw = {
+      "progression-fungi": `5 levels of Fungi as your spore grows into a mighty mushroom, holding more tokens means more spores and larger mushrooms!`,
+      "levels-fungi": [
+        ["Level 0", "1 - 20,999"],
+        ["Level 1", "0.01% - 21,000"],
+        ["Level 2", "0.25% - 525,000"],
+        ["Level 3", "0.50% - 1,050,000"],
+        ["Level 4", "0.75% - 1,575,000"],
+        ["Level 5", "1.00% - 2,100,000+"],
+      ],
+      "progression-froggi": `7 tiers of Froggi from colorful eggs to fully decked out denizens. Holding more tokens evolves your egg, with more trait combinations unlocking at higher levels.`,
+      "levels-froggi": [
+        ["Level 0", "999 tokens or less"],
+        ["Level 1", "1,000+ tokens"],
+        ["Level 2", "3,000+ tokens"],
+        ["Level 3", "10,000+ tokens"],
+        ["Level 4", "30,000+ tokens"],
+        ["Level 5", "60,000+ tokens"],
+        ["Level 6", "120,000+ tokens"],
+      ],
+      "progression-pepi": `6 levels of Pepi let you see your Pepi grow from egg cluster, to tadpole, to fully mature. Each tier of Pepi offers a unique stage of growth for your inscription.`,
+      "levels-pepi": [
+        ["Level 1", "1–10 tokens"],
+        ["Level 2", "11–21 tokens"],
+        ["Level 3", "22–32 tokens"],
+        ["Level 4", "33–43 tokens"],
+        ["Level 5", "44–55 tokens"],
+        ["Level 6", "56+ tokens"],
+      ],
+    };
+
+    const val = raw[activeInfo as keyof typeof raw];
+    if (!val) return null;
+
+    if (typeof val === "string") {
+      return <p>{val}</p>;
+    }
+
+    return val.map(([label, detail], idx) => (
+      <p key={idx}>
+        <span className="font-semibold">{label}</span> – {detail}
+      </p>
+    ));
+  })()}
+</div>
+
+    )}
+  </div>
+)}
+
+
+                  {activeFilter === "all" && (
+                    <p className="text-sm text-gray-500 mt-1">{token.about}</p>
+                  )}
+<div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+  {(inscriptions[token.key] || []).map((inscription) => {
+    const isSelected = combineList.some(i => i.id === inscription.id);
+    return (
+      <div
+        key={inscription.id}
+        onClick={() => {
+          if (combineMode && inscription.type === "Stable") {
+            setCombineList((prev) =>
+              prev.some((i) => i.id === inscription.id)
+                ? prev.filter((i) => i.id !== inscription.id)
+                : [...prev, inscription]
+            );
+          } else {
+            setSelectedInscription(inscription);
+          }
+        }}
+        className={`border rounded shadow p-3 bg-white cursor-pointer ${
+          isSelected ? "ring-2 ring-blue-500" : ""
+        }`}
+      >
+        <div
+          className="w-full aspect-square mb-2"
+          dangerouslySetInnerHTML={{ __html: inscription.svg }}
+        />
+        <div className="text-xs text-gray-400">Type: {inscription.type}</div>
+        <div className="text-xs text-gray-400">Tokens: {inscription.seed}</div>
+      </div>
+    );
+  })}
+
+<div
+  className="border rounded shadow p-3 bg-white relative cursor-pointer hover:opacity-80 transition"
+  onClick={() => {
+    setIsSwapOpen(true);
+    setSwapTokenKey(token.key as "froggi" | "fungi" | "pepi");
+  }}
+  
+>
+  <div className="w-full aspect-square relative">
+    <img
+      src={token.key === "pepi"
+        ? "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/pepi_logo.jpg"
+        : token.logo}
+      alt={`${token.name} placeholder`}
+      className="w-full h-full object-contain opacity-60"
+    />
+    <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+      <div className="text-sm font-medium bg-white/25 backdrop-blur-sm px-3 py-3 rounded text-gray-800 shadow">
+        <div>{inscriptions[token.key]?.length ? "Get more" : "No tokens found!"}</div>
+        <div className="mt-2">Click to swap</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+                </div>
+              ))}
+          </div>
+        )}
+
+    {selectedInscription && (
+      <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 shadow-lg max-w-lg w-full">
+          <div className="flex justify-between mb-4">
+            <h2 className="text-xl font-semibold">Inscription Detail</h2>
+            <button onClick={() => setSelectedInscription(null)}>✕</button>
+          </div>
+          <div className="w-full aspect-square mb-4" dangerouslySetInnerHTML={{ __html: selectedInscription.svg }} />
+          <div className="text-sm text-gray-600 mb-2"><span className="font-semibold">Seed:</span> {selectedInscription.seed}</div>
+          <div className="text-sm text-gray-600 mb-4"><span className="font-semibold">Type:</span> {selectedInscription.type}</div>
+          <div className="flex flex-row justify-between items-end mt-4 gap-3">
+            <div className="flex gap-3 flex-wrap">
+              {selectedInscription.type === "Stable" ? (
+                <>
+                  <button
+                    onClick={() => handleClick(selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi", "destabilize", selectedInscription.seed)}
+                    className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded"
+                  >
+                    Destabilize
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCombineMode(true);
+                      setCombineList((prev) =>
+                        prev.some((i) => i.id === selectedInscription.id)
+                          ? prev
+                          : [...prev, selectedInscription]
+                      );
+                      setSelectedInscription(null);
+                    }}
+                    className="px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded"
+                  >
+                    Combine
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => handleClick(selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi", "stabilize", selectedInscription.seed)}
+                    className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded"
+                  >
+                    Stabilize
+                  </button>
+                  <button
+                    onClick={() => handleClick(selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi", "destabilize", selectedInscription.seed)}
+                    className="px-4 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
+                  >
+                    Re-roll
+                  </button>
+                  <button
+  onClick={() => {
+    setCombineMode(true);
+    setCombineList([selectedInscription]); // Start with selected inscription
+    setSelectedInscription(null);
+  }}
+  className="px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded"
+>
+  Combine
+</button>
+
+                </>
+              )}
+            </div>
+            <button
+              onClick={() => setSelectedInscription(null)}
+              className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+        <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="border rounded-full py-2 px-4 text-sm inline-block hover:bg-gray-100 mt-10">
+          Join the Telegram <span className="ml-2 inline-block">↗</span>
+        </a>
+      </div>
+    </>
+  );
+}
