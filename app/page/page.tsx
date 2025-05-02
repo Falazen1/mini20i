@@ -3,17 +3,17 @@
 import { useEffect, useState } from "react";
 import { useAccount, useConnect } from "wagmi";
 import { readContract } from "@wagmi/core";
-import { config } from "../helpers/wagmiConfig";
-import abis from "../helpers/abi";
-import tokens from "../helpers/tokens.json";
-import { TELEGRAM_URL } from "../helpers/constants";
-import Topnav from "../components/Topnav";
-import { getFunctionNames } from "../helpers/abi/mapping";
-import { type Seed } from "../helpers/types";
-import { useTransaction } from "../helpers/useTransaction";
+import { config } from "../../helpers/wagmiConfig";
+import abis from "../../helpers/abi";
+import tokens from "../../helpers/tokens.json";
+import { TELEGRAM_URL } from "../../helpers/constants";
+import Topnav from "../../components/Topnav";
+import { getFunctionNames } from "../../helpers/abi/mapping";
+import { type Seed } from "../../helpers/types";
+import { useTransaction } from "../../helpers/useTransaction";
 import { Address } from "viem";
-import { useTokenStore } from "../helpers/useTokenStore";
-import SwapModal from "../components/SwapModal";
+import { useTokenStore } from "../../helpers/useTokenStore";
+import SwapModal from "../../components/SwapModal";
 import Image from "next/image";
 
 type Inscription = {
