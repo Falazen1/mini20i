@@ -94,7 +94,7 @@ export default function HomeToken() {
   }, [tokenStore]);
 
   useEffect(() => {
-    tokenStore.init(address ?? addressInput);
+    tokenStore.init();
   }, [address, addressInput, tokenStore]);
 
   return (

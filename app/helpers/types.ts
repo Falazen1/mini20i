@@ -13,7 +13,7 @@ export type Inscription = {
   svg: string
   animatedSvg?: string
   seed: Seed
-  meta: Record<string, any>
+  meta: Record<string, unknown>
 }
 
 export type SeedNoBigint = {

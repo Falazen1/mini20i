@@ -11,19 +11,23 @@ import { createInscriptionReader } from "./useInscription";
 import { tokenRef } from "./useTransaction";
 import type { Inscription } from "./types";
 
-// 👇 Define or import this if you haven't already
-type TokenKey = "froggi" | "fungi" | "pepi";
+export type TokenKey = "froggi" | "fungi" | "pepi";
 
-type TokenInfo = {
+export type TokenInfo = {
   name: string;
-  address: string;
   symbol: string;
-  banner: string;
   logo: string;
+  banner: string;
   about: string;
+  address: `0x${string}`;
   key: TokenKey;
   decimals: number;
+  website?: string;
+  twitter?: string;
+  telegram?: string;
+  pairAddress?: `0x${string}`;
 };
+
 
 
 
@@ -75,6 +79,11 @@ export function useTokenStore() {
     }
   }
 
+  function init() {
+    // legacy stub — no-op
+  }
+  
+  
   return {
     inscriptions,
     balanceUnits,
@@ -85,5 +94,7 @@ export function useTokenStore() {
     tokenAddress,
     tokenDecimals,
     setTokenByKey,
+    init, // <-- add this line
   };
+  
 }

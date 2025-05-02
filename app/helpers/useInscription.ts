@@ -5,8 +5,9 @@ import { type Address } from "viem";
 import { config } from "./wagmiConfig";
 import { type Seed, type Inscription } from "./types";
 import { getFunctionNames } from "./abi/mapping";
+import { Abi } from "viem";
 
-export function createInscriptionReader(tokenAddress: Address, abi: any, tokenKey: string) {
+export function createInscriptionReader(tokenAddress: Address, abi: Abi, tokenKey: string) {
   const functionNames = getFunctionNames(tokenKey);
 
   async function getInscription(seed: Seed): Promise<Inscription> {
@@ -81,7 +82,7 @@ export function createInscriptionReader(tokenAddress: Address, abi: any, tokenKe
       )
     );
 
-    const normalizedSeeds = seeds.map((s) => ({
+    const normalizedSeeds: Seed[] & { isDynamic?: boolean }[] = seeds.map((s) => ({
       seed: s.seed,
       seed2: s.seed2,
       extra: s.extra,

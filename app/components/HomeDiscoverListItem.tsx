@@ -19,7 +19,14 @@ type Props = {
 };
 
 export default function HomeDiscoverListItem({ token }: Props) {
-  const [tokenPair, setTokenPair] = useState<any>(null);
+  type TokenPair = {
+    priceUsd: string;
+    priceChange: {
+      h6: number;
+    };
+  };
+
+  const [tokenPair, setTokenPair] = useState<TokenPair | null>(null);
 
   useEffect(() => {
     async function fetchPrice() {
