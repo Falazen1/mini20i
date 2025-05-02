@@ -15,7 +15,7 @@ export function Providers(props: { children: ReactNode }) {
           mode: "auto",
           theme: "mini-app-theme",
           name: "Mini20i",
-          logo: "https://froggi.app/logo.png",
+          logo: "./logo.png",
         },
       }}
     >
