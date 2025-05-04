@@ -345,7 +345,7 @@ useEffect(() => {
       playsInline
       className="w-full h-full object-cover absolute inset-0 z-0"
     >
-      <source src="/aidos_head.MP4" type="video/mp4" />
+      <source src="https://github.com/Falazen1/mini20i/raw/refs/heads/main/public/aidos_head.mp4" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
     <div className="relative z-10 text-white text-center px-6">
