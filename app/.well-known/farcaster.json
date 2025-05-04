@@ -1,9 +1,0 @@
-{
-    "name": "Mini 20i",
-    "description": "View, manage, and swap Base inscription tokens.",
-    "icon": "https://mini20i.vercel.app/logo.png",
-    "website": "https://mini20i.vercel.app",
-    "requestedPermissions": ["wallet_address"],
-    "redirectUrls": ["https://mini20i.vercel.app"]
-  }
-  
