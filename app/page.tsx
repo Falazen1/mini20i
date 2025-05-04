@@ -212,7 +212,7 @@ useEffect(() => {
     <>
       {isProcessing && (
         <div className="fixed inset-0 z-[9999] bg-black bg-opacity-70 flex items-center justify-center">
-          <div className="bg-white px-6 py-4 rounded shadow text-center text-lg">Processing transaction...</div>
+          <div className="bg-white px-6 py-4 rounded shadow text-center text-lg text-black">Processing transaction...</div>
         </div>
       )}
       {successMessage && (
@@ -222,7 +222,7 @@ useEffect(() => {
       )}
 {combineMode && (
   <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 overflow-auto">
-    <div className="bg-white rounded-lg p-6 shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+  <div className="bg-[#1c1e24] border border-white/10 rounded-xl shadow-xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto text-white">
       <h2 className="text-lg font-semibold mb-4">Select Inscriptions to Combine</h2>
       <p className="text-sm mb-2">Select at least 2 stable inscriptions to enable combination.</p>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
@@ -247,7 +247,8 @@ useEffect(() => {
                   )
                 }
                 className={`border rounded shadow p-2 bg-white cursor-pointer ${
-                  isSelected ? "ring-2 ring-blue-500" : ""
+                  isSelected ? "ring-4 ring-blue-500 shadow-[0_0_0_2px_rgba(96,165,250,0.7)]" : ""
+
                 }`}
               >
                 <div
@@ -455,8 +456,19 @@ useEffect(() => {
     </button>
   </div>
 
-  {(activeInfo === `progression-${token.key}` || activeInfo === `levels-${token.key}`) && (
-    <div className="bg-gray-50 border border-gray-200 rounded p-4 text-sm text-gray-700 leading-relaxed space-y-1">
+{(activeInfo === `progression-${token.key}` || activeInfo === `levels-${token.key}`) && (
+  <div
+    onClick={() => setActiveInfo(null)}
+    className="relative z-20"
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className={`bg-gray-50 border border-gray-200 rounded p-4 text-sm text-gray-700 leading-relaxed space-y-1 ${
+        activeInfo === `progression-${token.key}` || activeInfo === `levels-${token.key}`
+          ? "animate-fade-in"
+          : "animate-fade-out"
+      }`}      
+    >
       {(() => {
         const raw = {
           "progression-fungi": `6 levels of $Fungi as your spore grows into a full fungi! Holding more tokens means more mycelium and an even mightier mushroom!`,
@@ -503,58 +515,67 @@ useEffect(() => {
         ));
       })()}
     </div>
-  )}
+  </div>
+)}
+
+
 </div>
 
 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
   {(inscriptions[token.key] || []).map((inscription) => {
     const isSelected = combineList.some(i => i.id === inscription.id);
     return (
-      <div
-        key={inscription.id}
-        onClick={() => {
-          if (combineMode && inscription.type === "Stable") {
-            setCombineList((prev) =>
-              prev.some((i) => i.id === inscription.id)
-                ? prev.filter((i) => i.id !== inscription.id)
-                : [...prev, inscription]
-            );
-          } else {
-            setSelectedInscription(inscription);
-          }
-        }}
-        className={`border rounded shadow p-3 bg-white cursor-pointer ${
-          isSelected ? "ring-2 ring-blue-500" : ""
-        }`}
-      >
-        <div
-          className="w-full aspect-square mb-2"
-          dangerouslySetInnerHTML={{ __html: inscription.svg }}
-        />
-        <div className="text-xs text-gray-400">Type: {inscription.type}</div>
-        <div className="text-xs text-gray-400">Tokens: {inscription.seed}</div>
-      </div>
+<div
+  key={inscription.id}
+  onClick={() => {
+    if (combineMode && inscription.type === "Stable") {
+      setCombineList((prev) =>
+        prev.some((i) => i.id === inscription.id)
+          ? prev.filter((i) => i.id !== inscription.id)
+          : [...prev, inscription]
+      );
+    } else {
+      setSelectedInscription(inscription);
+    }
+  }}
+  className={`bg-[#1c1e24] border border-white/10 rounded-xl shadow-md p-3 cursor-pointer transition hover:scale-[1.02] hover:ring-1 hover:ring-white/20 ${
+    isSelected ? "ring-2 ring-purple-400" : ""
+  }`}
+>
+  <div
+    className="w-full aspect-square mb-2 rounded overflow-hidden bg-black"
+    dangerouslySetInnerHTML={{ __html: inscription.svg }}
+  />
+  <div className="text-xs text-white/80">Type: {inscription.type}</div>
+  <div className="text-xs text-white/80">Tokens: {inscription.seed}</div>
+</div>
+
     );
   })}
 
 <div className={`transition-opacity duration-700 ${showTokenSwap ? "opacity-100" : "opacity-0"}`}>
   <div
-    className="border rounded shadow p-3 bg-white relative cursor-pointer hover:opacity-90 transition"
+    className="bg-[#1c1e24] border border-white/10 rounded-xl shadow-md p-3 cursor-pointer transition hover:scale-[1.02] hover:ring-1 hover:ring-white/20"
     onClick={() => {
       setIsSwapOpen(true);
       setSwapTokenKey(token.key as "froggi" | "fungi" | "pepi");
     }}
   >
-    <div className="w-full aspect-square relative">
+    <div className="w-full aspect-square relative rounded overflow-hidden bg-black">
       <Image
         src={`${token.buyImage}`}
         alt={`${token.name} buy more`}
         fill
-        className="object-contain opacity-60 hover:opacity-90 transition"
+        className="object-contain hover:opacity-90 transition"
       />
     </div>
+    <div className="text-xl text-white/0 mt-2 mb-[10px] text-center font-medium tracking-wide">
+  SWAP FOR MORE
+</div>
+
   </div>
 </div>
+
 
 </div>
 
@@ -565,14 +586,14 @@ useEffect(() => {
 
     {selectedInscription && (
       <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 shadow-lg max-w-lg w-full">
+  <div className="bg-[#1c1e24] border border-white/10 rounded-xl shadow-xl p-6 max-w-lg w-full text-white">
           <div className="flex justify-between mb-4">
             <h2 className="text-xl font-semibold">Inscription Detail</h2>
             <button onClick={() => setSelectedInscription(null)}>✕</button>
           </div>
           <div className="w-full aspect-square mb-4" dangerouslySetInnerHTML={{ __html: selectedInscription.svg }} />
-          <div className="text-sm text-gray-600 mb-2"><span className="font-semibold">Seed:</span> {selectedInscription.seed}</div>
-          <div className="text-sm text-gray-600 mb-4"><span className="font-semibold">Type:</span> {selectedInscription.type}</div>
+          <div className="text-sm text-white/90 mb-2"><span className="font-semibold">Seed:</span> {selectedInscription.seed}</div>
+          <div className="text-sm text-white/90 mb-4"><span className="font-semibold">Type:</span> {selectedInscription.type}</div>
           <div className="flex flex-row justify-between items-end mt-4 gap-3">
             <div className="flex gap-3 flex-wrap">
               {selectedInscription.type === "Stable" ? (

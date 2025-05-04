@@ -72,36 +72,39 @@ export default function SwapModal({
 
   return (
     <div className="fixed inset-0 z-[9999] bg-black bg-opacity-70 flex items-center justify-center">
-      <div className="bg-white rounded-lg p-6 shadow-lg w-full max-w-md relative">
+      <div className="relative bg-[#1c1e24] rounded-xl shadow-2xl p-6 w-full max-w-md text-white border border-white/10">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-black"
+          className="absolute top-3 right-3 text-white text-xl hover:text-red-400"
         >
           ✕
         </button>
 
-        <h3 className="text-lg font-semibold mb-4 text-center">
-          Swap ETH → {token.name}
-        </h3>
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          Swap ETH → {token.symbol}
+        </h2>
 
         <OnchainKitProvider
           apiKey="3KA49gYhtfR0hrw5L7L0nPVYlO1z4tyE"
           chain={base}
           config={{
             appearance: {
-              mode: "auto",
+              mode: "dark",
               theme: "default",
               name: "Mini20i",
-              logo: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/main/logo512.png",
+              logo:
+                "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/main/logo512.png",
             },
           }}
         >
           <Swap>
-            <SwapAmountInput label="Sell" token={ethBase} type="from" />
-            <SwapAmountInput label="Buy" token={token} type="to" />
-            <SwapButton />
-            <SwapMessage />
-            <SwapToast />
+            <div className="space-y-4">
+              <SwapAmountInput label="From" token={ethBase} type="from" />
+              <SwapAmountInput label="To" token={token} type="to" />
+              <SwapButton />
+              <SwapMessage />
+              <SwapToast />
+            </div>
           </Swap>
         </OnchainKitProvider>
       </div>
