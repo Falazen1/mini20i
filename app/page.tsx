@@ -459,11 +459,12 @@ export default function Page() {
 >
   <div className="w-full aspect-square relative">
   <Image
-  src={token.buyImage || "/default-image.jpg"}
+  src={`/${token.buyImage}`}
   alt={`${token.name} buy more`}
   fill
   className="object-contain opacity-60 hover:opacity-80 transition"
 />
+
 
   </div>
 </div>
