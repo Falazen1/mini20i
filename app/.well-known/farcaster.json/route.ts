@@ -8,13 +8,13 @@ export async function GET() {
   frame: {
     version: "next",
     name: "Mini20i",
-    homeUrl: "https://mini20i.vercel.app",
-    iconUrl: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
-    imageUrl: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
+    homeUrl: "mini20i.vercel.app",
+    iconUrl: "raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
+    imageUrl: "raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
     buttonTitle: "Launch Mini20i",
-    splashImageUrl: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
+    splashImageUrl: "raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
     splashBackgroundColor: "#282c34",
-    webhookUrl: "https://mini20i.vercel.app/api/webhook"
+    webhookUrl: "mini20i.vercel.app/api/webhook"
   }
 });
 }
