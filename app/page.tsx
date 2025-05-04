@@ -459,7 +459,7 @@ useEffect(() => {
     <div className="bg-gray-50 border border-gray-200 rounded p-4 text-sm text-gray-700 leading-relaxed space-y-1">
       {(() => {
         const raw = {
-          "progression-fungi": `5 levels of Fungi as your spore grows into a mighty mushroom, holding more tokens means more mycelium and larger mushrooms!`,
+          "progression-fungi": `6 levels of $Fungi as your spore grows into a full fungi! Holding more tokens means more mycelium and an even mightier mushroom!`,
           "levels-fungi": [
             ["Level 0", "1 - 20,999"],
             ["Level 1", "0.01% - 21,000"],
@@ -468,7 +468,7 @@ useEffect(() => {
             ["Level 4", "0.75% - 1,575,000"],
             ["Level 5", "1.00% - 2,100,000+"],
           ],
-          "progression-froggi": `7 tiers of Froggi from colorful eggs to fully decked out denizens. Holding more tokens evolves your egg, with more trait combinations unlocking at higher levels.`,
+          "progression-froggi": `7 tiers of $Froggi from colorful eggs to fully decked out denizens. Holding more tokens evolves your egg, with more trait combinations unlocking at higher levels.`,
           "levels-froggi": [
             ["Level 0", "999 tokens or less"],
             ["Level 1", "1,000+ tokens"],
@@ -478,7 +478,7 @@ useEffect(() => {
             ["Level 5", "60,000+ tokens"],
             ["Level 6", "120,000+ tokens"],
           ],
-          "progression-pepi": `6 levels of Pepi let you see your Pepi grow from egg cluster, to tadpole, to fully mature. Each tier of Pepi offers a unique stage of growth for your inscription.`,
+          "progression-pepi": `6 levels of $Pepi let you see your Pepi grow from egg cluster, to tadpole, to fully mature. Each tier of Pepi offers a unique stage of growth for your inscription.`,
           "levels-pepi": [
             ["Level 1", "1–10 tokens"],
             ["Level 2", "11–21 tokens"],
