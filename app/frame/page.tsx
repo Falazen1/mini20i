@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server';
+// app/frame/page.tsx
+export const dynamic = 'force-dynamic';
 
-export async function GET() {
-  return new NextResponse(`
-    <!DOCTYPE html>
+export default function FramePage() {
+  return (
     <html>
       <head>
-        <meta property="og:title" content="Swap Inscriptions" />
+        <meta property="og:title" content="Swap Base Inscriptions" />
         <meta property="og:image" content="https://mini20i.vercel.app/logo.png" />
         <meta name="fc:frame" content="vNext" />
         <meta name="fc:frame:image" content="https://mini20i.vercel.app/logo.png" />
@@ -14,9 +14,5 @@ export async function GET() {
       </head>
       <body></body>
     </html>
-  `, {
-    headers: {
-      'Content-Type': 'text/html',
-    },
-  });
+  );
 }
