@@ -38,7 +38,27 @@ export default function Page() {
   const [activeInfo, setActiveInfo] = useState<string | null>(null);
   const [isSwapOpen, setIsSwapOpen] = useState(false);
   const [swapTokenKey, setSwapTokenKey] = useState<"froggi" | "fungi" | "pepi" | null>(null);
-  
+  const [showVideo, setShowVideo] = useState(true);
+  const [showMiniKit, setShowMiniKit] = useState(false);
+const [showDescription, setShowDescription] = useState(false);
+const [showBanners, setShowBanners] = useState(false);
+const [showTokens, setShowTokens] = useState(false);
+const [showTokenSwap, setShowTokenSwap] = useState(false);
+
+useEffect(() => {
+  if (address) {
+    setTimeout(() => setShowMiniKit(true), 100); // MiniKit
+    setTimeout(() => setShowDescription(true), 700); // Description
+    setTimeout(() => setShowTokens(true), 1400); // Rest of content
+    setTimeout(() => setShowBanners(true), 1400); // Rest of content
+    setTimeout(() => setShowTokenSwap(true), 2000); // Rest of content
+  }
+}, [address]);
+
+useEffect(() => {
+  if (address) setTimeout(() => setShowVideo(false), 1000);
+}, [address]);
+
   useEffect(() => {
     if (!address) return;
 
@@ -215,7 +235,7 @@ export default function Page() {
                   className="aspect-square w-full mb-1"
                   dangerouslySetInnerHTML={{ __html: insc.svg }}
                 />
-                <div className="text-xs text-gray-400">Seed: {insc.seed}</div>
+                <div className="text-xs text-gray-400">Tokens: {insc.seed}</div>
               </div>
             );
           })}
@@ -265,15 +285,23 @@ export default function Page() {
   />
 )}
 
-      <Topnav />
+<div className={`transition-opacity duration-700 ${showMiniKit ? "opacity-100" : "opacity-0"}`}>
+  <Topnav />
+</div>
+
       <div className="px-4 max-w-6xl mx-auto mb-28">
-        <div className="text-center px-4 mt-10 mb-4">
-          <h1 className="text-4xl font-semibold">Mini 20i</h1>
-          <p className="text-sm text-gray-600 mt-1">View, manage, and swap Inscriptions</p>
-        </div>
+      <div className="relative w-full flex justify-center px-4 mt-10 mb-4">
+  <div className="absolute inset-0 top-[-20px] bottom-[-164px] w-full bg-gradient-to-b from-[#1c1e24]/80 via-[#15171c]/70 to-transparent shadow-[inset_0_20px_40px_rgba(0,0,0,0.5)] z-0 rounded" />
+  <div className={`text-center z-10 transition-opacity duration-700 ${showDescription ? "opacity-100" : "opacity-0"}`}>
+    <h1 className="text-4xl font-semibold">Mini 20i</h1>
+    <p className="text-sm text-white-600 mt-1">View, manage, and swap Inscriptions</p>
+  </div>
+</div>
+
+
 
         <div className="flex flex-col items-center gap-2 mb-6">
-          <p className="text-lg text-gray-700 font-semibold mb-2">
+          <p className="text-lg text-white font-semibold mb-2 z-10">
             {activeFilter === "all" ? "All" : `$${activeToken?.name}`}
           </p>
 
@@ -304,20 +332,37 @@ export default function Page() {
               );
             })}
 
-            {!address && (
-              <div className="absolute z-[9999] bg-black bg-opacity-70 -top-16 -bottom-4 -left-4 -right-4 flex items-center justify-center text-white text-center px-4 transform translate-y-6">
-                <div
-                  className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition"
-                  onClick={() => connect({ connector: connectors[0] })}
-                >
-                  <p className="text-lg font-semibold mb-2">Wallet Required</p>
-                  <p className="text-sm">Click here to connect your wallet.</p>
-                </div>
-              </div>
-            )}
+{!address || showVideo ? (
+  <div
+    className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ${
+      address ? "opacity-0 pointer-events-none" : "opacity-100"
+    }`}
+  >
+    <video
+      autoPlay
+      loop
+      muted
+      playsInline
+      className="w-full h-full object-cover absolute inset-0 z-0"
+    >
+      <source src="/aidos_head.MP4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+    <div className="relative z-10 text-white text-center px-6">
+      <div
+        className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
+        onClick={() => connect({ connector: connectors[0] })}
+      >
+        <p className="text-lg font-semibold mb-2">Wallet Required</p>
+        <p className="text-sm">Click here to connect your wallet.</p>
+      </div>
+    </div>
+  </div>
+) : null}
+
           </div>
 
-          <p className="text-sm text-gray-600 text-center max-w-xl mt-2">
+          <p className="text-sm text-white-600 text-center max-w-xl mt-4">
             {activeFilter === "all"
               ? "Browse all your Inscriptions or select by project"
               : activeToken?.about}
@@ -330,19 +375,30 @@ export default function Page() {
               .filter((token) => activeFilter === "all" || token.key === activeFilter)
               .map((token) => (
                 <div key={token.key}>
-                  {activeFilter === "all" && (
-                    <h3 className="text-xl font-semibold mt-6">{token.name}</h3>
-                  )}
-<Image
-  src={token.banner}
-  alt={`${token.name} banner`}
-  width={1024}
-  height={360}
-  className="w-full max-h-[420px] md:max-h-[360px] object-contain rounded shadow mt-3 cursor-pointer"
-/>
+<div className="relative w-screen left-1/2 right-1/2 -mx-[50vw] px-4 sm:px-8 pb-2">
+<div className="absolute inset-0 bottom-[-8px] top-[-12px] bg-gradient-to-b from-[#1c1e24]/80 via-[#15171c]/70 to-transparent shadow-[inset_0_20px_40px_rgba(0,0,0,0.5)]" />
+
+  <div className="relative z-10">
+    {activeFilter === "all" && (
+      <h3 className="text-xl font-semibold mt-6">{token.name}</h3>
+    )}
+    <div className={`transition-opacity duration-700 ${showBanners ? "opacity-100" : "opacity-0"}`}>
+      <Image
+        src={token.banner}
+        alt={`${token.name} banner`}
+        width={1024}
+        height={360}
+        className="w-full max-h-[420px] md:max-h-[360px] object-contain rounded shadow mt-3 cursor-pointer"
+      />
+    </div>
+  </div>
+</div>
+
+
 
 <div className="mt-4">
-  <div className="flex gap-3 mb-2">
+<div className={`flex gap-3 mb-2 transition-opacity duration-700 ${showTokens ? "opacity-100" : "opacity-0"}`}>
+
     <button
       onClick={() =>
         setActiveInfo((prev) =>
@@ -447,25 +503,24 @@ export default function Page() {
     );
   })}
 
-<div
-  className="border rounded shadow p-3 bg-white relative cursor-pointer hover:opacity-80 transition"
-  onClick={() => {
-    setIsSwapOpen(true);
-    setSwapTokenKey(token.key as "froggi" | "fungi" | "pepi");
-  }}
->
-  <div className="w-full aspect-square relative">
-  <Image
-  src={`${token.buyImage}`}
-  alt={`${token.name} buy more`}
-  fill
-  className="object-contain opacity-60 hover:opacity-80 transition"
-/>
-
-
+<div className={`transition-opacity duration-700 ${showTokenSwap ? "opacity-100" : "opacity-0"}`}>
+  <div
+    className="border rounded shadow p-3 bg-white relative cursor-pointer hover:opacity-90 transition"
+    onClick={() => {
+      setIsSwapOpen(true);
+      setSwapTokenKey(token.key as "froggi" | "fungi" | "pepi");
+    }}
+  >
+    <div className="w-full aspect-square relative">
+      <Image
+        src={`${token.buyImage}`}
+        alt={`${token.name} buy more`}
+        fill
+        className="object-contain opacity-60 hover:opacity-90 transition"
+      />
+    </div>
   </div>
 </div>
-
 
 </div>
 
