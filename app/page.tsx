@@ -459,7 +459,7 @@ export default function Page() {
 >
   <div className="w-full aspect-square relative">
   <Image
-  src={`/Froggi_buy_more_1.png`.replace("Froggi", token.name)}
+  src={token.buyImage || "/default-image.jpg"}
   alt={`${token.name} buy more`}
   fill
   className="object-contain opacity-60 hover:opacity-80 transition"
