@@ -1,25 +1,34 @@
+// app/providers.tsx
 "use client";
 
-import { type ReactNode } from "react";
-import { base } from "wagmi/chains";
-import { MiniKitProvider } from "@coinbase/onchainkit/minikit";
+import { PropsWithChildren } from "react";
+import { config } from "../app/helpers/wagmiConfig";
+import { WagmiProvider } from "wagmi";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { OnchainKitProvider } from "@coinbase/onchainkit";
+import { base } from "viem/chains";
 
-export function Providers(props: { children: ReactNode }) {
+const queryClient = new QueryClient();
+
+export function Providers({ children }: PropsWithChildren) {
   return (
-    <MiniKitProvider
-      projectId="8db55de0-70b8-44fa-8bc0-f8c6dda24ed6"
-      apiKey="7c181787-70f4-44ef-972d-5bc3c3ed2bde"
-      chain={base}
-      config={{
-        appearance: {
-          mode: "auto",
-          theme: "mini-app-theme",
-          name: "Mini20i",
-          logo: "https://froggi.app/logo.png",
-        },
-      }}
-    >
-      {props.children}
-    </MiniKitProvider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <OnchainKitProvider
+          apiKey="e1a10bfd-a677-4efd-9fe1-88c400e9587b"
+          chain={base}
+          config={{
+            appearance: {
+              name: "Mini20i",
+              logo: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/frog-token.png",
+              theme: "default",
+              mode: "auto",
+            },
+          }}
+        >
+          {children}
+        </OnchainKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }

@@ -1,37 +1,53 @@
 "use client";
 
-import { useState } from "react";
 import { useAccount } from "wagmi";
-import tokens from "../helpers/tokens.json";
+import { useState, useEffect } from "react";
 import { Token } from "@coinbase/onchainkit/token";
 import {
   Swap,
   SwapAmountInput,
   SwapButton,
   SwapMessage,
-  SwapToggleButton,
+  SwapToast,
 } from "@coinbase/onchainkit/swap";
+import { OnchainKitProvider } from "@coinbase/onchainkit";
+import { base } from "viem/chains";
 
-const ETHToken: Token = {
-  address: "0x0000000000000000000000000000000000000000",
-  chainId: 8453,
-  decimals: 18,
-  name: "Ether",
+const ethBase: Token = {
+  name: "Ethereum",
+  address: "",
   symbol: "ETH",
-  image:
-    "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/baseeth_logo.png",
-};
-
-const USDCToken: Token = {
-  address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  decimals: 18,
+  image: "https://wallet-api-production.s3.amazonaws.com/uploads/tokens/eth_288.png",
   chainId: 8453,
-  decimals: 6,
-  name: "USDc",
-  symbol: "USDc",
-  image: "https://basescan.org/token/images/centre-usdc_28.png",
 };
 
-const extraTokens: Token[] = [ETHToken, USDCToken];
+const TOKENS: Record<"froggi" | "fungi" | "pepi", Token> = {
+  froggi: {
+    name: "Froggi",
+    address: "0x88A78C5035BdC8C9A8bb5c029e6cfCDD14B822FE",
+    symbol: "FROGGI",
+    decimals: 9,
+    chainId: 8453,
+    image: "https://d38ulo0p1ibxtf.cloudfront.net/fit-in/2560x1600/companies/4616/websites/images/original_image_34477546-d02c-4110-915a-26ab6914bcc3.png",
+  },
+  fungi: {
+    name: "Fungi",
+    address: "0x7d9ce55d54ff3feddb611fc63ff63ec01f26d15f",
+    symbol: "FUNGI",
+    decimals: 9,
+    chainId: 8453,
+    image: "https://www.dextools.io/resources/tokens/logos/base/0x7d9ce55d54ff3feddb611fc63ff63ec01f26d15f.png?1711917415936",
+  },
+  pepi: {
+    name: "Pepi",
+    address: "0x28a5e71BFc02723eAC17E39c84c5190415C0de9F",
+    symbol: "PEPI",
+    decimals: 9,
+    chainId: 8453,
+    image: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/pepi_logo.jpg",
+  },
+};
 
 export default function SwapModal({
   tokenKey,
@@ -41,21 +57,18 @@ export default function SwapModal({
   onClose: () => void;
 }) {
   const { address } = useAccount();
-  const [isPending, setIsPending] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [isError, setIsError] = useState(false);
+  const token = TOKENS[tokenKey];
+  const [debounced, setDebounced] = useState(false);
 
-  const buyToken = tokens.find((t) => t.key === tokenKey);
-  if (!buyToken || !address) return null;
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(true), 500);
+    return () => {
+      setDebounced(false);
+      clearTimeout(timer);
+    };
+  }, [tokenKey]);
 
-  const buyTokenObj: Token = {
-    address: buyToken.address as `0x${string}`,
-    chainId: 8453,
-    decimals: buyToken.decimals,
-    name: buyToken.name,
-    symbol: buyToken.symbol,
-    image: buyToken.logo,
-  };
+  if (!address || !token || !debounced) return null;
 
   return (
     <div className="fixed inset-0 z-[9999] bg-black bg-opacity-70 flex items-center justify-center">
@@ -66,54 +79,31 @@ export default function SwapModal({
         >
           ✕
         </button>
-        <h3 className="text-lg font-semibold mb-4 text-center">
-          Swap for {buyToken.name}
-        </h3>
-        <Swap>
-          <SwapAmountInput
-            label="Sell"
-            swappableTokens={[...extraTokens, buyTokenObj]}
-            token={ETHToken}
-            type="from"
-          />
-          <SwapToggleButton />
-          <SwapAmountInput
-            label="Buy"
-            swappableTokens={[...extraTokens, buyTokenObj]}
-            token={buyTokenObj}
-            type="to"
-          />
-          <div
-            onClick={() => {
-              setIsPending(true);
-              setIsSuccess(false);
-              setIsError(false);
-              setTimeout(() => {
-                setIsPending(false);
-                setIsSuccess(true);
-              }, 2000); // fake tx time
-            }}
-          >
-            <SwapButton />
-          </div>
-          <SwapMessage className="text-red-600" />
-        </Swap>
 
-        {isPending && (
-          <p className="text-center text-sm text-gray-600 mt-4">
-            Transaction pending...
-          </p>
-        )}
-        {isSuccess && (
-          <p className="text-center text-green-600 mt-4 font-semibold">
-            Swap successful!
-          </p>
-        )}
-        {isError && (
-          <p className="text-center text-red-600 mt-4">
-            Something went wrong.
-          </p>
-        )}
+        <h3 className="text-lg font-semibold mb-4 text-center">
+          Swap ETH → {token.name}
+        </h3>
+
+        <OnchainKitProvider
+          apiKey="3KA49gYhtfR0hrw5L7L0nPVYlO1z4tyE"
+          chain={base}
+          config={{
+            appearance: {
+              mode: "auto",
+              theme: "default",
+              name: "Mini20i",
+              logo: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/main/logo512.png",
+            },
+          }}
+        >
+          <Swap>
+            <SwapAmountInput label="Sell" token={ethBase} type="from" />
+            <SwapAmountInput label="Buy" token={token} type="to" />
+            <SwapButton />
+            <SwapMessage />
+            <SwapToast />
+          </Swap>
+        </OnchainKitProvider>
       </div>
     </div>
   );

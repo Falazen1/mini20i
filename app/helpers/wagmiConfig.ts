@@ -3,12 +3,12 @@ import { base } from 'wagmi/chains';
 import { injected, walletConnect, coinbaseWallet } from 'wagmi/connectors';
 import { Buffer } from 'buffer';
 
-export const WC_PROJECT_ID = '9b70fa1fe3feb6b21e9af826661a3e17';
+export const WC_PROJECT_ID = '150a8dd59fc17ad01ad57503669c735f';
 
 export const config = createConfig({
   chains: [base],
   transports: {
-    [base.id]: http('https://base-mainnet.g.alchemy.com/v2/h_Eo8VfIkLqa6vLqzrt023fm073ncKxJ'),
+    [base.id]: http('https://base-mainnet.g.alchemy.com/v2/9qMBmGtkKgEUQkdQlEpq0GhMtfly2mzS'),
   },
   connectors: [
     injected(),

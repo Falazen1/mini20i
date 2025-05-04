@@ -38,6 +38,7 @@ export default function Page() {
   const [activeInfo, setActiveInfo] = useState<string | null>(null);
   const [isSwapOpen, setIsSwapOpen] = useState(false);
   const [swapTokenKey, setSwapTokenKey] = useState<"froggi" | "fungi" | "pepi" | null>(null);
+  
   useEffect(() => {
     if (!address) return;
 
@@ -122,7 +123,14 @@ export default function Page() {
 
   const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi"].includes(t.key));
   const activeToken = visibleTokens.find((t) => t.key === activeFilter);
+  const [mounted, setMounted] = useState(false);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  if (!mounted) return null;
+  
   async function handleClick(
     key: "froggi" | "fungi" | "pepi",
     action: "stabilize" | "destabilize" | "combine",
@@ -452,27 +460,18 @@ onClick={() =>
     setIsSwapOpen(true);
     setSwapTokenKey(token.key as "froggi" | "fungi" | "pepi");
   }}
-  
 >
   <div className="w-full aspect-square relative">
   <Image
-  src={
-    token.key === "pepi"
-      ? "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/pepi_logo.jpg"
-      : token.logo
-  }
-  alt={`${token.name} placeholder`}
+  src={`/Froggi_buy_more_1.png`.replace("Froggi", token.name)}
+  alt={`${token.name} buy more`}
   fill
-  className="object-contain opacity-60"
+  className="object-contain opacity-60 hover:opacity-80 transition"
 />
-    <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-      <div className="text-sm font-medium bg-white/25 backdrop-blur-sm px-3 py-3 rounded text-gray-800 shadow">
-        <div>{inscriptions[token.key]?.length ? "Get more" : "No tokens found!"}</div>
-        <div className="mt-2">Click to swap</div>
-      </div>
-    </div>
+
   </div>
 </div>
+
 
 </div>
 
