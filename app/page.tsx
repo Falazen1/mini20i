@@ -197,11 +197,11 @@ useEffect(() => {
           : action.charAt(0).toUpperCase() + action.slice(1);
 
       setSuccessMessage(`${label} successful.`);
-      setTimeout(() => setSuccessMessage(""), 5000);
+      setTimeout(() => setSuccessMessage(""),4000);
     } catch (e) {
       console.error(e);
       setSuccessMessage("Transaction failed.");
-      setTimeout(() => setSuccessMessage(""), 5000);
+      setTimeout(() => setSuccessMessage(""), 4000);
     } finally {
       setIsProcessing(false);
       setSelectedInscription(null);
