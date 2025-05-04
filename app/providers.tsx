@@ -15,7 +15,7 @@ export function Providers({ children }: PropsWithChildren) {
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <OnchainKitProvider
-          apiKey="e1a10bfd-a677-4efd-9fe1-88c400e9587b"
+          apiKey="3KA49gYhtfR0hrw5L7L0nPVYlO1z4tyE"
           chain={base}
           config={{
             appearance: {

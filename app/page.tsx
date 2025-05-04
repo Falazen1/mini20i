@@ -148,6 +148,25 @@ useEffect(() => {
   useEffect(() => {
     setMounted(true);
   }, []);
+  useEffect(() => {
+    const vid = document.getElementById("glitch-video") as HTMLVideoElement | null;
+    if (!vid) return;
+  
+    vid.playbackRate = 0.5; // play slowly
+  
+    const glitchInterval = setInterval(() => {
+      if (!vid || vid.paused || vid.readyState < 2) return;
+  
+      const shouldGlitch = Math.random() < 0.5; // 5% chance
+      if (shouldGlitch) {
+        const duration = vid.duration;
+        const jumpTime = Math.random() * duration;
+        vid.currentTime = jumpTime;
+      }
+    }, 500); // check every 0.5s
+  
+    return () => clearInterval(glitchInterval);
+  }, []);
   
   if (!mounted) return null;
   
@@ -291,12 +310,26 @@ useEffect(() => {
 
       <div className="px-4 max-w-6xl mx-auto mb-28">
       <div className="relative w-full flex justify-center px-4 mt-10 mb-4">
-  <div className="absolute inset-0 top-[-20px] bottom-[-164px] w-full bg-gradient-to-b from-[#1c1e24]/80 via-[#15171c]/70 to-transparent shadow-[inset_0_20px_40px_rgba(0,0,0,0.5)] z-0 rounded" />
+      <div className="absolute inset-0 top-[-20px] bottom-[-170px] w-full z-0 overflow-hidden rounded-xl shadow-[0_0_80px_rgba(0,0,0,0.6)] backdrop-blur-md ring-1 ring-white/10">
+
+    <video
+      id="glitch-video"
+      autoPlay
+      loop
+      muted
+      playsInline
+      className="absolute inset-0 w-full h-full object-cover opacity-40"
+    >
+      <source src="/aidos_head.mp4" type="video/mp4" />
+    </video>
+    <div className="absolute inset-0 bg-gradient-to-b from-[#1c1e24]/80 via-[#15171c]/70 to-transparent shadow-[inset_0_20px_40px_rgba(0,0,0,0.5)]" />
+  </div>
   <div className={`text-center z-10 transition-opacity duration-700 ${showDescription ? "opacity-100" : "opacity-0"}`}>
     <h1 className="text-4xl font-semibold">Mini 20i</h1>
     <p className="text-sm text-white-600 mt-1">View, manage, and swap Inscriptions</p>
   </div>
 </div>
+
 
 
 
@@ -362,9 +395,9 @@ useEffect(() => {
 
           </div>
 
-          <p className="text-sm text-white-600 text-center max-w-xl mt-4">
+          <p className="text-sm text-white-600 text-center max-w-xl mt-1 z-10">
             {activeFilter === "all"
-              ? "Browse all your Inscriptions or select by project"
+              ? "Browse your Inscriptions or select by project"
               : activeToken?.about}
           </p>
         </div>
@@ -376,7 +409,7 @@ useEffect(() => {
               .map((token) => (
                 <div key={token.key}>
 <div className="relative w-screen left-1/2 right-1/2 -mx-[50vw] px-4 sm:px-8 pb-2">
-<div className="absolute inset-0 bottom-[-8px] top-[-12px] bg-gradient-to-b from-[#1c1e24]/80 via-[#15171c]/70 to-transparent shadow-[inset_0_20px_40px_rgba(0,0,0,0.5)]" />
+<div className="absolute inset-0 bottom-[-70px] top-[-12px] bg-gradient-to-b from-[#1c1e24]/80 via-[#15171c]/10 to-transparent shadow-[inset_0_20px_40px_rgba(0,0,0,0.5)]" />
 
   <div className="relative z-10">
     {activeFilter === "all" && (
@@ -397,7 +430,8 @@ useEffect(() => {
 
 
 <div className="mt-4">
-<div className={`flex gap-3 mb-2 transition-opacity duration-700 ${showTokens ? "opacity-100" : "opacity-0"}`}>
+<div className={`flex gap-3 mb-2 transition-opacity duration-700 z-[11] relative ${showTokens ? "opacity-100" : "opacity-0"}`}>
+
 
     <button
       onClick={() =>
