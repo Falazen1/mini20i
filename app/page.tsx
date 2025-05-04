@@ -341,88 +341,84 @@ export default function Page() {
   className="w-full max-h-[420px] md:max-h-[360px] object-contain rounded shadow mt-3 cursor-pointer"
 />
 
-{activeFilter === token.key && (
-  <div className="mt-4">
-    <div className="flex gap-3 mb-2">
-      <button
-onClick={() =>
-  setActiveInfo((prev) =>
-    prev === `progression-${token.key}` ? null : `progression-${token.key}`
-  )
-}
-        className="px-4 py-2 text-sm rounded bg-gray-100 text-gray-800 hover:bg-gray-200 shadow"
-      >
-        Progression
-      </button>
-      <button
-onClick={() =>
-  setActiveInfo((prev) =>
-    prev === `levels-${token.key}` ? null : `levels-${token.key}`
-  )
-}
-        className="px-4 py-2 text-sm rounded bg-gray-100 text-gray-800 hover:bg-gray-200 shadow"
-      >
-        Levels
-      </button>
-    </div>
-
-    {(activeInfo === `progression-${token.key}` || activeInfo === `levels-${token.key}`) && (
-      <div className="bg-gray-50 border border-gray-200 rounded p-4 text-sm text-gray-700 leading-relaxed space-y-1">
-  {(() => {
-    const raw = {
-      "progression-fungi": `5 levels of Fungi as your spore grows into a mighty mushroom, holding more tokens means more spores and larger mushrooms!`,
-      "levels-fungi": [
-        ["Level 0", "1 - 20,999"],
-        ["Level 1", "0.01% - 21,000"],
-        ["Level 2", "0.25% - 525,000"],
-        ["Level 3", "0.50% - 1,050,000"],
-        ["Level 4", "0.75% - 1,575,000"],
-        ["Level 5", "1.00% - 2,100,000+"],
-      ],
-      "progression-froggi": `7 tiers of Froggi from colorful eggs to fully decked out denizens. Holding more tokens evolves your egg, with more trait combinations unlocking at higher levels.`,
-      "levels-froggi": [
-        ["Level 0", "999 tokens or less"],
-        ["Level 1", "1,000+ tokens"],
-        ["Level 2", "3,000+ tokens"],
-        ["Level 3", "10,000+ tokens"],
-        ["Level 4", "30,000+ tokens"],
-        ["Level 5", "60,000+ tokens"],
-        ["Level 6", "120,000+ tokens"],
-      ],
-      "progression-pepi": `6 levels of Pepi let you see your Pepi grow from egg cluster, to tadpole, to fully mature. Each tier of Pepi offers a unique stage of growth for your inscription.`,
-      "levels-pepi": [
-        ["Level 1", "1–10 tokens"],
-        ["Level 2", "11–21 tokens"],
-        ["Level 3", "22–32 tokens"],
-        ["Level 4", "33–43 tokens"],
-        ["Level 5", "44–55 tokens"],
-        ["Level 6", "56+ tokens"],
-      ],
-    };
-
-    const val = raw[activeInfo as keyof typeof raw];
-    if (!val) return null;
-
-    if (typeof val === "string") {
-      return <p>{val}</p>;
-    }
-
-    return val.map(([label, detail], idx) => (
-      <p key={idx}>
-        <span className="font-semibold">{label}</span> – {detail}
-      </p>
-    ));
-  })()}
-</div>
-
-    )}
+<div className="mt-4">
+  <div className="flex gap-3 mb-2">
+    <button
+      onClick={() =>
+        setActiveInfo((prev) =>
+          prev === `progression-${token.key}` ? null : `progression-${token.key}`
+        )
+      }
+      className="px-4 py-2 text-sm rounded bg-gray-100 text-gray-800 hover:bg-gray-200 shadow"
+    >
+      Progression
+    </button>
+    <button
+      onClick={() =>
+        setActiveInfo((prev) =>
+          prev === `levels-${token.key}` ? null : `levels-${token.key}`
+        )
+      }
+      className="px-4 py-2 text-sm rounded bg-gray-100 text-gray-800 hover:bg-gray-200 shadow"
+    >
+      Levels
+    </button>
   </div>
+
+  {(activeInfo === `progression-${token.key}` || activeInfo === `levels-${token.key}`) && (
+    <div className="bg-gray-50 border border-gray-200 rounded p-4 text-sm text-gray-700 leading-relaxed space-y-1">
+      {(() => {
+        const raw = {
+          "progression-fungi": `5 levels of Fungi as your spore grows into a mighty mushroom, holding more tokens means more mycelium and larger mushrooms!`,
+          "levels-fungi": [
+            ["Level 0", "1 - 20,999"],
+            ["Level 1", "0.01% - 21,000"],
+            ["Level 2", "0.25% - 525,000"],
+            ["Level 3", "0.50% - 1,050,000"],
+            ["Level 4", "0.75% - 1,575,000"],
+            ["Level 5", "1.00% - 2,100,000+"],
+          ],
+          "progression-froggi": `7 tiers of Froggi from colorful eggs to fully decked out denizens. Holding more tokens evolves your egg, with more trait combinations unlocking at higher levels.`,
+          "levels-froggi": [
+            ["Level 0", "999 tokens or less"],
+            ["Level 1", "1,000+ tokens"],
+            ["Level 2", "3,000+ tokens"],
+            ["Level 3", "10,000+ tokens"],
+            ["Level 4", "30,000+ tokens"],
+            ["Level 5", "60,000+ tokens"],
+            ["Level 6", "120,000+ tokens"],
+          ],
+          "progression-pepi": `6 levels of Pepi let you see your Pepi grow from egg cluster, to tadpole, to fully mature. Each tier of Pepi offers a unique stage of growth for your inscription.`,
+          "levels-pepi": [
+            ["Level 1", "1–10 tokens"],
+            ["Level 2", "11–21 tokens"],
+            ["Level 3", "22–32 tokens"],
+            ["Level 4", "33–43 tokens"],
+            ["Level 5", "44–55 tokens"],
+            ["Level 6", "56+ tokens"],
+          ],
+        };
+
+        const val = raw[activeInfo as keyof typeof raw];
+        if (!val) return null;
+
+        if (typeof val === "string") {
+          return <p>{val}</p>;
+        }
+
+        return val.map(([label, detail], idx) => (
+          <p key={idx}>
+            <span className="font-semibold">{label}</span> – {detail}
+          </p>
+        ));
+      })()}
+    </div>
+  )}
+</div>
+{activeFilter !== "all" && (
+  <p className="text-sm text-gray-500 mt-1">{token.about}</p>
 )}
 
-
-                  {activeFilter === "all" && (
-                    <p className="text-sm text-gray-500 mt-1">{token.about}</p>
-                  )}
 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
   {(inscriptions[token.key] || []).map((inscription) => {
     const isSelected = combineList.some(i => i.id === inscription.id);
