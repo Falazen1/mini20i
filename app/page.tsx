@@ -54,7 +54,6 @@ useEffect(() => {
 
 useEffect(() => {
   if (address) {
-    setShowVideo(true);
     setTimeout(() => setShowMiniKit(true), 100); // MiniKit
     setTimeout(() => setShowDescription(true), 700); // Description
     setTimeout(() => setShowTokens(true), 1400); // Rest of content
@@ -64,11 +63,9 @@ useEffect(() => {
 }, [address]);
 
 useEffect(() => {
-  if (address) {
-    const timer = setTimeout(() => setShowVideo(false), 100);
-    return () => clearTimeout(timer);
-  }
+  if (address) setTimeout(() => setShowVideo(false), 1000);
 }, [address]);
+
 
 
   useEffect(() => {
@@ -402,13 +399,7 @@ useEffect(() => {
     <div className="relative z-10 text-white text-center px-6">
       <div
         className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
-        onClick={async () => {
-          await connect({ connector: connectors[0] });
-          if (window?.parent !== window) {
-            window.location.reload();
-          }
-        }}
-        
+        onClick={() => connect({ connector: connectors[0] })}
       >
         <p className="text-lg font-semibold mb-2">Wallet Required</p>
         <p className="text-sm">Click here to connect your wallet.</p>
