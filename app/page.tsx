@@ -47,6 +47,21 @@ const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
+useEffect(() => {
+  const updateAddress = async () => {
+    if (window.ethereum?.isCoinbaseWallet) {
+      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+      if (accounts && accounts[0]) {
+        setWarpcastAddress(accounts[0]);
+      }
+    }
+  };
+
+  window.ethereum?.on?.('accountsChanged', updateAddress);
+  return () => {
+    window.ethereum?.removeListener?.('accountsChanged', updateAddress);
+  };
+}, []);
 
 
 
