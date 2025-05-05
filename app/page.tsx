@@ -62,17 +62,14 @@ useEffect(() => {
   }
 }, [address]);
 
-useEffect(() => {
-  const interval = setInterval(() => {
-    const connected = address && typeof address === "string" && address.startsWith("0x");
-    if (connected) {
-      setShowVideo(false);
-      clearInterval(interval);
-    }
-  }, 300);
-  return () => clearInterval(interval);
-}, [address]);
 
+useEffect(() => {
+  if (!address) return;
+  const timeout = setTimeout(() => {
+    setShowVideo(false);
+  }, 1000);
+  return () => clearTimeout(timeout);
+}, [address, showVideo]);
   useEffect(() => {
     if (!address) return;
 
@@ -404,7 +401,13 @@ useEffect(() => {
     <div className="relative z-10 text-white text-center px-6">
       <div
         className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
-        onClick={() => connect({ connector: connectors[0] })}
+        onClick={() => {
+          connect({ connector: connectors[0] });
+          setTimeout(() => {
+            setFrameReady(); // retriggers frame activation
+          }, 500);
+        }}
+        
       >
         <p className="text-lg font-semibold mb-2">Wallet Required</p>
         <p className="text-sm">Click here to connect your wallet.</p>
