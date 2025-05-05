@@ -47,6 +47,25 @@ const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
+useEffect(() => {
+  const maxRetries = 20;
+  let attempts = 0;
+
+  const interval = setInterval(() => {
+    const ctxAddress = (context as any)?.walletAddress;
+    const fallbackAddress = wagmiAddress;
+
+    if (ctxAddress || fallbackAddress) {
+      setShowVideo(false);
+      clearInterval(interval);
+    }
+
+    attempts++;
+    if (attempts >= maxRetries) clearInterval(interval);
+  }, 500);
+
+  return () => clearInterval(interval);
+}, []);
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
@@ -402,13 +421,7 @@ useEffect(() => {
     <div className="relative z-10 text-white text-center px-6">
       <div
         className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
-        onClick={async () => {
-          await connect({ connector: connectors[0] });
-          setTimeout(() => {
-            window.location.reload(); // force re-checks and removes soft lock
-          }, 300);
-        }}
-        
+        onClick={() => connect({ connector: connectors[0] })}
       >
         <p className="text-lg font-semibold mb-2">Wallet Required</p>
         <p className="text-sm">Click here to connect your wallet.</p>
