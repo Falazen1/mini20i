@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useMiniKit } from '@coinbase/onchainkit/minikit';
 import { useAccount, useConnect } from "wagmi";
 import { readContract } from "@wagmi/core";
 import { config } from "./helpers/wagmiConfig";
@@ -15,7 +16,6 @@ import { Address } from "viem";
 import { useTokenStore } from "./helpers/useTokenStore";
 import SwapModal from "./components/SwapModal";
 import Image from "next/image";
-import { useMiniKit } from '@coinbase/onchainkit/minikit';
 type Inscription = {
   id: string;
   svg: string;
@@ -24,7 +24,9 @@ type Inscription = {
 };
 
 export default function Page() {
-  const { address } = useAccount();
+  const context = useMiniKit();
+  const wagmiAddress = useAccount().address;
+  const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
