@@ -57,8 +57,16 @@ export default function SwapModal({
   onClose: () => void;
 }) {
   const { address } = useAccount();
+  const [warpcastAddress, setWarpcastAddress] = useState<string | null>(null);
+  const connectedAddress = address || warpcastAddress;
   const token = TOKENS[tokenKey];
   const [debounced, setDebounced] = useState(false);
+
+  useEffect(() => {
+    if (window?.ethereum?.isCoinbaseWallet && window.ethereum.selectedAddress) {
+      setWarpcastAddress(window.ethereum.selectedAddress);
+    }
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebounced(true), 500);
@@ -68,7 +76,7 @@ export default function SwapModal({
     };
   }, [tokenKey]);
 
-  if (!address || !token || !debounced) return null;
+  if (!connectedAddress || !token || !debounced) return null;
 
   return (
     <div className="fixed inset-0 z-[9999] bg-black bg-opacity-70 flex items-center justify-center">
@@ -92,8 +100,7 @@ export default function SwapModal({
               mode: "dark",
               theme: "default",
               name: "Mini20i",
-              logo:
-                "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/main/logo512.png",
+              logo: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/main/logo512.png",
             },
           }}
         >
