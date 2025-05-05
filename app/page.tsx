@@ -26,7 +26,8 @@ type Inscription = {
 export default function Page() {
   const { address } = useAccount();
   const { context } = useMiniKit();
-  const connectedAddress = context?.walletAddress ?? address;
+  const connectedAddress = (context as { walletAddress?: string })?.walletAddress ?? address;
+
 
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});

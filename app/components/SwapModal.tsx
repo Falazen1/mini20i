@@ -59,7 +59,8 @@ export default function SwapModal({
 }) {
   const { address } = useAccount();
   const { context } = useMiniKit();
-  const connectedAddress = context?.walletAddress ?? address;
+  const connectedAddress = (context as { walletAddress?: string })?.walletAddress ?? address;
+
   
   const token = TOKENS[tokenKey];
   const [debounced, setDebounced] = useState(false);
