@@ -15,7 +15,7 @@ import { Address } from "viem";
 import { useTokenStore } from "./helpers/useTokenStore";
 import SwapModal from "./components/SwapModal";
 import Image from "next/image";
-
+import { useMiniKit } from '@coinbase/onchainkit/minikit';
 type Inscription = {
   id: string;
   svg: string;
@@ -44,6 +44,11 @@ const [showDescription, setShowDescription] = useState(false);
 const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
+const { setFrameReady, isFrameReady } = useMiniKit();
+
+useEffect(() => {
+  if (!isFrameReady) setFrameReady();
+}, [isFrameReady, setFrameReady]);
 
 useEffect(() => {
   if (address) {
