@@ -11,22 +11,21 @@ export const viewport: Viewport = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const URL = process.env.NEXT_PUBLIC_URL;
   return {
-    title: process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME,
+    title: "Mini20i",
     description:
       "Base Inscriptions Viewer",
     other: {
       "fc:frame": JSON.stringify({
-        version: process.env.NEXT_PUBLIC_VERSION,
-        imageUrl: process.env.NEXT_PUBLIC_IMAGE_URL,
+        version: "next",
+        imageUrl: "raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
         button: {
-          title: `Launch ${process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME}`,
+          title: `Launch Mini20i`,
           action: {
             type: "launch_frame",
-            name: process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME,
-            url: URL,
-            splashImageUrl: process.env.NEXT_PUBLIC_SPLASH_IMAGE_URL,
+            name: "Mini20i",
+            url: "mini20i.vercel.app",
+            splashImageUrl: "raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
             splashBackgroundColor: `#${process.env.NEXT_PUBLIC_SPLASH_BACKGROUND_COLOR}`,
           },
         },
