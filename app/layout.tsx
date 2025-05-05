@@ -10,28 +10,26 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export const generateMetadata = (): Metadata => {
+const PROJECT_NAME = process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME ?? 'Mini20i';
+const IMAGE_URL = process.env.NEXT_PUBLIC_IMAGE_URL ?? 'raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg';
+const SPLASH_IMAGE_URL = process.env.NEXT_PUBLIC_SPLASH_IMAGE_URL ?? 'raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg';
+const SPLASH_BG = `#${process.env.NEXT_PUBLIC_SPLASH_BACKGROUND_COLOR ?? 'FFFFFF'}`;
+const URL = process.env.NEXT_PUBLIC_URL ?? 'mini20i.vercel.app';
+
+export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME,
-    description: `${process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME} - A MiniKit App`,
+    title: PROJECT_NAME,
+    description: 'Mini20i – View, manage, and swap ERC-20i inscriptions on Base.',
     other: {
-      "fc:frame": JSON.stringify({
-        version: process.env.NEXT_PUBLIC_VERSION,
-        imageUrl: process.env.NEXT_PUBLIC_IMAGE_URL,
-        button: {
-          title: `Launch ${process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME}`,
-          action: {
-            type: "launch_frame",
-            name: process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME,
-            url: process.env.NEXT_PUBLIC_URL,
-            splashImageUrl: process.env.NEXT_PUBLIC_SPLASH_IMAGE_URL,
-            splashBackgroundColor: `#${process.env.NEXT_PUBLIC_SPLASH_BACKGROUND_COLOR}`,
-          },
-        },
-      }),
+      'fc:frame': 'vNext',
+      'fc:frame:image': IMAGE_URL,
+      'fc:frame:button:1': `Launch ${PROJECT_NAME}`,
+      'fc:frame:post_url': URL,
+      'fc:frame:splash': SPLASH_IMAGE_URL,
+      'fc:frame:splash_background': SPLASH_BG,
     },
   };
-};
+}
 
 export default function RootLayout({
   children,
