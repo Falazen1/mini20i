@@ -53,16 +53,14 @@ useEffect(() => {
 }, [isFrameReady, setFrameReady]);
 
 useEffect(() => {
-  if (!address) return;
-  setShowVideo(true);
-  setTimeout(() => setShowVideo(false), 200);     // Fade video last
-  setTimeout(() => setShowMiniKit(true), 500);     // MiniKit
-  setTimeout(() => setShowDescription(true), 1000); // Description
-  setTimeout(() => setShowTokens(true), 1600);     // Tokens
-  setTimeout(() => setShowBanners(true), 1600);    // Banners
-  setTimeout(() => setShowTokenSwap(true), 2100);  // Swap
+  if (address) {
+    setTimeout(() => setShowMiniKit(true), 100); // MiniKit
+    setTimeout(() => setShowDescription(true), 700); // Description
+    setTimeout(() => setShowTokens(true), 1400); // Rest of content
+    setTimeout(() => setShowBanners(true), 1400); // Rest of content
+    setTimeout(() => setShowTokenSwap(true), 2000); // Rest of content
+  }
 }, [address]);
-
 
 useEffect(() => {
   if (address) setTimeout(() => setShowVideo(false), 1000);
