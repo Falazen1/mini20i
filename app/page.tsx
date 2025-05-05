@@ -27,30 +27,6 @@ export default function Page() {
   const context = useMiniKit();
   const wagmiAddress = useAccount().address;
   const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
-  // Patch: Ensure wallet stays recognized after refresh/frame reopen
-const [walletReady, setWalletReady] = useState(false);
-useEffect(() => {
-  if (walletReady || address) return;
-}, [context, wagmiAddress, address, walletReady]);
-
-
-  const maxRetries = 20;
-  let attempts = 0;
-  const check = setInterval(() => {
-    const ctxAddress = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-    const fallback = wagmiAddress;
-    if (ctxAddress || fallback) {
-      setWalletReady(true);
-      setShowVideo(false);
-      clearInterval(check);
-    }
-    attempts++;
-    if (attempts >= maxRetries) clearInterval(check);
-  }, 300);
-
-  return () => clearInterval(check);
-}, [context, wagmiAddress, address]);
-
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
@@ -71,6 +47,27 @@ const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
+useEffect(() => {
+  if (!context && !wagmiAddress) return;
+
+  const maxRetries = 30;
+  let attempts = 0;
+
+  const interval = setInterval(() => {
+    const ctx = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+    const fallback = wagmiAddress;
+
+    if (ctx || fallback) {
+      setShowVideo(false);
+      clearInterval(interval);
+    }
+
+    attempts++;
+    if (attempts >= maxRetries) clearInterval(interval);
+  }, 300);
+
+  return () => clearInterval(interval);
+}, [context, wagmiAddress]);
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
