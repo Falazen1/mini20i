@@ -12,7 +12,7 @@ export const viewport: Viewport = {
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Mini20i",
+    title: "mini20i",
     description:
       "Base Inscriptions Viewer",
     other: {
@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
           title: `Launch Mini20i`,
           action: {
             type: "launch_frame",
-            name: "Mini20i",
+            name: "mini20i",
             url: "https://mini20i.vercel.app",
             splashImageUrl: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
             splashBackgroundColor: `#${process.env.NEXT_PUBLIC_SPLASH_BACKGROUND_COLOR}`,

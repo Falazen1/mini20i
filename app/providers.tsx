@@ -19,8 +19,8 @@ export function Providers({ children }: PropsWithChildren) {
           chain={base}
           config={{
             appearance: {
-              name: "Mini20i",
-              logo: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/frog-token.png",
+              name: "mini20i",
+              logo: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
               theme: "default",
               mode: "auto",
             },
