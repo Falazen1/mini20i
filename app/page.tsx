@@ -346,7 +346,7 @@ useEffect(() => {
       loop
       muted
       playsInline
-      className="absolute inset-0 w-full h-full object-cover opacity-60"
+      className="absolute inset-0 w-full h-full object-cover opacity-70"
     >
       <source src="/aidos_head.mp4" type="video/mp4" />
     </video>
@@ -369,7 +369,7 @@ useEffect(() => {
           <div className="relative w-full flex justify-center gap-4">
           <Image
   onClick={() => setActiveFilter("all")}
-  src="https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg"
+  src="https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.png"
   alt="All Projects"
   width={56}
   height={56}
