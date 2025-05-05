@@ -18,14 +18,14 @@ export async function generateMetadata(): Promise<Metadata> {
     other: {
       "fc:frame": JSON.stringify({
         version: "next",
-        imageUrl: "raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
+        imageUrl: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
         button: {
           title: `Launch Mini20i`,
           action: {
             type: "launch_frame",
             name: "Mini20i",
             url: "https://mini20i.vercel.app",
-            splashImageUrl: "raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
+            splashImageUrl: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
             splashBackgroundColor: `#${process.env.NEXT_PUBLIC_SPLASH_BACKGROUND_COLOR}`,
           },
         },
