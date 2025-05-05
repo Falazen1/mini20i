@@ -13,7 +13,7 @@ export const viewport: Viewport = {
 export const generateMetadata = (): Metadata => {
   return {
     title: process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME,
-    description: `${process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME}`,
+    description: `${process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME} - A MiniKit App`,
     other: {
       "fc:frame": JSON.stringify({
         version: process.env.NEXT_PUBLIC_VERSION,
