@@ -25,11 +25,8 @@ type Inscription = {
 
 export default function Page() {
   const context = useMiniKit();
-  const { walletAddress } = context as { walletAddress?: `0x${string}` };
-  const { address: wagmiAddress } = useAccount();
-  
-  const address = walletAddress || wagmiAddress;
-  
+  const wagmiAddress = useAccount().address;
+  const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
@@ -51,10 +48,11 @@ const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
 useEffect(() => {
-  if (!walletAddress && !wagmiAddress) return; // still waiting
-  if (!address) return; // resolved as undefined
-  setShowVideo(false); // safe to proceed
-}, [walletAddress, wagmiAddress]);
+  // Wait for either wallet source to load before hiding the video
+  if (!context?.walletAddress && !wagmiAddress) return;
+  if (!address) return;
+  setShowVideo(false);
+}, [context?.walletAddress, wagmiAddress]);
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
@@ -69,6 +67,15 @@ useEffect(() => {
     setTimeout(() => setShowTokenSwap(true), 2000); // Rest of content
   }
 }, [address]);
+
+
+useEffect(() => {
+  if (!address) return;
+  const timeout = setTimeout(() => {
+    setShowVideo(false);
+  }, 1000);
+  return () => clearTimeout(timeout);
+}, [address, showVideo]);
 
   useEffect(() => {
     if (!address) return;
