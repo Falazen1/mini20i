@@ -1,5 +1,10 @@
 export async function GET() {
   return Response.json({
+    "name": "mini20i",
+    "description": "Base Inscriptions Viewer",
+    "url": "https://mini20i.vercel.app",
+    "icon": "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
+    "redirects": [],
     "accountAssociation": {
       "header": "eyJmaWQiOjUxMjY4NywidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDk2OTg0NDBGZjliMjVFNzkxMThBQzdkMTU3NDdGMEI3RDZBODc1MTQifQ",
       "payload": "eyJkb21haW4iOiJtaW5pMjBpLnZlcmNlbC5hcHAifQ",
@@ -19,3 +24,4 @@ export async function GET() {
     }
   });
 }
+
