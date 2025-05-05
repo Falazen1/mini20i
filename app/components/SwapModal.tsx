@@ -52,9 +52,11 @@ const TOKENS: Record<"froggi" | "fungi" | "pepi", Token> = {
 export default function SwapModal({
   tokenKey,
   onClose,
+  onSuccess,
 }: {
   tokenKey: "froggi" | "fungi" | "pepi";
   onClose: () => void;
+  onSuccess: () => void;
 }) {
   const { address } = useAccount();
   const token = TOKENS[tokenKey];
@@ -97,7 +99,7 @@ export default function SwapModal({
             },
           }}
         >
-          <Swap>
+          <Swap onSuccess={onSuccess}>
             <div className="space-y-4">
               <SwapAmountInput label="From" token={ethBase} type="from" />
               <SwapAmountInput label="To" token={token} type="to" />

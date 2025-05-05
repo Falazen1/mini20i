@@ -54,6 +54,7 @@ useEffect(() => {
 
 useEffect(() => {
   if (address) {
+    setShowVideo(true);
     setTimeout(() => setShowMiniKit(true), 100); // MiniKit
     setTimeout(() => setShowDescription(true), 700); // Description
     setTimeout(() => setShowTokens(true), 1400); // Rest of content
@@ -63,8 +64,12 @@ useEffect(() => {
 }, [address]);
 
 useEffect(() => {
-  if (address) setTimeout(() => setShowVideo(false), 1000);
+  if (address) {
+    const timer = setTimeout(() => setShowVideo(false), 1000);
+    return () => clearTimeout(timer);
+  }
 }, [address]);
+
 
   useEffect(() => {
     if (!address) return;
@@ -303,13 +308,18 @@ useEffect(() => {
   </div>
 )}
 {isSwapOpen && swapTokenKey && (
-  <SwapModal
-    tokenKey={swapTokenKey}
-    onClose={() => {
-      setIsSwapOpen(false);
-      setSwapTokenKey(null);
-    }}
-  />
+<SwapModal
+  tokenKey={swapTokenKey}
+  onClose={() => {
+    setIsSwapOpen(false);
+    setSwapTokenKey(null);
+  }}
+  onSuccess={() => {
+    setSuccessMessage("Swap successful!");
+    setTimeout(() => setSuccessMessage(""), 4000);
+  }}
+/>
+
 )}
 
 <div className={`transition-opacity duration-700 ${showMiniKit ? "opacity-100" : "opacity-0"}`}>
