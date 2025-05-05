@@ -47,6 +47,7 @@ const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
+let triggeredVideoFade = false;
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
@@ -63,11 +64,15 @@ useEffect(() => {
 }, [address]);
 
 useEffect(() => {
-  if (!address || !showVideo) return;
-
-  const timeout = setTimeout(() => setShowVideo(false), 1000);
-  return () => clearTimeout(timeout);
-}, [address, showVideo]);
+  const interval = setInterval(() => {
+    if (address && !triggeredVideoFade) {
+      triggeredVideoFade = true;
+      setTimeout(() => setShowVideo(false), 1000);
+      clearInterval(interval);
+    }
+  }, 1000);
+  return () => clearInterval(interval);
+}, []);
 
   useEffect(() => {
     if (!address) return;
