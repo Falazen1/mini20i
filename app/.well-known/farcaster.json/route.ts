@@ -13,7 +13,7 @@ export async function GET() {
     "imageUrl": "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
     "buttonTitle": "Launch Mini20i",
     "splashImageUrl": "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
-    "splashBackgroundColor": "282c34",
+    "splashBackgroundColor": "#282c34",
     "webhookUrl": "https://mini20i.vercel.app/api/webhook"
   }
 });
