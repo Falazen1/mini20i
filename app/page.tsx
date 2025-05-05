@@ -403,13 +403,22 @@ useEffect(() => {
     <div className="relative z-10 text-white text-center px-6">
       <div
         className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
-        onClick={() => {
-          if (window.ethereum?.isCoinbaseWallet && window.ethereum.selectedAddress) {
-            setWarpcastAddress(window.ethereum.selectedAddress);
-          } else {
-            connect({ connector: connectors[0] });
+        onClick={async () => {
+          try {
+            if (typeof window !== "undefined" && window.ethereum) {
+              const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+              if (accounts && accounts.length > 0) {
+                setWarpcastAddress(accounts[0]);
+                return;
+              }
+            }
+          } catch (err) {
+            console.error("Wallet detection failed:", err);
           }
-        }}        
+        
+          connect({ connector: connectors[0] });
+        }}
+            
       >
         <p className="text-lg font-semibold mb-2">Wallet Required</p>
         <p className="text-sm">Click here to connect your wallet.</p>
