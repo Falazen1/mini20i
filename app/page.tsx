@@ -31,11 +31,13 @@ export default function Page() {
 const [walletReady, setWalletReady] = useState(false);
 useEffect(() => {
   if (walletReady || address) return;
+}, [context, wagmiAddress, address, walletReady]);
+
 
   const maxRetries = 20;
   let attempts = 0;
   const check = setInterval(() => {
-    const ctxAddress = (context as any)?.walletAddress;
+    const ctxAddress = (context as { walletAddress?: `0x${string}` })?.walletAddress;
     const fallback = wagmiAddress;
     if (ctxAddress || fallback) {
       setWalletReady(true);
