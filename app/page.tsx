@@ -25,8 +25,27 @@ type Inscription = {
 
 export default function Page() {
   const context = useMiniKit();
-  const wagmiAddress = useAccount().address;
-  const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
+const wagmiAddress = useAccount().address;
+const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
+
+useEffect(() => {
+  if (typeof window === "undefined") return;
+
+  const stored = sessionStorage.getItem("hasConnected");
+  if (address && !stored) {
+    sessionStorage.setItem("hasConnected", "true");
+  }
+}, [address]);
+
+useEffect(() => {
+  if (typeof window === "undefined") return;
+
+  const wasConnected = sessionStorage.getItem("hasConnected") === "true";
+  if (wasConnected && address) {
+    setShowVideo(false);
+  }
+}, []);
+
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
@@ -51,23 +70,6 @@ const { setFrameReady, isFrameReady } = useMiniKit();
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
 }, [isFrameReady, setFrameReady]);
-useEffect(() => {
-  const maxRetries = 20;
-  let attempts = 0;
-
-  const interval = setInterval(() => {
-    const ctx = context as { walletAddress?: `0x${string}` };
-    if (ctx?.walletAddress || wagmiAddress) {
-      setShowVideo(false);
-      clearInterval(interval);
-    }
-
-    attempts++;
-    if (attempts >= maxRetries) clearInterval(interval);
-  }, 500);
-
-  return () => clearInterval(interval);
-}, [context, wagmiAddress]);
 
 useEffect(() => {
   if (address) {
