@@ -15,7 +15,7 @@ import { Address } from "viem";
 import { useTokenStore } from "./helpers/useTokenStore";
 import SwapModal from "./components/SwapModal";
 import Image from "next/image";
-import { useMiniKit } from '@coinbase/onchainkit/minikit';
+
 type Inscription = {
   id: string;
   svg: string;
@@ -26,8 +26,6 @@ type Inscription = {
 export default function Page() {
   const { address } = useAccount();
   const { connect, connectors } = useConnect();
-  const [warpcastAddress, setWarpcastAddress] = useState<string | null>(null);
-  const connectedAddress = address || warpcastAddress;
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [selectedInscription, setSelectedInscription] = useState<Inscription | null>(null);
@@ -46,52 +44,23 @@ const [showDescription, setShowDescription] = useState(false);
 const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
-const { setFrameReady, isFrameReady } = useMiniKit();
-useEffect(() => {
-  const detectWarpcast = async () => {
-    if (window.ethereum?.isCoinbaseWallet && window.ethereum.selectedAddress) {
-      setWarpcastAddress(window.ethereum.selectedAddress);
-    }
-  };
-
-  const updateAddress = async () => {
-    if (window.ethereum?.isCoinbaseWallet) {
-      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-      if (accounts && accounts[0]) {
-        setWarpcastAddress(accounts[0]);
-      }
-    }
-  };
-
-  detectWarpcast();
-  window.ethereum?.on?.('accountsChanged', updateAddress);
-
-  return () => {
-    window.ethereum?.removeListener?.('accountsChanged', updateAddress);
-  };
-}, []);
-
 
 useEffect(() => {
-  if (!isFrameReady) setFrameReady();
-}, [isFrameReady, setFrameReady]);
-
-useEffect(() => {
-  if (connectedAddress) {
+  if (address) {
     setTimeout(() => setShowMiniKit(true), 100); // MiniKit
     setTimeout(() => setShowDescription(true), 700); // Description
     setTimeout(() => setShowTokens(true), 1400); // Rest of content
     setTimeout(() => setShowBanners(true), 1400); // Rest of content
     setTimeout(() => setShowTokenSwap(true), 2000); // Rest of content
   }
-}, [connectedAddress]);
+}, [address]);
 
 useEffect(() => {
-  if (connectedAddress) setTimeout(() => setShowVideo(false), 1000);
-}, [connectedAddress]);
+  if (address) setTimeout(() => setShowVideo(false), 1000);
+}, [address]);
 
   useEffect(() => {
-    if (!connectedAddress) return;
+    if (!address) return;
 
     async function loadInscriptions() {
       const results: Record<string, Inscription[]> = {};
@@ -109,7 +78,7 @@ useEffect(() => {
             abi,
             address: contractAddress,
             functionName: fn.sporesDegree,
-            args: [connectedAddress],
+            args: [address],
           }) as Seed;
 
           if (dynamic.seed && dynamic.seed !== 0n) {
@@ -134,7 +103,7 @@ useEffect(() => {
             abi,
             address: contractAddress,
             functionName: fn.mushroomCount,
-            args: [connectedAddress],
+            args: [address],
           }) as bigint;
 
           for (let i = 0n; i < count; i++) {
@@ -143,7 +112,7 @@ useEffect(() => {
                 abi,
                 address: contractAddress,
                 functionName: fn.mushroomOfOwnerByIndex,
-                args: [connectedAddress, i],
+                args: [address, i],
               }) as Seed;
 
               const svg = await readContract(config, {
@@ -170,7 +139,7 @@ useEffect(() => {
     }
 
     loadInscriptions();
-  }, [connectedAddress, successMessage]);
+  }, [address, successMessage]);
 
   const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi"].includes(t.key));
   const activeToken = visibleTokens.find((t) => t.key === activeFilter);
@@ -211,7 +180,7 @@ useEffect(() => {
       setSuccessMessage("");
       await tokenStore.setTokenByKey(key);
       const value = BigInt(seed);
-      const user = connectedAddress as Address;
+      const user = address as Address;
 
       if (action === "stabilize") await stabilizeInscription(user, value);
       if (action === "destabilize") await destabilizeInscription(user, value);
@@ -397,10 +366,10 @@ useEffect(() => {
               );
             })}
 
-{!connectedAddress || showVideo ? (
+{!address || showVideo ? (
   <div
     className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ${
-      connectedAddress ? "opacity-0 pointer-events-none" : "opacity-100"
+      address ? "opacity-0 pointer-events-none" : "opacity-100"
     }`}
   >
     <video
@@ -416,21 +385,7 @@ useEffect(() => {
     <div className="relative z-10 text-white text-center px-6">
       <div
         className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
-onClick={async () => {
-  try {
-    if (window.ethereum?.isCoinbaseWallet) {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      if (accounts && accounts[0]) {
-        setWarpcastAddress(accounts[0]);
-      }
-    } else {
-      connect({ connector: connectors.find(c => c.name === "Coinbase Wallet") || connectors[0] });
-    }
-  } catch (err) {
-    console.error("Wallet connection failed:", err);
-  }
-}}
-
+        onClick={() => connect({ connector: connectors[0] })}
       >
         <p className="text-lg font-semibold mb-2">Wallet Required</p>
         <p className="text-sm">Click here to connect your wallet.</p>
@@ -448,7 +403,7 @@ onClick={async () => {
           </p>
         </div>
 
-        {connectedAddress && (
+        {address && (
           <div className="flex flex-col gap-12">
             {visibleTokens
               .filter((token) => activeFilter === "all" || token.key === activeFilter)
