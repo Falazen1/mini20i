@@ -25,26 +25,29 @@ type Inscription = {
 
 export default function Page() {
   const context = useMiniKit();
-const wagmiAddress = useAccount().address;
-const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
-
+  const wagmiAddress = useAccount().address;
+  const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
+  // Patch: Ensure wallet stays recognized after refresh/frame reopen
+const [walletReady, setWalletReady] = useState(false);
 useEffect(() => {
-  if (typeof window === "undefined") return;
+  if (walletReady || address) return;
 
-  const stored = sessionStorage.getItem("hasConnected");
-  if (address && !stored) {
-    sessionStorage.setItem("hasConnected", "true");
-  }
-}, [address]);
+  const maxRetries = 20;
+  let attempts = 0;
+  const check = setInterval(() => {
+    const ctxAddress = (context as any)?.walletAddress;
+    const fallback = wagmiAddress;
+    if (ctxAddress || fallback) {
+      setWalletReady(true);
+      setShowVideo(false);
+      clearInterval(check);
+    }
+    attempts++;
+    if (attempts >= maxRetries) clearInterval(check);
+  }, 300);
 
-useEffect(() => {
-  if (typeof window === "undefined") return;
-
-  const wasConnected = sessionStorage.getItem("hasConnected") === "true";
-  if (wasConnected && address) {
-    setShowVideo(false);
-  }
-}, []);
+  return () => clearInterval(check);
+}, [context, wagmiAddress, address]);
 
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
