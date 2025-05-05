@@ -63,16 +63,11 @@ useEffect(() => {
 }, [address]);
 
 useEffect(() => {
-  let triggered = false;
-  const interval = setInterval(() => {
-    const connected = Boolean(address);
-    if (connected && !triggered) {
-      triggered = true;
-      setTimeout(() => setShowVideo(false), 1000);
-      clearInterval(interval);
-    }
-  }, 500);
-  return () => clearInterval(interval);
+  if (!address) return;
+  const timeout = setTimeout(() => {
+    setShowVideo(false);
+  }, 1000);
+  return () => clearTimeout(timeout);
 }, [address, showVideo]);
 
   useEffect(() => {
