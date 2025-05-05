@@ -48,6 +48,12 @@ const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
 useEffect(() => {
+  const detectWarpcast = async () => {
+    if (window.ethereum?.isCoinbaseWallet && window.ethereum.selectedAddress) {
+      setWarpcastAddress(window.ethereum.selectedAddress);
+    }
+  };
+
   const updateAddress = async () => {
     if (window.ethereum?.isCoinbaseWallet) {
       const accounts = await window.ethereum.request({ method: 'eth_accounts' });
@@ -57,22 +63,14 @@ useEffect(() => {
     }
   };
 
+  detectWarpcast();
   window.ethereum?.on?.('accountsChanged', updateAddress);
+
   return () => {
     window.ethereum?.removeListener?.('accountsChanged', updateAddress);
   };
 }, []);
 
-
-
-useEffect(() => {
-  const detectWarpcast = async () => {
-    if (window.ethereum?.isCoinbaseWallet && window.ethereum.selectedAddress) {
-      setWarpcastAddress(window.ethereum.selectedAddress);
-    }
-  };
-  detectWarpcast();
-}, []);
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
