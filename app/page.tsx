@@ -63,12 +63,15 @@ useEffect(() => {
 }, [address]);
 
 useEffect(() => {
-  if (!address) return;
-  const timeout = setTimeout(() => {
-    setShowVideo(false);
-  }, 1000);
-  return () => clearTimeout(timeout);
-}, [address, showVideo]);
+  const interval = setInterval(() => {
+    const connected = address && typeof address === "string" && address.startsWith("0x");
+    if (connected) {
+      setShowVideo(false);
+      clearInterval(interval);
+    }
+  }, 300);
+  return () => clearInterval(interval);
+}, [address]);
 
   useEffect(() => {
     if (!address) return;
