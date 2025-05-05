@@ -47,13 +47,34 @@ const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
+const [hydrated, setHydrated] = useState(false);
+
 useEffect(() => {
-  if (!address) return;
-  const timeout = setTimeout(() => {
+  if (typeof window !== "undefined") {
+    setHydrated(true);
+  }
+}, []);
+
+useEffect(() => {
+  let intervalId: ReturnType<typeof setInterval>;
+
+
+  if (!address) {
+    intervalId = setInterval(() => {
+      const currentAddress = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
+      if (currentAddress) {
+        setShowVideo(false);
+        clearInterval(intervalId);
+      }
+    }, 250); // Check every 100ms
+  } else {
     setShowVideo(false);
-  }, 1000);
-  return () => clearTimeout(timeout);
-}, [address, showVideo]);
+  }
+
+  return () => {
+    if (intervalId) clearInterval(intervalId);
+  };
+}, [context, wagmiAddress, address]);
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
@@ -186,8 +207,8 @@ useEffect(() => {
   
     return () => clearInterval(glitchInterval);
   }, []);
-  
-  if (!mounted) return null;
+  if (!hydrated || !mounted) return null;
+
   
   async function handleClick(
     key: "froggi" | "fungi" | "pepi",
