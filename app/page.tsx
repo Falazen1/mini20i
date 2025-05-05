@@ -24,7 +24,9 @@ type Inscription = {
 };
 
 export default function Page() {
-  const { address } = useAccount();
+  const context = useMiniKit();
+  const wagmiAddress = useAccount().address;
+  const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
@@ -59,9 +61,16 @@ useEffect(() => {
     setTimeout(() => setShowTokenSwap(true), 2000); // Rest of content
   }
 }, [address]);
-
 useEffect(() => {
-  if (address) setTimeout(() => setShowVideo(false), 1000);
+  let triggered = false;
+  const interval = setInterval(() => {
+    if (address && !triggered) {
+      triggered = true;
+      setTimeout(() => setShowVideo(false), 1000);
+      clearInterval(interval);
+    }
+  }, 1000);
+  return () => clearInterval(interval);
 }, [address]);
 
 
