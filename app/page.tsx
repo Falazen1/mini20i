@@ -22,7 +22,7 @@ type Inscription = {
   seed: string;
   type: "Dynamic" | "Stable";
 };
-
+let triggeredVideoFade = false;
 export default function Page() {
   const context = useMiniKit();
   const wagmiAddress = useAccount().address;
@@ -47,7 +47,6 @@ const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
-let triggeredVideoFade = false;
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
