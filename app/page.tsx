@@ -369,7 +369,7 @@ useEffect(() => {
           <div className="relative w-full flex justify-center gap-4">
           <Image
   onClick={() => setActiveFilter("all")}
-  src="https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.png"
+  src="https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg"
   alt="All Projects"
   width={56}
   height={56}
