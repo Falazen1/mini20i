@@ -17,14 +17,13 @@ export async function generateMetadata(): Promise<Metadata> {
       "Base Inscriptions Viewer",
     other: {
       "fc:frame": JSON.stringify({
-        version: "next",
-        imageUrl: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
+        version: "vNext",
+        imageUrl: "https://your-preview-image.png",
         button: {
-          title: `Launch Mini20i`,
+          title: "Launch Mini20i",
           action: {
             type: "launch_frame",
             name: "mini20i",
-            url: "https://mini20i.vercel.app",
           },
         },
       }),
