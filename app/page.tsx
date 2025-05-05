@@ -65,14 +65,15 @@ useEffect(() => {
 useEffect(() => {
   let triggered = false;
   const interval = setInterval(() => {
-    if (address && !triggered) {
+    const connected = Boolean(address);
+    if (connected && !triggered) {
       triggered = true;
       setTimeout(() => setShowVideo(false), 1000);
       clearInterval(interval);
     }
-  }, 1000);
+  }, 500);
   return () => clearInterval(interval);
-}, [address]);
+}, [address, showVideo]);
 
   useEffect(() => {
     if (!address) return;
