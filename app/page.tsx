@@ -47,34 +47,16 @@ const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
-const [hydrated, setHydrated] = useState(false);
-
 useEffect(() => {
-  if (typeof window !== "undefined") {
-    setHydrated(true);
-  }
-}, []);
+  const interval = setInterval(() => {
+    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+    if (mini && !address) {
+      window.location.reload();
+    }
+  }, 400);
 
-useEffect(() => {
-  let intervalId: ReturnType<typeof setInterval>;
-
-
-  if (!address) {
-    intervalId = setInterval(() => {
-      const currentAddress = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
-      if (currentAddress) {
-        setShowVideo(false);
-        clearInterval(intervalId);
-      }
-    }, 250); // Check every 100ms
-  } else {
-    setShowVideo(false);
-  }
-
-  return () => {
-    if (intervalId) clearInterval(intervalId);
-  };
-}, [context, wagmiAddress, address]);
+  return () => clearInterval(interval);
+}, [context, address]);
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
@@ -207,8 +189,8 @@ useEffect(() => {
   
     return () => clearInterval(glitchInterval);
   }, []);
-  if (!hydrated || !mounted) return null;
-
+  
+  if (!mounted) return null;
   
   async function handleClick(
     key: "froggi" | "fungi" | "pepi",
