@@ -24,9 +24,7 @@ type Inscription = {
 };
 
 export default function Page() {
-  const context = useMiniKit();
-  const wagmiAddress = useAccount().address;
-  const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
+  const { address } = useAccount();
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
