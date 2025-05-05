@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
 
+import { useEffect, useState } from "react";
 import { useMiniKit } from '@coinbase/onchainkit/minikit';
 import { useAccount, useConnect } from "wagmi";
 import { readContract } from "@wagmi/core";
@@ -51,7 +51,7 @@ const { setFrameReady, isFrameReady } = useMiniKit();
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
 }, [isFrameReady, setFrameReady]);
-let triggeredVideoFade = false;
+
 useEffect(() => {
   if (address) {
     setTimeout(() => setShowMiniKit(true), 100); // MiniKit
@@ -62,13 +62,16 @@ useEffect(() => {
   }
 }, [address]);
 
-const fadeTriggered = useRef(false);
-
 useEffect(() => {
-  if (address && !fadeTriggered.current) {
-    fadeTriggered.current = true;
-    setTimeout(() => setShowVideo(false), 1000);
-  }
+  let triggered = false;
+  const interval = setInterval(() => {
+    if (address && !triggered) {
+      triggered = true;
+      setTimeout(() => setShowVideo(false), 1000);
+      clearInterval(interval);
+    }
+  }, 1000);
+  return () => clearInterval(interval);
 }, [address]);
 
   useEffect(() => {
