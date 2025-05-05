@@ -346,7 +346,7 @@ useEffect(() => {
       loop
       muted
       playsInline
-      className="absolute inset-0 w-full h-full object-cover opacity-40"
+      className="absolute inset-0 w-full h-full object-cover opacity-60"
     >
       <source src="/aidos_head.mp4" type="video/mp4" />
     </video>
