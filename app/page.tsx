@@ -47,15 +47,17 @@ const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
+
+useEffect(() => {
+  if (!isFrameReady) setFrameReady();
+}, [isFrameReady, setFrameReady]);
 useEffect(() => {
   const maxRetries = 20;
   let attempts = 0;
 
   const interval = setInterval(() => {
-    const ctxAddress = (context as any)?.walletAddress;
-    const fallbackAddress = wagmiAddress;
-
-    if (ctxAddress || fallbackAddress) {
+    const ctx = context as { walletAddress?: `0x${string}` };
+    if (ctx?.walletAddress || wagmiAddress) {
       setShowVideo(false);
       clearInterval(interval);
     }
@@ -65,11 +67,7 @@ useEffect(() => {
   }, 500);
 
   return () => clearInterval(interval);
-}, []);
-
-useEffect(() => {
-  if (!isFrameReady) setFrameReady();
-}, [isFrameReady, setFrameReady]);
+}, [context, wagmiAddress]);
 
 useEffect(() => {
   if (address) {
