@@ -61,6 +61,7 @@ export default function SwapModal({
   const { address } = useAccount();
   const token = TOKENS[tokenKey];
   const [debounced, setDebounced] = useState(false);
+  const [swapDone, setSwapDone] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebounced(true), 500);
@@ -69,6 +70,18 @@ export default function SwapModal({
       clearTimeout(timer);
     };
   }, [tokenKey]);
+
+  const handleSuccess = () => {
+    setSwapDone(true);
+    onSuccess(); // refresh inscriptions
+  };
+
+  const revealText =
+    tokenKey === "froggi"
+      ? "Reveal Frog"
+      : tokenKey === "fungi"
+      ? "Reveal Mushroom"
+      : "Reveal Pepe";
 
   if (!address || !token || !debounced) return null;
 
@@ -86,29 +99,41 @@ export default function SwapModal({
           Swap ETH → {token.symbol}
         </h2>
 
-        <OnchainKitProvider
-          apiKey="3KA49gYhtfR0hrw5L7L0nPVYlO1z4tyE"
-          chain={base}
-          config={{
-            appearance: {
-              mode: "dark",
-              theme: "default",
-              name: "Mini20i",
-              logo:
-                "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/main/logo512.png",
-            },
-          }}
-        >
-          <Swap onSuccess={onSuccess}>
-            <div className="space-y-4">
-              <SwapAmountInput label="From" token={ethBase} type="from" />
-              <SwapAmountInput label="To" token={token} type="to" />
-              <SwapButton />
-              <SwapMessage />
-              <SwapToast />
-            </div>
-          </Swap>
-        </OnchainKitProvider>
+        {swapDone ? (
+          <div className="flex flex-col items-center space-y-6">
+            <p className="text-lg text-center">Swap successful!</p>
+            <button
+              onClick={onClose}
+              className="px-5 py-2 bg-green-600 rounded-lg text-white text-lg hover:bg-green-700"
+            >
+              {revealText}
+            </button>
+          </div>
+        ) : (
+          <OnchainKitProvider
+            apiKey="3KA49gYhtfR0hrw5L7L0nPVYlO1z4tyE"
+            chain={base}
+            config={{
+              appearance: {
+                mode: "dark",
+                theme: "default",
+                name: "Mini20i",
+                logo:
+                  "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/main/logo512.png",
+              },
+            }}
+          >
+            <Swap onSuccess={handleSuccess}>
+              <div className="space-y-4">
+                <SwapAmountInput label="From" token={ethBase} type="from" />
+                <SwapAmountInput label="To" token={token} type="to" />
+                <SwapButton />
+                <SwapMessage />
+                <SwapToast />
+              </div>
+            </Swap>
+          </OnchainKitProvider>
+        )}
       </div>
     </div>
   );
