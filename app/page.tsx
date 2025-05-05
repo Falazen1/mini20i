@@ -54,7 +54,6 @@ useEffect(() => {
 
 useEffect(() => {
   if (address) {
-    setShowVideo(true);
     setTimeout(() => setShowMiniKit(true), 100); // MiniKit
     setTimeout(() => setShowDescription(true), 700); // Description
     setTimeout(() => setShowTokens(true), 1400); // Rest of content
@@ -65,7 +64,7 @@ useEffect(() => {
 
 useEffect(() => {
   if (address) {
-    const timer = setTimeout(() => setShowVideo(false), 1000);
+    const timer = setTimeout(() => setShowVideo(false), 1500);
     return () => clearTimeout(timer);
   }
 }, [address]);
