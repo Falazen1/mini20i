@@ -25,8 +25,6 @@ export async function generateMetadata(): Promise<Metadata> {
             type: "launch_frame",
             name: "mini20i",
             url: "https://mini20i.vercel.app",
-            splashImageUrl: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg",
-            splashBackgroundColor: `#${process.env.NEXT_PUBLIC_SPLASH_BACKGROUND_COLOR}`,
           },
         },
       }),
