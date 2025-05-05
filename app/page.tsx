@@ -64,14 +64,14 @@ useEffect(() => {
 useEffect(() => {
   let triggered = false;
   const interval = setInterval(() => {
-    if (address && !triggered) {
+    if (address && !triggered && showVideo) {
       triggered = true;
       setTimeout(() => setShowVideo(false), 1000);
       clearInterval(interval);
     }
   }, 1000);
   return () => clearInterval(interval);
-}, [address]);
+}, [address, showVideo]);
 
 
   useEffect(() => {
