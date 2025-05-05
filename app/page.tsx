@@ -48,11 +48,12 @@ const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
 useEffect(() => {
-  // Wait for either wallet source to load before hiding the video
-  if (!(context as { walletAddress?: `0x${string}` })?.walletAddress && !wagmiAddress) return;
   if (!address) return;
-  setShowVideo(false);
-}, [context, wagmiAddress]);
+  const timeout = setTimeout(() => {
+    setShowVideo(false);
+  }, 1000);
+  return () => clearTimeout(timeout);
+}, [address, showVideo]);
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
