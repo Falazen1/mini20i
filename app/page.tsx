@@ -70,15 +70,6 @@ useEffect(() => {
   }
 }, [address]);
 
-
-useEffect(() => {
-  if (!address) return;
-  const timeout = setTimeout(() => {
-    setShowVideo(false);
-  }, 1000);
-  return () => clearTimeout(timeout);
-}, [address, showVideo]);
-
   useEffect(() => {
     if (!address) return;
 
