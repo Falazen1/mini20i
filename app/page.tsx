@@ -61,18 +61,13 @@ useEffect(() => {
     setTimeout(() => setShowTokenSwap(true), 2000); // Rest of content
   }
 }, [address]);
-useEffect(() => {
-  let triggered = false;
-  const interval = setInterval(() => {
-    if (address && !triggered && showVideo) {
-      triggered = true;
-      setTimeout(() => setShowVideo(false), 1000);
-      clearInterval(interval);
-    }
-  }, 1000);
-  return () => clearInterval(interval);
-}, [address, showVideo]);
 
+useEffect(() => {
+  if (!address || !showVideo) return;
+
+  const timeout = setTimeout(() => setShowVideo(false), 1000);
+  return () => clearTimeout(timeout);
+}, [address, showVideo]);
 
   useEffect(() => {
     if (!address) return;
