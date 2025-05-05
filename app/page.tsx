@@ -25,10 +25,6 @@ type Inscription = {
 
 export default function Page() {
   const { address } = useAccount();
-  const { context } = useMiniKit();
-  const connectedAddress = (context as { walletAddress?: string })?.walletAddress ?? address;
-
-
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
@@ -55,21 +51,21 @@ useEffect(() => {
 }, [isFrameReady, setFrameReady]);
 
 useEffect(() => {
-  if (connectedAddress) {
+  if (address) {
     setTimeout(() => setShowMiniKit(true), 100); // MiniKit
     setTimeout(() => setShowDescription(true), 700); // Description
     setTimeout(() => setShowTokens(true), 1400); // Rest of content
     setTimeout(() => setShowBanners(true), 1400); // Rest of content
     setTimeout(() => setShowTokenSwap(true), 2000); // Rest of content
   }
-}, [connectedAddress]);
+}, [address]);
 
 useEffect(() => {
-  if (connectedAddress) setTimeout(() => setShowVideo(false), 1000);
-}, [connectedAddress]);
+  if (address) setTimeout(() => setShowVideo(false), 1000);
+}, [address]);
 
   useEffect(() => {
-    if (!connectedAddress) return;
+    if (!address) return;
 
     async function loadInscriptions() {
       const results: Record<string, Inscription[]> = {};
@@ -87,7 +83,7 @@ useEffect(() => {
             abi,
             address: contractAddress,
             functionName: fn.sporesDegree,
-            args: [connectedAddress],
+            args: [address],
           }) as Seed;
 
           if (dynamic.seed && dynamic.seed !== 0n) {
@@ -112,7 +108,7 @@ useEffect(() => {
             abi,
             address: contractAddress,
             functionName: fn.mushroomCount,
-            args: [connectedAddress],
+            args: [address],
           }) as bigint;
 
           for (let i = 0n; i < count; i++) {
@@ -121,7 +117,7 @@ useEffect(() => {
                 abi,
                 address: contractAddress,
                 functionName: fn.mushroomOfOwnerByIndex,
-                args: [connectedAddress, i],
+                args: [address, i],
               }) as Seed;
 
               const svg = await readContract(config, {
@@ -148,7 +144,7 @@ useEffect(() => {
     }
 
     loadInscriptions();
-  }, [connectedAddress, successMessage]);
+  }, [address, successMessage]);
 
   const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi"].includes(t.key));
   const activeToken = visibleTokens.find((t) => t.key === activeFilter);
@@ -189,7 +185,7 @@ useEffect(() => {
       setSuccessMessage("");
       await tokenStore.setTokenByKey(key);
       const value = BigInt(seed);
-      const user = connectedAddress as Address;
+      const user = address as Address;
 
       if (action === "stabilize") await stabilizeInscription(user, value);
       if (action === "destabilize") await destabilizeInscription(user, value);
@@ -375,10 +371,10 @@ useEffect(() => {
               );
             })}
 
-{!connectedAddress || showVideo ? (
+{!address || showVideo ? (
   <div
     className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ${
-      connectedAddress ? "opacity-0 pointer-events-none" : "opacity-100"
+      address ? "opacity-0 pointer-events-none" : "opacity-100"
     }`}
   >
     <video
@@ -412,7 +408,7 @@ useEffect(() => {
           </p>
         </div>
 
-        {connectedAddress && (
+        {address && (
           <div className="flex flex-col gap-12">
             {visibleTokens
               .filter((token) => activeFilter === "all" || token.key === activeFilter)

@@ -12,7 +12,6 @@ import {
 } from "@coinbase/onchainkit/swap";
 import { OnchainKitProvider } from "@coinbase/onchainkit";
 import { base } from "viem/chains";
-import { useMiniKit } from '@coinbase/onchainkit/minikit';
 
 const ethBase: Token = {
   name: "Ethereum",
@@ -58,10 +57,6 @@ export default function SwapModal({
   onClose: () => void;
 }) {
   const { address } = useAccount();
-  const { context } = useMiniKit();
-  const connectedAddress = (context as { walletAddress?: string })?.walletAddress ?? address;
-
-  
   const token = TOKENS[tokenKey];
   const [debounced, setDebounced] = useState(false);
 
@@ -73,7 +68,7 @@ export default function SwapModal({
     };
   }, [tokenKey]);
 
-  if (!connectedAddress || !token || !debounced) return null;
+  if (!address || !token || !debounced) return null;
 
   return (
     <div className="fixed inset-0 z-[9999] bg-black bg-opacity-70 flex items-center justify-center">
