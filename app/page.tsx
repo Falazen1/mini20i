@@ -394,7 +394,8 @@ useEffect(() => {
               );
             })}
 
-{(!context?.walletAddress && !wagmiAddress) || showVideo ? (
+{(!(context as { walletAddress?: `0x${string}` })?.walletAddress && !wagmiAddress) || showVideo ? (
+
   <div
     className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ${
       address ? "opacity-0 pointer-events-none" : "opacity-100"
