@@ -49,13 +49,14 @@ const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
 useEffect(() => {
   const interval = setInterval(() => {
-    if (!address) {
+    if (!address && showVideo) {
       window.location.reload();
     }
   }, 9800);
 
   return () => clearInterval(interval);
-}, []);
+}, [address, showVideo]);
+
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
@@ -166,17 +167,6 @@ useEffect(() => {
   const activeToken = visibleTokens.find((t) => t.key === activeFilter);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    const el = document.getElementById("dots");
-    if (!el) return;
-    let count = 1;
-    const loop = setInterval(() => {
-      el.textContent = ".".repeat(count);
-      count = (count + 1) % 4;
-    }, 400);
-    return () => clearInterval(loop);
-  }, []);
-  
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -417,25 +407,19 @@ useEffect(() => {
       className="w-full h-full object-cover absolute inset-0 z-0"
     >
       <source src="/aidos_head.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
     </video>
     <div className="relative z-10 text-white text-center px-6">
-      {typeof window !== "undefined" && window.navigator.userAgent.includes("Warpcast") ? (
-        <div className="bg-white text-black px-6 py-4 rounded shadow-lg inline-block text-lg font-semibold">
-          Initializing<span className="ml-1" id="dots">.</span>
-        </div>
-      ) : (
-        <div
-          className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
-          onClick={() => connect({ connector: connectors[0] })}
-        >
-          <p className="text-lg font-semibold mb-2">Wallet Required</p>
-          <p className="text-sm">Click here to connect your wallet.</p>
-        </div>
-      )}
+      <div
+        className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
+        onClick={() => connect({ connector: connectors[0] })}
+      >
+        <p className="text-lg font-semibold mb-2">Wallet Required</p>
+        <p className="text-sm">Click here to connect your wallet.</p>
+      </div>
     </div>
   </div>
 ) : null}
-
 
           </div>
 
