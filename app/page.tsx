@@ -27,20 +27,6 @@ export default function Page() {
   const { setFrameReady, isFrameReady, context } = useMiniKit();
   const wagmiAddress = useAccount().address;
   const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
-  const [hydrated, setHydrated] = useState(false);
-
-useEffect(() => {
-  const check = setInterval(() => {
-    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-    const wagmi = wagmiAddress;
-    if (mini || wagmi) {
-      clearInterval(check);
-      setHydrated(true);
-    }
-  }, 300);
-
-  return () => clearInterval(check);
-}, []);
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
@@ -61,12 +47,14 @@ const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
 useEffect(() => {
-  if (!hydrated && !address) {
-    const timeout = setTimeout(() => window.location.reload(), 8000);
-    return () => clearTimeout(timeout);
-  }
-}, [hydrated, address]);
+  const interval = setInterval(() => {
+    if (!address && showVideo) {
+      window.location.reload();
+    }
+  }, 9800);
 
+  return () => clearInterval(interval);
+}, [address, showVideo]);
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
@@ -403,10 +391,10 @@ useEffect(() => {
               );
             })}
 
-{!hydrated || !address || showVideo ? (
+{!address || showVideo ? (
   <div
     className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ${
-      address && hydrated ? "opacity-0 pointer-events-none" : "opacity-100"
+      address ? "opacity-0 pointer-events-none" : "opacity-100"
     }`}
   >
     <video
