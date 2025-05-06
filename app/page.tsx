@@ -40,7 +40,7 @@ export default function Page() {
   const [activeInfo, setActiveInfo] = useState<string | null>(null);
   const [isSwapOpen, setIsSwapOpen] = useState(false);
   const [swapTokenKey, setSwapTokenKey] = useState<"froggi" | "fungi" | "pepi" | null>(null);
-  const [showVideo] = useState(true);
+  const [showVideo, setShowVideo] = useState(true);
   const [showMiniKit, setShowMiniKit] = useState(false);
 const [showDescription, setShowDescription] = useState(false);
 const [showBanners, setShowBanners] = useState(false);
@@ -50,13 +50,15 @@ const { setFrameReady, isFrameReady } = useMiniKit();
 useEffect(() => {
   const interval = setInterval(() => {
     const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-    if (mini && !address) {
+    if (mini) {
+      clearInterval(interval);
       window.location.reload();
     }
   }, 400);
 
   return () => clearInterval(interval);
-}, [context, address]);
+}, []);
+
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
@@ -72,18 +74,14 @@ useEffect(() => {
   }
 }, [address]);
 
+
 useEffect(() => {
-  const interval = setInterval(() => {
-    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-    if (mini) {
-      clearInterval(interval);
-      window.location.reload();
-    }
-  }, 400);
-
-  return () => clearInterval(interval);
-}, []);
-
+  if (!address) return;
+  const timeout = setTimeout(() => {
+    setShowVideo(false);
+  }, 1000);
+  return () => clearTimeout(timeout);
+}, [address, showVideo]);
 
   useEffect(() => {
     if (!address) return;
