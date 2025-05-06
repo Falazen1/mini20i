@@ -409,8 +409,6 @@ useEffect(() => {
       address && hydrated ? "opacity-0 pointer-events-none" : "opacity-100"
     }`}
   >
-
-  >
     <video
       autoPlay
       loop
