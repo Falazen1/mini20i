@@ -24,9 +24,23 @@ type Inscription = {
 };
 
 export default function Page() {
-  const context = useMiniKit();
+  const { setFrameReady, isFrameReady, context } = useMiniKit();
   const wagmiAddress = useAccount().address;
   const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
+  const [hydrated, setHydrated] = useState(false);
+
+useEffect(() => {
+  const check = setInterval(() => {
+    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+    const wagmi = wagmiAddress;
+    if (mini || wagmi) {
+      clearInterval(check);
+      setHydrated(true);
+    }
+  }, 300);
+
+  return () => clearInterval(check);
+}, []);
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
@@ -46,16 +60,12 @@ const [showDescription, setShowDescription] = useState(false);
 const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
-const { setFrameReady, isFrameReady } = useMiniKit();
 useEffect(() => {
-  const interval = setInterval(() => {
-    if (!address && showVideo) {
-      window.location.reload();
-    }
-  }, 9800);
-
-  return () => clearInterval(interval);
-}, [address, showVideo]);
+  if (!hydrated && !address) {
+    const timeout = setTimeout(() => window.location.reload(), 8000);
+    return () => clearTimeout(timeout);
+  }
+}, [hydrated, address]);
 
 
 useEffect(() => {
@@ -393,11 +403,13 @@ useEffect(() => {
               );
             })}
 
-{!address || showVideo ? (
+{!hydrated || !address || showVideo ? (
   <div
     className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ${
-      address ? "opacity-0 pointer-events-none" : "opacity-100"
+      address && hydrated ? "opacity-0 pointer-events-none" : "opacity-100"
     }`}
+  >
+
   >
     <video
       autoPlay
