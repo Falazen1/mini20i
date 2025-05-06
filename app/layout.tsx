@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "Base Inscriptions Viewer",
     other: {
       "fc:frame": JSON.stringify({
-        version: "vNext",
+        version: "next",
         imageUrl: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem1.png",
         button: {
           title: `Launch Mini20i`,
