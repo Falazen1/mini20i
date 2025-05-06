@@ -48,13 +48,13 @@ const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
 useEffect(() => {
   const interval = setInterval(() => {
-    if (!address && showVideo) {
+    if (!address) {
       window.location.reload();
     }
   }, 9800);
 
   return () => clearInterval(interval);
-}, [address, showVideo]);
+}, [address]);
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
