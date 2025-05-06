@@ -8,6 +8,7 @@ export async function GET() {
     frame: {
       "version": "next",
       "imageUrl": "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem1.png",
+      "iconUrl": "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem1.png",
       "name": "mini20i",
       "homeUrl": "https://mini20i.vercel.app",
       "button": {
