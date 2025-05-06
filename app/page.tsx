@@ -49,13 +49,16 @@ const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
 useEffect(() => {
   const interval = setInterval(() => {
-    if (!address) {
+    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+    if (mini) {
+      clearInterval(interval);
       window.location.reload();
     }
-  }, 4000);
-
+  }, 400);
   return () => clearInterval(interval);
 }, []);
+
+
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
