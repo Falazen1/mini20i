@@ -167,6 +167,17 @@ useEffect(() => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    const el = document.getElementById("dots");
+    if (!el) return;
+    let count = 1;
+    const loop = setInterval(() => {
+      el.textContent = ".".repeat(count);
+      count = (count + 1) % 4;
+    }, 400);
+    return () => clearInterval(loop);
+  }, []);
+  
+  useEffect(() => {
     setMounted(true);
   }, []);
   useEffect(() => {
@@ -228,17 +239,7 @@ useEffect(() => {
       setSelectedInscription(null);
     }
   }
-  useEffect(() => {
-    const el = document.getElementById("dots");
-    if (!el) return;
-    let count = 1;
-    const loop = setInterval(() => {
-      el.textContent = ".".repeat(count);
-      count = (count + 1) % 4;
-    }, 400);
-    return () => clearInterval(loop);
-  }, []);
-  
+
   return (
     <>
       {isProcessing && (
