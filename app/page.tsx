@@ -72,14 +72,18 @@ useEffect(() => {
   }
 }, [address]);
 
-
 useEffect(() => {
-  if (!address) return;
-  const timeout = setTimeout(() => {
-    setShowVideo(false);
-  }, 1000);
-  return () => clearTimeout(timeout);
-}, [address, showVideo]);
+  const interval = setInterval(() => {
+    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+    if (mini) {
+      clearInterval(interval);
+      window.location.reload();
+    }
+  }, 400);
+
+  return () => clearInterval(interval);
+}, []);
+
 
   useEffect(() => {
     if (!address) return;
