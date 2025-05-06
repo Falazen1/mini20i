@@ -20,7 +20,7 @@ export function Providers({ children }: PropsWithChildren) {
           config={{
             appearance: {
               name: "mini20i",
-              logo: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem1.png",
+              logo: "https://mini20i.vercel.app/favicon.ico",
               theme: "default",
               mode: "auto",
             },

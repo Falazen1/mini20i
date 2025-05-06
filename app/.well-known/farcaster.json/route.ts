@@ -20,6 +20,11 @@ export async function GET() {
           "url": "https://mini20i.vercel.app",
         }
       }
-    }
+    },
+    openGraph: {
+      "title": 'mini20i',
+      "description": 'Base Inscriptions Viewer',
+      "images": `https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem1.png`, 
+    },
   });
 }
