@@ -2,8 +2,8 @@ export async function GET() {
   return Response.json({
     "name": "mini20i",
     "description": "Base Inscriptions Viewer",
-    "url": "mini20i.vercel.app",
-    "icon": "raw.githubusercontent.com/Falazen1/mini20i/247d458041f9aaa57982f1250fbd27074517684d/public/ERC20i%20ecosystem.png?token=GHSAT0AAAAAADDK3QQH4PJT64J6HPSXTOUG2AZBS7A",
+    "url": "https://mini20i.vercel.app",
+    "icon": "https://raw.githubusercontent.com/Falazen1/mini20i/247d458041f9aaa57982f1250fbd27074517684d/public/ERC20i%20ecosystem.png?token=GHSAT0AAAAAADDK3QQH4PJT64J6HPSXTOUG2AZBS7A",
     "redirects": [],
     "accountAssociation": {
       "header": "eyJmaWQiOjUxMjY4NywidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDk2OTg0NDBGZjliMjVFNzkxMThBQzdkMTU3NDdGMEI3RDZBODc1MTQifQ",
@@ -12,13 +12,13 @@ export async function GET() {
     },
     "frame": {
       "version": "next",
-      "imageUrl": "raw.githubusercontent.com/Falazen1/mini20i/247d458041f9aaa57982f1250fbd27074517684d/public/ERC20i%20ecosystem.png?token=GHSAT0AAAAAADDK3QQH4PJT64J6HPSXTOUG2AZBS7A",
+      "imageUrl": "https://raw.githubusercontent.com/Falazen1/mini20i/247d458041f9aaa57982f1250fbd27074517684d/public/ERC20i%20ecosystem.png?token=GHSAT0AAAAAADDK3QQH4PJT64J6HPSXTOUG2AZBS7A",
       "button": {
         "title": "Launch Mini20i",
         "action": {
           "type": "launch_frame",
           "name": "mini20i",
-          "url": "mini20i.vercel.app",
+          "url": "https://mini20i.vercel.app",
         }
       }
     }

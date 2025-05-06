@@ -16,7 +16,6 @@ import { Address } from "viem";
 import { useTokenStore } from "./helpers/useTokenStore";
 import SwapModal from "./components/SwapModal";
 import Image from "next/image";
-
 type Inscription = {
   id: string;
   svg: string;
