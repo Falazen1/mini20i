@@ -59,7 +59,7 @@ useEffect(() => {
     if (!address) {
       window.location.reload();
     }
-  }, 9800);
+  }, 5000);
 
   return () => clearInterval(interval);
 }, [address]);
