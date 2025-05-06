@@ -40,7 +40,7 @@ export default function Page() {
   const [activeInfo, setActiveInfo] = useState<string | null>(null);
   const [isSwapOpen, setIsSwapOpen] = useState(false);
   const [swapTokenKey, setSwapTokenKey] = useState<"froggi" | "fungi" | "pepi" | null>(null);
-  const [showVideo, setShowVideo] = useState(true);
+  const [showVideo] = useState(true);
   const [showMiniKit, setShowMiniKit] = useState(false);
 const [showDescription, setShowDescription] = useState(false);
 const [showBanners, setShowBanners] = useState(false);
