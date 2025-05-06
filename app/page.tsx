@@ -49,14 +49,13 @@ const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
 useEffect(() => {
   const interval = setInterval(() => {
-    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-    if (mini && !address) {
+    if (!address) {
       window.location.reload();
     }
-  }, 400);
+  }, 600);
 
   return () => clearInterval(interval);
-}, [context, address]);
+}, []);
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
@@ -79,7 +78,7 @@ useEffect(() => {
     setShowVideo(false);
   }, 1000);
   return () => clearTimeout(timeout);
-}, []);
+}, [address, showVideo]);
 
   useEffect(() => {
     if (!address) return;
