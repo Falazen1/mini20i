@@ -24,10 +24,7 @@ type Inscription = {
 };
 
 export default function Page() {
-  const miniKit = useMiniKit();
-  const context = miniKit.context;
-  const setFrameReady = miniKit.setFrameReady;
-  const isFrameReady = miniKit.isFrameReady;
+  const context = useMiniKit();
   const wagmiAddress = useAccount().address;
   const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
   const { connect, connectors } = useConnect();
@@ -49,29 +46,22 @@ const [showDescription, setShowDescription] = useState(false);
 const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
+const { setFrameReady, isFrameReady } = useMiniKit();
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
 }, [isFrameReady, setFrameReady]);
-
 useEffect(() => {
   const interval = setInterval(() => {
-    if (!address) {
+    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+    if (mini && !address) {
       window.location.reload();
     }
-  }, 5000);
+  }, 400);
 
   return () => clearInterval(interval);
-}, [address]);
+}, [context, address]);
 
-
-useEffect(() => {
-  if (!address) return;
-  const timeout = setTimeout(() => {
-    setShowVideo(false);
-  }, 1000);
-  return () => clearTimeout(timeout);
-}, [address, showVideo]);
 
 useEffect(() => {
   if (address) {
@@ -82,6 +72,15 @@ useEffect(() => {
     setTimeout(() => setShowTokenSwap(true), 2000); // Rest of content
   }
 }, [address]);
+
+
+useEffect(() => {
+  if (!address) return;
+  const timeout = setTimeout(() => {
+    setShowVideo(false);
+  }, 1000);
+  return () => clearTimeout(timeout);
+}, [address, showVideo]);
 
   useEffect(() => {
     if (!address) return;
