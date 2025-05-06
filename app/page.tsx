@@ -46,6 +46,11 @@ const [showDescription, setShowDescription] = useState(false);
 const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
+
+useEffect(() => {
+  if (!isFrameReady) setFrameReady();
+}, [isFrameReady, setFrameReady]);
+
 useEffect(() => {
   const interval = setInterval(() => {
     if (!address) {
@@ -56,9 +61,14 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, [address]);
 
+
 useEffect(() => {
-  if (!isFrameReady) setFrameReady();
-}, [isFrameReady, setFrameReady]);
+  if (!address) return;
+  const timeout = setTimeout(() => {
+    setShowVideo(false);
+  }, 1000);
+  return () => clearTimeout(timeout);
+}, [address, showVideo]);
 
 useEffect(() => {
   if (address) {
@@ -69,15 +79,6 @@ useEffect(() => {
     setTimeout(() => setShowTokenSwap(true), 2000); // Rest of content
   }
 }, [address]);
-
-
-useEffect(() => {
-  if (!address) return;
-  const timeout = setTimeout(() => {
-    setShowVideo(false);
-  }, 1000);
-  return () => clearTimeout(timeout);
-}, [address, showVideo]);
 
   useEffect(() => {
     if (!address) return;
