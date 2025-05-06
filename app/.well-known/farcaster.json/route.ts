@@ -11,7 +11,7 @@ export async function GET() {
       "signature": "MHhjNjNlZjI5NDVjMjJhMzE5OGZmZjIwZWNhNDhlZWI5NWFiZGRiMjViMTUwMWJjM2MzODBiODM5MjlmZjdhZWJjM2Y1OWM3NTI3NTZkMTljYWM4ZDQ0ZDQ0NjU3NTVmYWI0YTllODk1N2IwMDg4ZmVjZGZkY2RkMWYzMDdmNDM5NTFi",
     },
     "frame": {
-      "version": "vNext",
+      "version": "next",
       "imageUrl": "https://raw.githubusercontent.com/Falazen1/mini20i/247d458041f9aaa57982f1250fbd27074517684d/public/ERC20i%20ecosystem.png?token=GHSAT0AAAAAADDK3QQH4PJT64J6HPSXTOUG2AZBS7A",
       "button": {
         "title": "Launch Mini20i",
