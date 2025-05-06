@@ -24,7 +24,10 @@ type Inscription = {
 };
 
 export default function Page() {
-  const { setFrameReady, isFrameReady, context } = useMiniKit();
+  const miniKit = useMiniKit();
+  const context = miniKit.context;
+  const setFrameReady = miniKit.setFrameReady;
+  const isFrameReady = miniKit.isFrameReady;
   const wagmiAddress = useAccount().address;
   const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
   const { connect, connectors } = useConnect();
