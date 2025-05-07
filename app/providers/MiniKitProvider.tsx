@@ -12,7 +12,7 @@ export function MiniKitProvider({ children }: { children: ReactNode }) {
       config={{
         appearance: {
           name: "mini20i",
-          logo: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem1.png",
+          logo: "https://mini20i.vercel.app/favicon.png",
           theme: "default",
           mode: "auto",
         },

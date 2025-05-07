@@ -7,9 +7,9 @@ export async function GET() {
     },
     frame: {
       "version": "next",
-      "imageUrl": "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem1.png",
-      "iconUrl": "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem1.png",
-      "appIcon": `https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem1.png`,
+      "imageUrl": "https://mini20i.vercel.app/favicon.png",
+      "iconUrl": "https://mini20i.vercel.app/favicon.png",
+      "appIcon": `https://mini20i.vercel.app/favicon.png`,
       "name": "mini20i",
       "homeUrl": "https://mini20i.vercel.app",
       "button": {
@@ -20,11 +20,6 @@ export async function GET() {
           "url": "https://mini20i.vercel.app",
         }
       }
-    },
-    openGraph: {
-      "title": 'mini20i',
-      "description": 'Base Inscriptions Viewer',
-      "images": `https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem1.png`, 
-    },
+    }
   });
 }
