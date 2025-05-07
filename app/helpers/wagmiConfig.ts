@@ -42,8 +42,8 @@ if (typeof window !== 'undefined') {
       wagmiConfig: config,
       projectId: WC_PROJECT_ID,
       connectorImages: {
-        injected: 'https://mini20i.vercel.app/logo.png',
-      }
+        injected: 'https://mini20i.vercel.app/logo2.png',
+      },
     });
   });
 }
