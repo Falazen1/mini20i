@@ -1,5 +1,4 @@
 "use client";
-import Head from "next/head";
 
 import { useEffect, useState } from "react";
 import { useMiniKit } from '@coinbase/onchainkit/minikit';
@@ -66,11 +65,11 @@ useEffect(() => {
 
 useEffect(() => {
   if (address) {
-    setTimeout(() => setShowMiniKit(true), 100); // MiniKit
-    setTimeout(() => setShowDescription(true), 700); // Description
-    setTimeout(() => setShowTokens(true), 1400); // Rest of content
-    setTimeout(() => setShowBanners(true), 1400); // Rest of content
-    setTimeout(() => setShowTokenSwap(true), 2000); // Rest of content
+    setTimeout(() => setShowMiniKit(true), 100); 
+    setTimeout(() => setShowDescription(true), 700); 
+    setTimeout(() => setShowTokens(true), 1400); 
+    setTimeout(() => setShowBanners(true), 1400); 
+    setTimeout(() => setShowTokenSwap(true), 2000); 
   }
 }, [address]);
 
@@ -176,12 +175,12 @@ useEffect(() => {
     const vid = document.getElementById("glitch-video") as HTMLVideoElement | null;
     if (!vid) return;
   
-    vid.playbackRate = 0.5; // play slowly
+    vid.playbackRate = 0.5; 
   
     const glitchInterval = setInterval(() => {
       if (!vid || vid.paused || vid.readyState < 2) return;
   
-      const shouldGlitch = Math.random() < 0.5; // 5% chance
+      const shouldGlitch = Math.random() < 0.5; 
       if (shouldGlitch) {
         const duration = vid.duration;
         const jumpTime = Math.random() * duration;
@@ -234,14 +233,6 @@ useEffect(() => {
 
   return (
     <>
-  <Head>
-    <link
-      rel="icon"
-      href="https://mini20i.vercel.app/logo.png"
-      type="image/png"
-    />
-  </Head>
-
       {isProcessing && (
         <div className="fixed inset-0 z-[9999] bg-black bg-opacity-70 flex items-center justify-center">
           <div className="bg-white px-6 py-4 rounded shadow text-center text-lg text-black">Processing transaction...</div>
@@ -328,7 +319,7 @@ useEffect(() => {
   </div>
 )}
 {isSwapOpen && swapTokenKey && (
-<SwapModal
+  <SwapModal
   tokenKey={swapTokenKey}
   onClose={() => {
     setIsSwapOpen(false);
@@ -338,7 +329,9 @@ useEffect(() => {
     setSuccessMessage("Swap successful!");
     setTimeout(() => setSuccessMessage(""), 4000);
   }}
+  inscriptionList={inscriptions[swapTokenKey] || []}
 />
+
 
 )}
 
@@ -599,17 +592,20 @@ useEffect(() => {
       setSwapTokenKey(token.key as "froggi" | "fungi" | "pepi");
     }}
   >
-    <div className="w-full aspect-square relative rounded overflow-hidden bg-black">
-      <Image
-        src={`${token.buyImage}`}
-        alt={`${token.name} buy more`}
-        fill
-        className="object-contain hover:opacity-90 transition"
-      />
-    </div>
-    <div className="text-xl text-white/0 mt-2 mb-[10px] text-center font-medium tracking-wide">
-  SWAP FOR MORE
+<div className="w-full aspect-square mb-11 rounded flex items-center justify-center">
+  <div className="mt-9 w-full h-full flex items-start">
+    <Image
+      src={`${token.buyImage}`}
+      alt={`${token.name} buy more`}
+      className="w-full h-auto object-contain hover:opacity-90 transition"
+      width={512}
+      height={512}
+    />
+  </div>
 </div>
+
+
+
 
   </div>
 </div>
@@ -630,7 +626,7 @@ useEffect(() => {
             <button onClick={() => setSelectedInscription(null)}>✕</button>
           </div>
           <div className="w-full aspect-square mb-4" dangerouslySetInnerHTML={{ __html: selectedInscription.svg }} />
-          <div className="text-sm text-white/90 mb-2"><span className="font-semibold">Seed:</span> {selectedInscription.seed}</div>
+          <div className="text-sm text-white/90 mb-2"><span className="font-semibold">Tokens:</span> {selectedInscription.seed}</div>
           <div className="text-sm text-white/90 mb-4"><span className="font-semibold">Type:</span> {selectedInscription.type}</div>
           <div className="flex flex-row justify-between items-end mt-4 gap-3">
             <div className="flex gap-3 flex-wrap">
@@ -674,7 +670,7 @@ useEffect(() => {
                   <button
   onClick={() => {
     setCombineMode(true);
-    setCombineList([selectedInscription]); // Start with selected inscription
+    setCombineList([selectedInscription]);
     setSelectedInscription(null);
   }}
   className="px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded"
