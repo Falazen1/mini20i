@@ -504,12 +504,12 @@ useEffect(() => {
         const raw = {
           "progression-fungi": `6 levels of $Fungi as your spore grows into a full fungi! Holding more tokens means more mycelium and an even mightier mushroom!`,
           "levels-fungi": [
-            ["Level 0", "1 - 20,999"],
-            ["Level 1", "0.01% - 21,000"],
-            ["Level 2", "0.25% - 525,000"],
-            ["Level 3", "0.50% - 1,050,000"],
-            ["Level 4", "0.75% - 1,575,000"],
-            ["Level 5", "1.00% - 2,100,000+"],
+            ["Level 0", "20,999 tokens or less"],
+            ["Level 1", "21,000+ tokens"],
+            ["Level 2", "525,000+ tokens"],
+            ["Level 3", "1,050,000+ tokens"],
+            ["Level 4", "1,575,000+ tokens"],
+            ["Level 5", "2,100,000+ tokens"],
           ],
           "progression-froggi": `7 tiers of $Froggi from colorful eggs to fully decked out denizens. Holding more tokens evolves your egg, with more trait combinations unlocking at higher levels.`,
           "levels-froggi": [
@@ -523,12 +523,12 @@ useEffect(() => {
           ],
           "progression-pepi": `6 levels of $Pepi let you see your Pepi grow from egg cluster, to tadpole, to fully mature. Each tier of Pepi offers a unique stage of growth for your inscription.`,
           "levels-pepi": [
-            ["Level 1", "1–10 tokens"],
-            ["Level 2", "11–21 tokens"],
-            ["Level 3", "22–32 tokens"],
-            ["Level 4", "33–43 tokens"],
-            ["Level 5", "44–55 tokens"],
-            ["Level 6", "56+ tokens"],
+            ["Level 0", "10 tokens or less"],
+            ["Level 1", "11–21 tokens"],
+            ["Level 2", "22–32 tokens"],
+            ["Level 3", "33–43 tokens"],
+            ["Level 4", "44–55 tokens"],
+            ["Level 5", "56+ tokens"],
           ],
         };
 
