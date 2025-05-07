@@ -117,9 +117,8 @@ export default function SwapModal({
               appearance: {
                 mode: "dark",
                 theme: "default",
-                name: "Mini20i",
-                logo:
-                  "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/main/logo512.png",
+                name: "mini20i",
+                logo: "https://mini20i.vercel.app/logo.png",
               },
             }}
           >
