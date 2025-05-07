@@ -3,7 +3,7 @@ import { base } from 'wagmi/chains';
 import { injected, walletConnect, coinbaseWallet } from 'wagmi/connectors';
 import { Buffer } from 'buffer';
 
-export const WC_PROJECT_ID = '150a8dd59fc17ad01ad57503669c735f';
+export const WC_PROJECT_ID = '5155899d6b66f997fb6c8554991c47ae';
 
 // Image must be HTTPS, public, and CORS-safe -- NO IPFS or GITHUB IMAGE HOSTING!
 
