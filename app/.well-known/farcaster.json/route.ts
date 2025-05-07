@@ -9,6 +9,7 @@ export async function GET() {
       "version": "next",
       "imageUrl": "https://mini20i.vercel.app/favicon.png",
       "iconUrl": "https://mini20i.vercel.app/favicon.png",
+      "logo": "https://mini20i.vercel.app/logo.png",
       "appIcon": `https://mini20i.vercel.app/favicon.png`,
       "name": "mini20i",
       "homeUrl": "https://mini20i.vercel.app",
