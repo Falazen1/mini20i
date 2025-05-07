@@ -41,6 +41,9 @@ if (typeof window !== 'undefined') {
     createWeb3Modal({
       wagmiConfig: config,
       projectId: WC_PROJECT_ID,
+      connectorImages: {
+        injected: 'https://mini20i.vercel.app/logo.png',
+      }
     });
   });
 }

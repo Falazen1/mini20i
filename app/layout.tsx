@@ -19,6 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "fc:frame": JSON.stringify({
         version: "next",
         appIcon: `https://mini20i.vercel.app/favicon.png`,
+        appLogoUrl: `https://mini20i.vercel.app/logo.png`,
         logo: "https://mini20i.vercel.app/logo.png",
         imageUrl: "https://mini20i.vercel.app/favicon.png",
         button: {
