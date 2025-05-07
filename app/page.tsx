@@ -1,4 +1,5 @@
 "use client";
+import Head from "next/head";
 
 import { useEffect, useState } from "react";
 import { useMiniKit } from '@coinbase/onchainkit/minikit';
@@ -233,6 +234,14 @@ useEffect(() => {
 
   return (
     <>
+  <Head>
+    <link
+      rel="icon"
+      href="https://mini20i.vercel.app/logo.png"
+      type="image/png"
+    />
+  </Head>
+
       {isProcessing && (
         <div className="fixed inset-0 z-[9999] bg-black bg-opacity-70 flex items-center justify-center">
           <div className="bg-white px-6 py-4 rounded shadow text-center text-lg text-black">Processing transaction...</div>
