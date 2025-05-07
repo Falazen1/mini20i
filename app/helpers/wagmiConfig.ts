@@ -5,12 +5,13 @@ import { Buffer } from 'buffer';
 
 export const WC_PROJECT_ID = '5155899d6b66f997fb6c8554991c47ae';
 
-// Image must be HTTPS, public, and CORS-safe -- NO IPFS or GITHUB IMAGE HOSTING!
+// Image must be HTTPS, public, and CORS-safe
+// Upload 'logo2.png' to your /public directory
 
 export const config = createConfig({
   chains: [base],
   transports: {
-    [base.id]: http('https://base-mainnet.g.alchemy.com/v2/9qMBmGtkKgEUQkdQlEpq0GhMtfly2mzS'),
+    [base.id]: http('https://base-mainnet.g.alchemy.com/v2/h_Eo8VfIkLqa6vLqzrt023fm073ncKxJ'),
   },
   connectors: [
     injected(),
@@ -20,12 +21,12 @@ export const config = createConfig({
         name: 'mini20i',
         description: 'Swap and manage mini20i tokens',
         url: 'https://mini20i.vercel.app',
-        icons: ['https://mini20i.vercel.app/logo.png'], 
+        icons: ['https://mini20i.vercel.app/logo.png'], // ✅ updated image
       },
     }),
     coinbaseWallet({
       appName: 'mini20i',
-      appLogoUrl: 'https://mini20i.vercel.app/logo.png',
+      appLogoUrl: 'https://mini20i.vercel.app/logo.png', // ✅ updated image
       chainId: base.id,
     }),
   ],
@@ -42,7 +43,9 @@ if (typeof window !== 'undefined') {
       wagmiConfig: config,
       projectId: WC_PROJECT_ID,
       connectorImages: {
-        injected: 'https://mini20i.vercel.app/logo2.png',
+        injected: 'https://mini20i.vercel.app/logo.png', // ✅ consistent branding
+        coinbaseWallet: 'https://mini20i.vercel.app/logo.png', // ✅ optional
+        walletConnect: 'https://mini20i.vercel.app/logo.png', // ✅ optional
       },
     });
   });

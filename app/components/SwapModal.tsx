@@ -118,7 +118,7 @@ export default function SwapModal({
                 mode: "dark",
                 theme: "default",
                 name: "mini20i",
-                logo: "https://mini20i.vercel.app/logo.png",
+                logo: `https://mini20i.vercel.app/logo.png`,
               },
             }}
           >

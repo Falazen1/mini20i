@@ -12,6 +12,7 @@ const queryClient = new QueryClient();
 
 export function Providers({ children }: PropsWithChildren) {
   return (
+    
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <OnchainKitProvider
@@ -20,13 +21,13 @@ export function Providers({ children }: PropsWithChildren) {
           config={{
             appearance: {
               name: "mini20i",
-              logo: "https://mini20i.vercel.app/logo.png",
+              logo: `https://mini20i.vercel.app/logo.png`,
               theme: "default",
               mode: "auto",
             },
           }}
         >
-          <MiniKitProvider>{children}</MiniKitProvider>
+          <MiniKitProvider> {children}</MiniKitProvider>
         </OnchainKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

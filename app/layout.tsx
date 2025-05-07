@@ -20,8 +20,8 @@ export async function generateMetadata(): Promise<Metadata> {
         version: "next",
         appIcon: `https://mini20i.vercel.app/favicon.png`,
         appLogoUrl: `https://mini20i.vercel.app/logo.png`,
-        logo: "https://mini20i.vercel.app/logo.png",
-        imageUrl: "https://mini20i.vercel.app/favicon.png",
+        logo: `https://mini20i.vercel.app/logo.png`,
+        imageUrl: `https://mini20i.vercel.app/favicon.png`,
         button: {
           title: `Launch Mini20i`,
           action: {
