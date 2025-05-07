@@ -13,6 +13,7 @@ import {
 import { OnchainKitProvider } from "@coinbase/onchainkit";
 import { base } from "viem/chains";
 import { useTransaction } from "../helpers/useTransaction";
+import Image from "next/image";
 
 const ethBase: Token = {
   name: "Ethereum",
@@ -21,6 +22,12 @@ const ethBase: Token = {
   decimals: 18,
   image: "https://wallet-api-production.s3.amazonaws.com/uploads/tokens/eth_288.png",
   chainId: 8453,
+};
+
+const LOADING_GIFS: Record<"froggi" | "fungi" | "pepi", string> = {
+  froggi: "/frog_rolling_long.gif",
+  fungi: "/fungi_rolling_long.gif",
+  pepi: "/pepi_rolling_long.gif",
 };
 
 const TOKENS: Record<"froggi" | "fungi" | "pepi", Token> = {
@@ -64,15 +71,16 @@ export default function SwapModal({
     svg: string;
     seed: string;
     type: "Dynamic" | "Stable";
-  }[]; 
+  }[];
 }) {
   const { address } = useAccount();
   const token = TOKENS[tokenKey];
+  const loadingGif = LOADING_GIFS[tokenKey];
   const [debounced, setDebounced] = useState(false);
   const [swapDone, setSwapDone] = useState(false);
   const [newInscription, setNewInscription] = useState<string | null>(null);
   const [inscriptionId, setInscriptionId] = useState<string | null>(null);
-  const [fadeInButtons, setFadeInButtons] = useState(false); 
+  const [fadeInButtons, setFadeInButtons] = useState(false);
   const prevSvgRef = useRef<string | null>(null);
   const { stabilizeInscription, destabilizeInscription, combineInscriptions } = useTransaction();
 
@@ -108,10 +116,10 @@ export default function SwapModal({
 
   useEffect(() => {
     if (newInscription) {
-      setFadeInButtons(true); 
+      setFadeInButtons(true);
     }
   }, [newInscription]);
-  
+
   const handleSuccess = () => {
     setSwapDone(true);
     onSuccess();
@@ -145,7 +153,6 @@ export default function SwapModal({
   return (
     <div className="fixed inset-0 z-[9999] bg-black bg-opacity-70 flex items-center justify-center">
       <div className="relative bg-[#1c1e24] rounded-xl shadow-2xl p-6 w-full max-w-md text-white border border-white/10">
-        {/* X Button (top-right corner, no fade-in) */}
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-white text-xl hover:text-red-400"
@@ -154,34 +161,41 @@ export default function SwapModal({
         </button>
 
         <h2 className="text-2xl font-bold mb-6 text-center">
-          Swap ETH → {token.symbol}
-        </h2>
+  {newInscription
+    ? tokenKey === "froggi"
+      ? "Your Froggi has evolved!"
+      : tokenKey === "fungi"
+      ? "Your Fungi has grown!"
+      : "Your Pepi has transformed!"
+    : `Swap ETH → ${token.symbol}`}
+</h2>
 
-        {swapDone ? (
-          <>
-            <div className="mb-4 text-center text-sm">
-              {!newInscription
-                ? tokenKey === "froggi"
-                  ? "Your Froggi is evolving..."
-                  : tokenKey === "fungi"
-                  ? "Your Fungi is growing..."
-                  : "Your Pepi is transforming..."
-                : tokenKey === "froggi"
-                ? "Your Froggi has evolved!"
-                : tokenKey === "fungi"
-                ? "Your Fungi has grown!"
-                : "Your Pepi has transformed!"}
-            </div>
+
+{swapDone ? (
+  <>
+    {!newInscription && (
+      <div className="mb-4 text-center text-sm">
+        {tokenKey === "froggi"
+          ? "Your Froggi is evolving..."
+          : tokenKey === "fungi"
+          ? "Your Fungi is growing..."
+          : "Your Pepi is transforming..."}
+      </div>
+    )}
 
             <div className="w-full aspect-square rounded bg-[#0f1014] flex items-center justify-center relative mb-2">
               {!newInscription ? (
-                <p className="text-sm opacity-70 absolute text-center">
-                  {tokenKey === "froggi"
-                    ? "Your Froggi is evolving..."
-                    : tokenKey === "fungi"
-                    ? "Your Fungi is growing..."
-                    : "Your Pepi is transforming..."}
-                </p>
+                <div className="absolute inset-0 overflow-hidden">
+  <Image
+    src={loadingGif}
+    alt="loading gif"
+    className="w-full h-full object-contain translate-y-[3px]"
+    fill
+    unoptimized
+  />
+</div>
+
+
               ) : (
                 <div
                   className="w-full h-full absolute top-0 left-0 animate-fade-in2"
@@ -197,38 +211,36 @@ export default function SwapModal({
               </div>
             )}
 
-              <div className="w-full pt-1 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                <div className={`flex space-x-2 ${fadeInButtons ? 'animate-fade-in2' : 'opacity-0'}`}>
-                  <button
-                    onClick={handleStabilize}
-                    className="bg-green-100 text-green-900 px-4 py-2 rounded hover:bg-green-200"
-                  >
-                    Stabilize
-                  </button>
-                  <button
-                    onClick={handleReroll}
-                    className="bg-yellow-100 text-yellow-900 px-4 py-2 rounded hover:bg-yellow-200"
-                  >
-                    Re-roll
-                  </button>
-                  <button
-                    onClick={handleCombine}
-                    className="bg-indigo-100 text-indigo-900 px-4 py-2 rounded hover:bg-indigo-200"
-                  >
-                    Combine
-                  </button>
-                </div>
-
-                {/* Close button remains at the bottom-right and is not part of the fade-in */}
-                <div className="mt-4 sm:mt-0">
-                  <button
-                    onClick={onClose}
-                    className="bg-white text-black px-4 py-2 rounded hover:bg-gray-200"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
+<div className="w-full pt-1 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-y-4 items-end">
+  <div className={`flex flex-wrap gap-2 ${fadeInButtons ? 'animate-fade-in2' : 'opacity-0'}`}>
+    <button
+      onClick={handleStabilize}
+      className="bg-green-100 text-green-900 px-4 py-2 rounded hover:bg-green-200"
+    >
+      Stabilize
+    </button>
+    <button
+      onClick={handleReroll}
+      className="bg-yellow-100 text-yellow-900 px-4 py-2 rounded hover:bg-yellow-200"
+    >
+      Re-roll
+    </button>
+    <button
+      onClick={handleCombine}
+      className="bg-indigo-100 text-indigo-900 px-4 py-2 rounded hover:bg-indigo-200"
+    >
+      Combine
+    </button>
+  </div>
+  <div className="flex justify-end">
+    <button
+      onClick={onClose}
+      className="bg-white text-black px-4 py-2 rounded hover:bg-gray-200"
+    >
+      Close
+    </button>
+  </div>
+</div>
 
           </>
         ) : (
