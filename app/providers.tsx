@@ -20,14 +20,14 @@ export function Providers({ children }: PropsWithChildren) {
           chain={base}
           config={{
             appearance: {
-              name: "mini20i-desktop",
+              name: "mini20i",
               logo: "https://mini20i.vercel.app/logo.png",
               theme: "default",
               mode: "auto",
             },
           }}
         >
-          <MiniKitProvider> {children}</MiniKitProvider>
+          <MiniKitProvider>{children}</MiniKitProvider>
         </OnchainKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

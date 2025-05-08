@@ -70,7 +70,7 @@ export default function SwapModal({
     id: string;
     svg: string;
     seed: string;
-    type: "Dynamic" | "Stable";
+    type: "Growing" | "Safe";
   }[];
 }) {
   const { address } = useAccount();
@@ -82,7 +82,7 @@ export default function SwapModal({
   const [inscriptionId, setInscriptionId] = useState<string | null>(null);
   const [fadeInButtons, setFadeInButtons] = useState(false);
   const prevSvgRef = useRef<string | null>(null);
-  const { stabilizeInscription, destabilizeInscription, combineInscriptions } = useTransaction();
+  const { stabilizeInscription, combineInscriptions } = useTransaction();
 
   useEffect(() => {
     const timer = setTimeout(() => setDebounced(true), 500);
@@ -94,14 +94,14 @@ export default function SwapModal({
 
   useEffect(() => {
     if (!swapDone) {
-      const before = inscriptionList.find(i => i.type === "Dynamic");
+      const before = inscriptionList.find(i => i.type === "Growing");
       prevSvgRef.current = before?.svg ?? null;
     }
   }, [swapDone, inscriptionList]);
 
   useEffect(() => {
     if (!swapDone) return;
-    const latest = inscriptionList.find(i => i.type === "Dynamic");
+    const latest = inscriptionList.find(i => i.type === "Growing");
     const isNew = latest && latest.svg !== prevSvgRef.current;
 
     if (isNew) {
@@ -125,19 +125,15 @@ export default function SwapModal({
     onSuccess();
   };
 
-  const handleStabilize = () => {
+  const handleStabilize = async () => {
     if (inscriptionId && address) {
       const seed = BigInt(inscriptionList.find(i => i.id === inscriptionId)?.seed || "0");
-      stabilizeInscription(address, seed);
+      await stabilizeInscription(address, seed);
+      onClose();
     }
   };
+  
 
-  const handleReroll = () => {
-    if (inscriptionId && address) {
-      const seed = BigInt(inscriptionList.find(i => i.id === inscriptionId)?.seed || "0");
-      destabilizeInscription(address, seed);
-    }
-  };
 
   const handleCombine = () => {
     if (inscriptionId && address) {
@@ -162,13 +158,16 @@ export default function SwapModal({
 
         <h2 className="text-2xl font-bold mb-6 text-center">
   {newInscription
-    ? tokenKey === "froggi"
-      ? "Your Froggi has evolved!"
-      : tokenKey === "fungi"
-      ? "Your Fungi has grown!"
-      : "Your Pepi has transformed!"
+    ? prevSvgRef.current === null
+      ? "You got a new inscription!"
+      : tokenKey === "froggi"
+        ? "Your Froggi has evolved!"
+        : tokenKey === "fungi"
+        ? "Your Fungi has grown!"
+        : "Your Pepi has transformed!"
     : `Swap ETH → ${token.symbol}`}
 </h2>
+
 
 
 {swapDone ? (
@@ -207,31 +206,43 @@ export default function SwapModal({
             {seedValue && (
               <div className="text-sm text-white text-left mb-3 space-y-1">
                 <div><span className="font-semibold">Tokens:</span> {seedValue}</div>
-                <div><span className="font-semibold">Type:</span> Dynamic</div>
+                <div><span className="font-semibold">Mode:</span> Growing</div>
               </div>
             )}
 
 <div className="w-full pt-1 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-y-4 items-end">
-  <div className={`flex flex-wrap gap-2 ${fadeInButtons ? 'animate-fade-in2' : 'opacity-0'}`}>
+<div className={`flex flex-wrap gap-2 ${fadeInButtons ? 'animate-fade-in2' : 'opacity-0'}`}>
+  {tokenKey === "froggi" && (
     <button
       onClick={handleStabilize}
       className="bg-green-100 text-green-900 px-4 py-2 rounded hover:bg-green-200"
     >
-      Stabilize
+      Stash
     </button>
-    <button
-      onClick={handleReroll}
-      className="bg-yellow-100 text-yellow-900 px-4 py-2 rounded hover:bg-yellow-200"
-    >
-      Re-roll
-    </button>
+  )}
+
+  <button
+    onClick={() => {
+      setSwapDone(false);
+      setNewInscription(null);
+      setInscriptionId(null);
+      setFadeInButtons(false);
+    }}
+    className="bg-yellow-100 text-yellow-900 px-4 py-2 rounded hover:bg-yellow-200"
+  >
+    Add more
+  </button>
+
+  {inscriptionList.filter(i => i.type === "Safe" && i.id !== inscriptionId).length > 0 && (
     <button
       onClick={handleCombine}
       className="bg-indigo-100 text-indigo-900 px-4 py-2 rounded hover:bg-indigo-200"
     >
       Combine
     </button>
-  </div>
+  )}
+</div>
+
   <div className="flex justify-end">
     <button
       onClick={onClose}

@@ -20,7 +20,7 @@ type Inscription = {
   id: string;
   svg: string;
   seed: string;
-  type: "Dynamic" | "Stable";
+  type: "Growing" | "Safe";
 };
 
 export default function Page() {
@@ -122,7 +122,7 @@ useEffect(() => {
               id: `${token.key}-dynamic`,
               svg,
               seed: dynamic.seed.toString(),
-              type: "Dynamic",
+              type: "Growing",
             });
           }
         } catch {}
@@ -155,7 +155,7 @@ useEffect(() => {
                 id: `${token.key}-stable-${i}`,
                 svg,
                 seed: seed.seed.toString(),
-                type: "Stable",
+                type: "Safe",
               });
             } catch {}
           }
@@ -211,7 +211,11 @@ useEffect(() => {
       const value = BigInt(seed);
       const user = address as Address;
 
-      if (action === "stabilize") await stabilizeInscription(user, value);
+      if (action === "stabilize") {
+        await stabilizeInscription(user, value);
+        setSelectedInscription(null);
+      }
+      
       if (action === "destabilize") await destabilizeInscription(user, value);
       if (action === "combine") {
         const seeds = combineList.length > 0 ? combineList.map(i => BigInt(i.seed)) : [value];
@@ -221,7 +225,7 @@ useEffect(() => {
       }
 
       const label =
-        action === "destabilize" && selectedInscription?.type === "Dynamic"
+        action === "destabilize" && selectedInscription?.type === "Growing"
           ? "Re-roll"
           : action.charAt(0).toUpperCase() + action.slice(1);
 
@@ -260,7 +264,7 @@ useEffect(() => {
               id: `${tokenKey}-dynamic`,
               svg,
               seed: dynamic.seed.toString(),
-              type: "Dynamic",
+              type: "Growing",
             };
 
             const prevSvg = selectedInscription?.svg ?? null;
@@ -295,7 +299,7 @@ useEffect(() => {
     <>
       {isProcessing && (
         <div className="fixed inset-0 z-[9999] bg-black bg-opacity-70 flex items-center justify-center">
-          <div className="bg-white px-6 py-4 rounded shadow text-center text-lg text-black">Processing transaction...</div>
+          <div className="bg-white px-6 py-4 rounded shadow text-center text-lg text-black">Preparing transaction...</div>
         </div>
       )}
       {successMessage && (
@@ -619,7 +623,7 @@ useEffect(() => {
 <div
   key={inscription.id}
   onClick={() => {
-    if (combineMode && inscription.type === "Stable") {
+    if (combineMode && inscription.type === "Safe") {
       setCombineList((prev) =>
         prev.some((i) => i.id === inscription.id)
           ? prev.filter((i) => i.id !== inscription.id)
@@ -637,8 +641,8 @@ useEffect(() => {
     className="w-full aspect-square mb-2 rounded overflow-hidden bg-black"
     dangerouslySetInnerHTML={{ __html: inscription.svg }}
   />
-  <div className="text-xs text-white/80">Type: {inscription.type}</div>
   <div className="text-xs text-white/80">Tokens: {inscription.seed}</div>
+  <div className="text-xs text-white/80">Type: {inscription.type}</div>
 </div>
 
     );
@@ -686,7 +690,6 @@ useEffect(() => {
             <button onClick={() => setSelectedInscription(null)}>✕</button>
           </div>
           <div className="w-full aspect-square mb-4 relative bg-black rounded overflow-hidden">
-  {/* New Inscription SVG fades in, starts slightly earlier */}
   <div
     className={`absolute inset-0 w-full h-full z-10 transition-opacity duration-[500ms] ${
       showRollingGif ? 'opacity-0 delay-[100ms]' : 'opacity-100'
@@ -694,7 +697,7 @@ useEffect(() => {
     dangerouslySetInnerHTML={{ __html: selectedInscription.svg }}
   />
 
-  {/* Rolling GIF fades out slightly after SVG starts */}
+
   {showRollingGif && (
     <Image
       src={LOADING_GIFS[showRollingGif]}
@@ -709,61 +712,57 @@ useEffect(() => {
 </div>
 
 
-          <div className="text-sm text-white/90 mb-2"><span className="font-semibold">Tokens:</span> {selectedInscription.seed}</div>
-          <div className="text-sm text-white/90 mb-4"><span className="font-semibold">Type:</span> {selectedInscription.type}</div>
+          <div className="text-sm text-white/90 mb-2"><span className="font-semibold">Tokens: </span> {selectedInscription.seed}</div>
+          <div className="text-sm text-white/90 mb-4"><span className="font-semibold">Type: </span> {selectedInscription.type}</div>
           <div className="flex flex-row justify-between items-end mt-4 gap-3">
-            <div className="flex gap-3 flex-wrap">
-              {selectedInscription.type === "Stable" ? (
-                <>
-                  <button
-                    onClick={() => handleClick(selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi", "destabilize", selectedInscription.seed)}
-                    className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded"
-                  >
-                    Destabilize
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCombineMode(true);
-                      setCombineList((prev) =>
-                        prev.some((i) => i.id === selectedInscription.id)
-                          ? prev
-                          : [...prev, selectedInscription]
-                      );
-                      setSelectedInscription(null);
-                    }}
-                    className="px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded"
-                  >
-                    Combine
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => handleClick(selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi", "stabilize", selectedInscription.seed)}
-                    className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded"
-                  >
-                    Stabilize
-                  </button>
-                  <button
-                    onClick={() => handleClick(selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi", "destabilize", selectedInscription.seed)}
-                    className="px-4 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
-                  >
-                    Re-roll
-                  </button>
-                  <button
-  onClick={() => {
-    setCombineMode(true);
-    setCombineList([selectedInscription]);
-    setSelectedInscription(null);
-  }}
-  className="px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded"
->
-  Combine
-</button>
+          <div className="flex gap-3 flex-wrap">
+  {selectedInscription.id.startsWith("froggi") && selectedInscription.type === "Safe" && (
+    <button
+      onClick={() =>
+        handleClick("froggi", "destabilize", selectedInscription.seed)
+      }
+      className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded"
+    >
+      Growth mode
+    </button>
+  )}
 
-                </>
-              )}
-            </div>
+  {selectedInscription.id.startsWith("froggi") && selectedInscription.type === "Growing" && (
+    <button
+      onClick={() =>
+        handleClick("froggi", "stabilize", selectedInscription.seed)
+      }
+      className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded"
+    >
+      Stash
+    </button>
+  )}
+
+  {(inscriptions[selectedInscription.id.split("-")[0]]?.filter(i => i.type === "Safe").length ?? 0) > 1 && (
+    <button
+      onClick={() => {
+        setCombineMode(true);
+        setCombineList([selectedInscription]);
+        setSelectedInscription(null);
+      }}
+      className="px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded"
+    >
+      Combine
+    </button>
+  )}
+
+  <button
+    onClick={() => {
+      setSelectedInscription(null);
+      setSwapTokenKey(selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi");
+      setIsSwapOpen(true);
+    }}
+    className="px-4 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
+  >
+    Add more
+  </button>
+</div>
+
             <button
               onClick={() => setSelectedInscription(null)}
               className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
