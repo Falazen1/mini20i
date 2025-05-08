@@ -47,6 +47,12 @@ const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
+const LOADING_GIFS: Record<"froggi" | "fungi" | "pepi", string> = {
+  froggi: "/frog_rolling_long.gif",
+  fungi: "/fungi_rolling_long.gif",
+  pepi: "/pepi_rolling_long.gif",
+};
+const [showRollingGif, setShowRollingGif] = useState<null | "froggi" | "fungi" | "pepi">(null);
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
@@ -54,10 +60,10 @@ useEffect(() => {
 useEffect(() => {
   const interval = setInterval(() => {
     const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-    if (mini && !address) {
+    if (!mini && !address) {
       window.location.reload();
     }
-  }, 400);
+  }, 5000);
 
   return () => clearInterval(interval);
 }, [context, address]);
@@ -227,8 +233,62 @@ useEffect(() => {
       setTimeout(() => setSuccessMessage(""), 4000);
     } finally {
       setIsProcessing(false);
-      setSelectedInscription(null);
+
+      const reload = async () => {
+        const tokenKey = key;
+        const abi = abis[tokenKey];
+        const contractAddress = tokens.find(t => t.key === tokenKey)?.address as `0x${string}`;
+        const fn = getFunctionNames(tokenKey);
+
+        try {
+          const dynamic = await readContract(config, {
+            abi,
+            address: contractAddress,
+            functionName: fn.sporesDegree,
+            args: [address],
+          }) as Seed;
+
+          if (dynamic.seed && dynamic.seed !== 0n) {
+            const svg = await readContract(config, {
+              abi,
+              address: contractAddress,
+              functionName: "getSvg",
+              args: [dynamic],
+            }) as string;
+
+            const latest: Inscription = {
+              id: `${tokenKey}-dynamic`,
+              svg,
+              seed: dynamic.seed.toString(),
+              type: "Dynamic",
+            };
+
+            const prevSvg = selectedInscription?.svg ?? null;
+            const isNew = latest.svg !== prevSvg;
+
+            if (isNew) {
+              setShowRollingGif(tokenKey);
+              setTimeout(() => {
+                setSelectedInscription(latest);
+                setShowRollingGif(null);
+              }, 2580);
+            }
+            
+            
+          }
+        } catch {
+          setSelectedInscription(null);
+        }
+      };
+
+      if (action !== "combine") reload();
+      if (action === "combine") {
+        setCombineList([]);
+        setCombineMode(false);
+      }
     }
+
+
   }
 
   return (
@@ -625,7 +685,30 @@ useEffect(() => {
             <h2 className="text-xl font-semibold">Inscription Detail</h2>
             <button onClick={() => setSelectedInscription(null)}>✕</button>
           </div>
-          <div className="w-full aspect-square mb-4" dangerouslySetInnerHTML={{ __html: selectedInscription.svg }} />
+          <div className="w-full aspect-square mb-4 relative bg-black rounded overflow-hidden">
+  {/* New Inscription SVG fades in, starts slightly earlier */}
+  <div
+    className={`absolute inset-0 w-full h-full z-10 transition-opacity duration-[500ms] ${
+      showRollingGif ? 'opacity-0 delay-[100ms]' : 'opacity-100'
+    }`}
+    dangerouslySetInnerHTML={{ __html: selectedInscription.svg }}
+  />
+
+  {/* Rolling GIF fades out slightly after SVG starts */}
+  {showRollingGif && (
+    <Image
+      src={LOADING_GIFS[showRollingGif]}
+      alt="Loading animation"
+      fill
+      unoptimized
+      className="absolute inset-0 object-contain z-20 transition-opacity duration-[500ms] ${
+        showRollingGif ? 'opacity-100' : 'opacity-0'
+      } delay-[100ms]"
+    />
+  )}
+</div>
+
+
           <div className="text-sm text-white/90 mb-2"><span className="font-semibold">Tokens:</span> {selectedInscription.seed}</div>
           <div className="text-sm text-white/90 mb-4"><span className="font-semibold">Type:</span> {selectedInscription.type}</div>
           <div className="flex flex-row justify-between items-end mt-4 gap-3">
