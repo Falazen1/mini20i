@@ -781,6 +781,20 @@ useEffect(() => {
     </button>
   )}
 
+{selectedInscription.type === "Safe" ? (
+  (inscriptions[selectedInscription.id.split("-")[0]]?.some(i => i.type === "Growing") ? null : (
+    <button
+      onClick={() => {
+        setSelectedInscription(null);
+        setSwapTokenKey(selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi");
+        setIsSwapOpen(true);
+      }}
+      className="px-4 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
+    >
+      Start New
+    </button>
+  ))
+) : (
   <button
     onClick={() => {
       setSelectedInscription(null);
@@ -791,6 +805,8 @@ useEffect(() => {
   >
     Add more
   </button>
+)}
+
 </div>
 
             <button
