@@ -10,7 +10,7 @@ export async function GET() {
       "name": "mini 20i",
       "subtitle": "Swap ERC20i Inscriptions",
       "tagline": "Your base inscriptions hub",
-      "description": "Explore ERC20i Inscriptions like Fungi, Froggi, and Pepi — Tokens Evolved.",
+      "description": "Explore Fungi, Froggi, and Pepi — Tokens Evolved",
       "homeUrl": "https://mini20i.vercel.app",
       "iconUrl": "https://mini20i.vercel.app/favicon.png",
       "imageUrl": "https://mini20i.vercel.app/favicon.png",
@@ -20,7 +20,7 @@ export async function GET() {
       "primaryCategory": "art-creativity",
       "tags": ["erc20i", "NFT", "swap", "game", "collectible"],
       "ogTitle": "Swap ERC20i Inscriptions",
-      "ogDescription": "Explore Fungi, Froggi, and Pepi — Tokens Evolved.",
+      "ogDescription": "Explore Fungi, Froggi, and Pepi — Tokens Evolved",
       "ogImageUrl": "https://mini20i.vercel.app/favicon.png",
       "button": {
         "title": "Launch Mini20i",
