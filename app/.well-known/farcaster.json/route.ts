@@ -16,16 +16,12 @@ export async function GET() {
       "imageUrl": "https://mini20i.vercel.app/favicon.png",
       "logo": "https://mini20i.vercel.app/logo.png",
       "appIcon": "https://mini20i.vercel.app/favicon.png",
-      "screenshotUrls": [
-        "https://mini20i.vercel.app/screenshots/1.png",
-        "https://mini20i.vercel.app/screenshots/2.png"
-      ],
-      "heroImageUrl": "https://mini20i.vercel.app/hero.png",
+      "heroImageUrl": "https://mini20i.vercel.app/favicon.png",
       "primaryCategory": "finance",
       "tags": ["erc20i", "NFT", "swap", "art", "collectible"],
       "ogTitle": "Swap ERC20i Inscriptions",
       "ogDescription": "Explore Froggi, Fungi, and Pepi — Tokens Evolved.",
-      "ogImageUrl": "https://mini20i.vercel.app/og/froggi/0-anon.png",
+      "ogImageUrl": "https://mini20i.vercel.app/favicon.png",
       "button": {
         "title": "Launch Mini20i",
         "action": {
