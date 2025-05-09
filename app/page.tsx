@@ -17,7 +17,7 @@ import { Address } from "viem";
 import { useTokenStore } from "./helpers/useTokenStore";
 import SwapModal from "./components/SwapModal";
 import Image from "next/image";
-import ShareButton from "./components/ShareButton"; 
+{/*import ShareButton from "./components/ShareButton";*/}
 import Head from "next/head";
 
 type Inscription = {
@@ -837,12 +837,14 @@ useEffect(() => {
 </div>
 
 <div className="flex flex-col gap-2">
+{/*
 {typeof window !== "undefined" && (
-  <ShareButton
-    seed={selectedInscription.seed}
-    project={selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi"}
-  />
-)}
+<ShareButton
+  seed={selectedInscription.seed}
+  project={selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi"}
+  svg={selectedInscription.svg}
+/>
+*/}
 
   <button
     onClick={() => setSelectedInscription(null)}
