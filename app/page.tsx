@@ -17,6 +17,9 @@ import { Address } from "viem";
 import { useTokenStore } from "./helpers/useTokenStore";
 import SwapModal from "./components/SwapModal";
 import Image from "next/image";
+import ShareButton from "./components/ShareButton"; 
+import Head from "next/head";
+
 type Inscription = {
   id: string;
   svg: string;
@@ -316,6 +319,27 @@ useEffect(() => {
 
   return (
     <>
+{selectedInscription && (
+  <Head>
+    <meta
+      name="fc:frame"
+      content={JSON.stringify({
+        version: "next",
+        imageUrl: `https://mini20i.vercel.app/api/png/${selectedInscription.id.split("-")[0]}/${selectedInscription.seed}?address=${address}`,
+        button: {
+          title: "Launch Mini20i",
+          action: {
+            type: "launch_frame",
+            name: "mini20i",
+            url: `https://mini20i.vercel.app/view/${selectedInscription.id.split("-")[0]}/${selectedInscription.seed}?address=${address}`,
+          },
+        },
+      })}
+    />
+  </Head>
+)}
+
+
       {isProcessing && (
         <div className="fixed inset-0 z-[9999] bg-black bg-opacity-70 flex items-center justify-center">
           <div className="bg-white px-6 py-4 rounded shadow text-center text-lg text-black">Preparing transaction...</div>
@@ -451,7 +475,7 @@ useEffect(() => {
   </div>
   <div className={`text-center z-10 transition-opacity duration-700 ${showDescription ? "opacity-100" : "opacity-0"}`}>
     <h1 className="text-4xl font-semibold">Mini 20i</h1>
-    <p className="text-sm text-white-600 mt-1">View, manage, and swap Inscriptions</p>
+    <p className="text-xs text-white-600 mt-1">View and swap ERC20i inscriptions</p>
   </div>
 </div>
 
@@ -780,6 +804,14 @@ useEffect(() => {
       Combine
     </button>
   )}
+<ShareButton
+  seed={selectedInscription.seed}
+  project={selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi"}
+  svg={selectedInscription.svg}
+/>
+
+
+
 
 {selectedInscription.type === "Safe" ? (
   (inscriptions[selectedInscription.id.split("-")[0]]?.some(i => i.type === "Growing") ? null : (
