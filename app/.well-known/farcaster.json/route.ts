@@ -17,7 +17,7 @@ export async function GET() {
       "logo": "https://mini20i.vercel.app/logo.png",
       "appIcon": "https://mini20i.vercel.app/favicon.png",
       "heroImageUrl": "https://mini20i.vercel.app/favicon.png",
-      "primaryCategory": "finance",
+      "primaryCategory": "art-creativity",
       "tags": ["erc20i", "NFT", "swap", "art", "collectible"],
       "ogTitle": "Swap ERC20i Inscriptions",
       "ogDescription": "Explore Fungi, Froggi, and Pepi — Tokens Evolved.",
