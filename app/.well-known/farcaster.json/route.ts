@@ -1,4 +1,10 @@
-export async function GET() {
+export async function GET(req: Request) {
+  const searchParams = new URL(req.url).searchParams;
+  const project = searchParams.get("project") ?? "froggi";
+  const seed = searchParams.get("seed") ?? "0";
+  const address = searchParams.get("address") ?? "anon";
+    const dynamicImageUrl = `https://mini20i.vercel.app/og/${project}/${seed}-${address}.png`;
+
   return Response.json({
     "accountAssociation": {
       "header": "eyJmaWQiOjUxMjY4NywidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDk2OTg0NDBGZjliMjVFNzkxMThBQzdkMTU3NDdGMEI3RDZBODc1MTQifQ",
@@ -12,9 +18,8 @@ export async function GET() {
       "logo": "https://mini20i.vercel.app/logo.png",
       "appIcon": "https://mini20i.vercel.app/favicon.png",
       "name": "mini20i",
-      "homeUrl": "https://mini20i.vercel.app",
-      "ogImageUrl": "https://mini20i.vercel.app/logo.png",
-      "twitterImageUrl": "https://mini20i.vercel.app/logo.png",
+      "ogImageUrl": dynamicImageUrl,
+      "twitterImageUrl": dynamicImageUrl,
       "button": {
         "title": "Launch Mini20i",
         "action": {
