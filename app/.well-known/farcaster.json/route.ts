@@ -8,7 +8,7 @@ export async function GET() {
     frame: {
       "version": "next",
       "name": "mini 20i",
-      "subtitle": "Manage ERC20i Inscriptions",
+      "subtitle": "Swap ERC20i Inscriptions",
       "tagline": "Your base inscriptions hub",
       "description": "Explore ERC20i Inscriptions like Fungi, Froggi, and Pepi — Tokens Evolved.",
       "homeUrl": "https://mini20i.vercel.app",
