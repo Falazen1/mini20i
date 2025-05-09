@@ -1,10 +1,4 @@
-export async function GET(req: Request) {
-  const searchParams = new URL(req.url).searchParams;
-  const project = searchParams.get("project") ?? "froggi";
-  const seed = searchParams.get("seed") ?? "0";
-  const address = searchParams.get("address") ?? "anon";
-    const dynamicImageUrl = `https://mini20i.vercel.app/og/${project}/${seed}-${address}.png`;
-
+export async function GET() {
   return Response.json({
     "accountAssociation": {
       "header": "eyJmaWQiOjUxMjY4NywidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDk2OTg0NDBGZjliMjVFNzkxMThBQzdkMTU3NDdGMEI3RDZBODc1MTQifQ",
@@ -13,13 +7,25 @@ export async function GET(req: Request) {
     },
     frame: {
       "version": "next",
-      "imageUrl": "https://mini20i.vercel.app/favicon.png",
+      "name": "mini20i",
+      "subtitle": "Trade, evolve, and explore ERC20i",
+      "tagline": "Your ERC20i inscription hub",
+      "description": "Mini20i is a Web3 MiniApp for viewing, combining, and swapping onchain ERC20i inscriptions like Froggi, Fungi, and Pepi.",
+      "homeUrl": "https://mini20i.vercel.app",
       "iconUrl": "https://mini20i.vercel.app/favicon.png",
+      "imageUrl": "https://mini20i.vercel.app/favicon.png",
       "logo": "https://mini20i.vercel.app/logo.png",
       "appIcon": "https://mini20i.vercel.app/favicon.png",
-      "name": "mini20i",
-      "ogImageUrl": dynamicImageUrl,
-      "twitterImageUrl": dynamicImageUrl,
+      "screenshotUrls": [
+        "https://mini20i.vercel.app/screenshots/1.png",
+        "https://mini20i.vercel.app/screenshots/2.png"
+      ],
+      "heroImageUrl": "https://mini20i.vercel.app/hero.png",
+      "primaryCategory": "finance",
+      "tags": ["erc20i", "NFT", "swap", "art", "collectible"],
+      "ogTitle": "Mini20i: Swap and Manage ERC20i Inscriptions",
+      "ogDescription": "Explore dynamic ERC20i tokens like Froggi, Fungi, and Pepi — swap, combine, and evolve them instantly.",
+      "ogImageUrl": "https://mini20i.vercel.app/og/froggi/0-anon.png",
       "button": {
         "title": "Launch Mini20i",
         "action": {
@@ -27,7 +33,8 @@ export async function GET(req: Request) {
           "name": "mini20i",
           "url": "https://mini20i.vercel.app"
         }
-      }
+      },
+      "noindex": false
     }
   });
 }
