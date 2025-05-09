@@ -58,17 +58,17 @@ useEffect(() => {
   if (!isFrameReady) setFrameReady();
 }, [isFrameReady, setFrameReady]);
 useEffect(() => {
-  const interval = setInterval(() => {
-    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-    if (!mini && !address) {
-      window.location.reload();
-    }
-  }, 5000);
+  if (window.parent !== window) {
+    const interval = setInterval(() => {
+      const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+      if (!mini && !address) {
+        window.location.reload();
+      }
+    }, 3000);
 
-  return () => clearInterval(interval);
+    return () => clearInterval(interval);
+  }
 }, [context, address]);
-
-
 useEffect(() => {
   if (address) {
     setTimeout(() => setShowMiniKit(true), 100); 
