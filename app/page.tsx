@@ -777,7 +777,7 @@ useEffect(() => {
       }
       className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded"
     >
-      Growth mode
+      Unstash
     </button>
   )}
 
@@ -804,11 +804,6 @@ useEffect(() => {
       Combine
     </button>
   )}
-<ShareButton
-  seed={selectedInscription.seed}
-  project={selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi"}
-  svg={selectedInscription.svg}
-/>
 
 
 
@@ -841,12 +836,20 @@ useEffect(() => {
 
 </div>
 
-            <button
-              onClick={() => setSelectedInscription(null)}
-              className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
-            >
-              Close
-            </button>
+<div className="flex flex-col gap-2">
+  <ShareButton
+    seed={selectedInscription.seed}
+    project={selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi"}
+    svg={selectedInscription.svg}
+  />
+  <button
+    onClick={() => setSelectedInscription(null)}
+    className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
+  >
+    Close
+  </button>
+</div>
+
           </div>
         </div>
       </div>
