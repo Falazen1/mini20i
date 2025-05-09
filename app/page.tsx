@@ -816,9 +816,9 @@ useEffect(() => {
         setSwapTokenKey(selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi");
         setIsSwapOpen(true);
       }}
-      className="px-4 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
+      className="px-3 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
     >
-      Start New
+    Start New
     </button>
   ))
 ) : (
