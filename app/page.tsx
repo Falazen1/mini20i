@@ -836,14 +836,13 @@ useEffect(() => {
 
 </div>
 
+<div className="flex flex-col gap-2">
 {typeof window !== "undefined" && (
   <ShareButton
     seed={selectedInscription.seed}
     project={selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi"}
   />
 )}
-
-
 
   <button
     onClick={() => setSelectedInscription(null)}
