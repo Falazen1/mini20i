@@ -841,7 +841,6 @@ useEffect(() => {
   <ShareButton
     seed={selectedInscription.seed}
     project={selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi"}
-    svg={selectedInscription.svg}
   />
 )}
 

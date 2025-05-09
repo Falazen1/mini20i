@@ -5,11 +5,10 @@ import { useMiniKit, useOpenUrl } from "@coinbase/onchainkit/minikit";
 type ShareButtonProps = {
   seed: string;
   project: "froggi" | "fungi" | "pepi";
-  svg: string;
 };
 
-export default function ShareButton({ seed, project, svg }: ShareButtonProps) {
-  // @ts-expect-error: 'share' exists at runtime in frame
+export default function ShareButton({ seed, project }: ShareButtonProps) {
+  // @ts-expect-error: injected at runtime inside Warpcast frame
   const { share } = useMiniKit();
   const openUrl = useOpenUrl();
 
@@ -18,51 +17,27 @@ export default function ShareButton({ seed, project, svg }: ShareButtonProps) {
 
   const shareText = `Check out my ${project} inscription! #ERC20i`;
 
-  const svgToPng = async (svg: string): Promise<string> => {
-    const blob = new Blob([svg], { type: "image/svg+xml" });
-    const url = URL.createObjectURL(blob);
-    const img = new Image();
-    img.src = url;
-    await new Promise((res) => (img.onload = res));
+  const address =
+    (window as unknown as { ethereum?: { selectedAddress?: string } })?.ethereum
+      ?.selectedAddress ?? "anon";
 
-    const canvas = document.createElement("canvas");
-    canvas.width = 600;
-    canvas.height = 600;
-    const ctx = canvas.getContext("2d")!;
-    ctx.drawImage(img, 0, 0, 600, 600);
-    URL.revokeObjectURL(url);
+  const imageUrl = `https://mini20i.vercel.app/api/og/${project}/${seed}?address=${address}`;
 
-    return canvas.toDataURL("image/png");
+  const handleShare = async () => {
+    if (canShare) {
+      await share({
+        title: shareText,
+        body: shareText,
+        image: imageUrl,
+      });
+    } else {
+      openUrl(
+        `https://warpcast.com/~/compose?text=${encodeURIComponent(
+          shareText
+        )}&embeds=${encodeURIComponent(imageUrl)}`
+      );
+    }
   };
-
- const handleShare = async () => {
-  const png = await svgToPng(svg);
-  const address = window?.ethereum?.selectedAddress ?? "anon";
-
-  await fetch(`/api/og/${project}/${seed}?address=${address}`, {
-    method: "POST",
-    body: JSON.stringify({ image: png }),
-    headers: { "Content-Type": "application/json" },
-  });
-
-  await new Promise((r) => setTimeout(r, 300)); // optional but helps on Vercel
-
-  const imageUrl = `https://mini20i.vercel.app/og/${project}/${seed}-${address}.png`;
-
-  if (canShare) {
-    await share({
-      text: shareText,
-      embeds: [imageUrl], // ✅ must use 'embeds'
-    });
-  } else {
-    openUrl(
-      `https://warpcast.com/~/compose?text=${encodeURIComponent(
-        shareText
-      )}&embeds=${encodeURIComponent(imageUrl)}`
-    );
-  }
-};
-
 
   return (
     <button
