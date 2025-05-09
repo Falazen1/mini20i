@@ -9,7 +9,7 @@ type ShareButtonProps = {
 };
 
 export default function ShareButton({ seed, project, svg }: ShareButtonProps) {
-  // @ts-expect-error: 'share' exists at runtime
+  // @ts-expect-error: 'share' exists at runtime in frame
   const { share } = useMiniKit();
   const openUrl = useOpenUrl();
 
@@ -37,17 +37,17 @@ export default function ShareButton({ seed, project, svg }: ShareButtonProps) {
 
   const handleShare = async () => {
     const png = await svgToPng(svg);
+    const address =
+      (window as unknown as { ethereum?: { selectedAddress?: string } })?.ethereum
+        ?.selectedAddress ?? "anon";
 
-const address = (window as unknown as { ethereum?: { selectedAddress?: string } })?.ethereum?.selectedAddress ?? "anon";
-
-await fetch(`/api/og/${project}/${seed}?address=${address}`, {
+    await fetch(`/api/og/${project}/${seed}?address=${address}`, {
       method: "POST",
       body: JSON.stringify({ image: png }),
       headers: { "Content-Type": "application/json" },
     });
 
-const imageUrl = `https://mini20i.vercel.app/og/${project}/${seed}-${address}.png`;
-
+    const imageUrl = `https://mini20i.vercel.app/api/og/${project}/${seed}?address=${address}`;
 
     if (canShare) {
       await share({
