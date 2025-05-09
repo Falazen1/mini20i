@@ -18,23 +18,26 @@ export default function ShareButton({ seed, project }: ShareButtonProps) {
   const shareText = `Check out my ${project} inscription! #ERC20i`;
 
   const address =
-    (window as unknown as { ethereum?: { selectedAddress?: string } })?.ethereum
-      ?.selectedAddress ?? "anon";
+    typeof window !== "undefined" &&
+    typeof window.ethereum === "object" &&
+    typeof window.ethereum.selectedAddress === "string"
+      ? window.ethereum.selectedAddress
+      : "anon";
 
-  const imageUrl = `https://mini20i.vercel.app/api/og/${project}/${seed}?address=${address}`;
+  const sharePageUrl = `https://mini20i.vercel.app/view/${project}/${seed}?address=${address}`;
 
   const handleShare = async () => {
     if (canShare) {
       await share({
         title: shareText,
         body: shareText,
-        image: imageUrl,
+        image: sharePageUrl,
       });
     } else {
       openUrl(
         `https://warpcast.com/~/compose?text=${encodeURIComponent(
           shareText
-        )}&embeds=${encodeURIComponent(imageUrl)}`
+        )}&embeds=${encodeURIComponent(sharePageUrl)}`
       );
     }
   };
