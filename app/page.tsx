@@ -837,11 +837,14 @@ useEffect(() => {
 </div>
 
 <div className="flex flex-col gap-2">
+{typeof window !== "undefined" && window?.navigator?.userAgent?.includes("FarcasterFrame") && (
   <ShareButton
     seed={selectedInscription.seed}
     project={selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi"}
     svg={selectedInscription.svg}
   />
+)}
+
   <button
     onClick={() => setSelectedInscription(null)}
     className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
