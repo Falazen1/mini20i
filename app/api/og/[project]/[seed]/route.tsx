@@ -33,3 +33,30 @@ const filePath = path.join(dirPath, filename);
     return new Response("Failed to write file", { status: 500 });
   }
 }
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { project: string; seed: string } }
+) {
+  const { project, seed } = params;
+  const searchParams = new URL(req.url).searchParams;
+  const address = searchParams.get("address") ?? "anon";
+  const imageUrl = `https://mini20i.vercel.app/og/${project}/${seed}-${address}.png`;
+
+  return new Response(
+    `
+    <html>
+      <head>
+        <meta property="og:title" content="My ${project} Inscription" />
+        <meta property="og:image" content="${imageUrl}" />
+        <meta name="twitter:card" content="summary_large_image" />
+      </head>
+      <body></body>
+    </html>
+  `,
+    {
+      headers: {
+        "Content-Type": "text/html",
+      },
+    }
+  );
+}
