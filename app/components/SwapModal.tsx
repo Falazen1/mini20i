@@ -13,6 +13,7 @@ import {
 import { OnchainKitProvider } from "@coinbase/onchainkit";
 import { base } from "viem/chains";
 import { useTransaction } from "../helpers/useTransaction";
+import { useTokenStore } from "../helpers/useTokenStore";
 import Image from "next/image";
 
 const ethBase: Token = {
@@ -81,8 +82,25 @@ export default function SwapModal({
   const [newInscription, setNewInscription] = useState<string | null>(null);
   const [inscriptionId, setInscriptionId] = useState<string | null>(null);
   const [fadeInButtons, setFadeInButtons] = useState(false);
+  const [justLeveledUp, setJustLeveledUp] = useState(false);
   const prevSvgRef = useRef<string | null>(null);
-  const { stabilizeInscription, combineInscriptions } = useTransaction();
+  const prevLevelRef = useRef<number | null>(null);
+  const tokenStore = useTokenStore();
+  const { stabilizeInscription } = useTransaction();
+  const [showFinalMessage, setShowFinalMessage] = useState(false);
+
+  function getLevel(tokenKey: "froggi" | "fungi" | "pepi", amount: number): number {
+    const thresholds: Record<typeof tokenKey, number[]> = {
+      froggi: [0, 1000, 3000, 10000, 30000, 60000, 120000],
+      fungi: [0, 21000, 525000, 1050000, 1575000, 2100000],
+      pepi: [0, 11, 22, 33, 44, 56],
+    };
+    const levels = thresholds[tokenKey];
+    for (let i = levels.length - 1; i >= 0; i--) {
+      if (amount >= levels[i]) return i;
+    }
+    return 0;
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => setDebounced(true), 500);
@@ -96,8 +114,11 @@ export default function SwapModal({
     if (!swapDone) {
       const before = inscriptionList.find(i => i.type === "Growing");
       prevSvgRef.current = before?.svg ?? null;
+      if (before) {
+        prevLevelRef.current = getLevel(tokenKey, Number(before.seed));
+      }
     }
-  }, [swapDone, inscriptionList]);
+  }, [swapDone, inscriptionList, tokenKey]);
 
   useEffect(() => {
     if (!swapDone) return;
@@ -108,11 +129,27 @@ export default function SwapModal({
       const delay = setTimeout(() => {
         setNewInscription(latest.svg);
         setInscriptionId(latest.id);
+
+        const newSeed = Number(latest.seed);
+        const newLevel = getLevel(tokenKey, newSeed);
+
+        if (prevLevelRef.current !== null && newLevel > prevLevelRef.current) {
+          setJustLeveledUp(true);
+          setShowFinalMessage(false);
+          setTimeout(() => {
+            setShowFinalMessage(true);
+          }, 2500);
+        } else {
+          setShowFinalMessage(true); // fallback if no level up
+        }
+        
+
+        prevLevelRef.current = newLevel;
       }, 500);
 
       return () => clearTimeout(delay);
     }
-  }, [inscriptionList, swapDone]);
+  }, [swapDone, inscriptionList, tokenKey]);
 
   useEffect(() => {
     if (newInscription) {
@@ -125,22 +162,17 @@ export default function SwapModal({
     onSuccess();
   };
 
-  const handleStabilize = async () => {
-    if (inscriptionId && address) {
-      const seed = BigInt(inscriptionList.find(i => i.id === inscriptionId)?.seed || "0");
-      await stabilizeInscription(address, seed);
-      onClose();
-    }
-  };
-  
+const handleStabilize = async () => {
+  if (inscriptionId && address) {
+    await tokenStore.setTokenByKey(tokenKey);
+    const seed = BigInt(inscriptionList.find(i => i.id === inscriptionId)?.seed || "0");
+    await stabilizeInscription(address, seed);
+    onSuccess(); // trigger parent to reload list
+    onClose();   // then close modal
+  }
+};
 
 
-  const handleCombine = () => {
-    if (inscriptionId && address) {
-      const seed = BigInt(inscriptionList.find(i => i.id === inscriptionId)?.seed || "0");
-      combineInscriptions(address, [seed]);
-    }
-  };
 
   const seedValue = inscriptionList.find(i => i.id === inscriptionId)?.seed;
 
@@ -155,51 +187,94 @@ export default function SwapModal({
         >
           ✕
         </button>
+{/*
+{swapDone && (
+  <div className="mt-4">
+    <button
+      onClick={() => {
+        setJustLeveledUp(true);
+        setTimeout(() => setJustLeveledUp(false), 2500);
+      }}
+      className="px-4 py-2 text-sm bg-purple-100 text-purple-900 rounded hover:bg-purple-200"
+    >
+      Test Level Up
+    </button>
+  </div>
+)}
+*/}
 
-        <h2 className="text-2xl font-bold mb-6 text-center">
-  {newInscription
+
+<h2 className={`text-2xl font-bold mb-6 text-center transition-opacity duration-700 ${showFinalMessage ? 'opacity-100' : 'opacity-0'}`}>
+  {justLeveledUp
+    ? tokenKey === "froggi"
+      ? "Your Froggi has evolved!"
+      : tokenKey === "fungi"
+      ? "Your Fungi leveled up!"
+      : "Your Pepi leveled up!"
+    : newInscription
     ? prevSvgRef.current === null
       ? "You got a new inscription!"
       : tokenKey === "froggi"
-        ? "Your Froggi has evolved!"
-        : tokenKey === "fungi"
-        ? "Your Fungi has grown!"
-        : "Your Pepi has transformed!"
+      ? "Your Froggi has evolved!"
+      : tokenKey === "fungi"
+      ? "Your Fungi has grown!"
+      : "Your Pepi has transformed!"
     : `Swap ETH → ${token.symbol}`}
 </h2>
 
 
-
-{swapDone ? (
-  <>
-    {!newInscription && (
-      <div className="mb-4 text-center text-sm">
-        {tokenKey === "froggi"
-          ? "Your Froggi is evolving..."
-          : tokenKey === "fungi"
-          ? "Your Fungi is growing..."
-          : "Your Pepi is transforming..."}
-      </div>
-    )}
+        {swapDone ? (
+          <>
+            {!newInscription && (
+              <div className="mb-4 text-center text-sm">
+                {tokenKey === "froggi"
+                  ? "Your Froggi is evolving..."
+                  : tokenKey === "fungi"
+                  ? "Your Fungi is growing..."
+                  : "Your Pepi is transforming..."}
+              </div>
+            )}
 
             <div className="w-full aspect-square rounded bg-[#0f1014] flex items-center justify-center relative mb-2">
               {!newInscription ? (
                 <div className="absolute inset-0 overflow-hidden">
-  <Image
-    src={loadingGif}
-    alt="loading gif"
-    className="w-full h-full object-contain translate-y-[3px]"
-    fill
-    unoptimized
+                  <Image
+                    src={loadingGif}
+                    alt="loading gif"
+                    className="w-full h-full object-contain translate-y-[3px]"
+                    fill
+                    unoptimized
+                  />
+                </div>
+              ) : (
+                <>
+<div className="w-full h-full relative flex items-center justify-center">
+
+
+  {/* LEVEL UP TEXT */}
+  {justLeveledUp && (
+    <div className="absolute inset-20 flex justify-center items-start pt-10 z-30">
+      <div className="text-4xl sm:text-5xl font-bold text-yellow-300 drop-shadow-[0_0_10px_rgba(255,255,0,0.8)] animate-levelup-text">
+        Level Up!
+      </div>
+    </div>
+  )}
+
+{/* GLOWING BORDER AROUND SVG */}
+{justLeveledUp && (
+  <div className="absolute inset-[-6px] rounded-lg border-4 border-yellow-300 animate-glow-fade z-30 pointer-events-none" />
+)}
+
+
+  {/* SVG */}
+  <div
+    className="w-full h-full animate-fade-in2 z-20"
+    dangerouslySetInnerHTML={{ __html: newInscription }}
   />
 </div>
 
 
-              ) : (
-                <div
-                  className="w-full h-full absolute top-0 left-0 animate-fade-in2"
-                  dangerouslySetInnerHTML={{ __html: newInscription }}
-                />
+                </>
               )}
             </div>
 
@@ -210,49 +285,40 @@ export default function SwapModal({
               </div>
             )}
 
-<div className="w-full pt-1 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-y-4 items-end">
-<div className={`flex flex-wrap gap-2 ${fadeInButtons ? 'animate-fade-in2' : 'opacity-0'}`}>
-  {tokenKey === "froggi" && (
-    <button
-      onClick={handleStabilize}
-      className="bg-green-100 text-green-900 px-4 py-2 rounded hover:bg-green-200"
-    >
-      Stash
-    </button>
-  )}
+            <div className="w-full pt-1 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-y-4 items-end">
+              <div className={`flex flex-wrap gap-2 ${fadeInButtons ? 'animate-fade-in2' : 'opacity-0'}`}>
+                {tokenKey === "froggi" && (
+                  <button
+                    onClick={handleStabilize}
+                    className="bg-green-100 text-green-900 px-4 py-2 rounded hover:bg-green-200"
+                  >
+                    Stash
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    setSwapDone(false);
+                    setNewInscription(null);
+                    setInscriptionId(null);
+                    setFadeInButtons(false);
+                    
+                  }}
+                  className="bg-yellow-100 text-yellow-900 px-4 py-2 rounded hover:bg-yellow-200"
+                >
+                  Add more
+                </button>
 
-  <button
-    onClick={() => {
-      setSwapDone(false);
-      setNewInscription(null);
-      setInscriptionId(null);
-      setFadeInButtons(false);
-    }}
-    className="bg-yellow-100 text-yellow-900 px-4 py-2 rounded hover:bg-yellow-200"
-  >
-    Add more
-  </button>
+              </div>
 
-  {inscriptionList.filter(i => i.type === "Safe" && i.id !== inscriptionId).length > 0 && (
-    <button
-      onClick={handleCombine}
-      className="bg-indigo-100 text-indigo-900 px-4 py-2 rounded hover:bg-indigo-200"
-    >
-      Combine
-    </button>
-  )}
-</div>
-
-  <div className="flex justify-end">
-    <button
-      onClick={onClose}
-      className="bg-white text-black px-4 py-2 rounded hover:bg-gray-200"
-    >
-      Close
-    </button>
-  </div>
-</div>
-
+              <div className="flex justify-end">
+                <button
+                  onClick={onClose}
+                  className="bg-white text-black px-4 py-2 rounded hover:bg-gray-200"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           </>
         ) : (
           <OnchainKitProvider

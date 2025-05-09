@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -47,6 +48,9 @@ const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
+const [fadeOutIndex, setFadeOutIndex] = useState<number | null>(null);
+const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] | null>(null);
+
 const LOADING_GIFS: Record<"froggi" | "fungi" | "pepi", string> = {
   froggi: "/frog_rolling_long.gif",
   fungi: "/fungi_rolling_long.gif",
@@ -217,12 +221,31 @@ useEffect(() => {
       }
       
       if (action === "destabilize") await destabilizeInscription(user, value);
+
       if (action === "combine") {
-        const seeds = combineList.length > 0 ? combineList.map(i => BigInt(i.seed)) : [value];
+        const seeds = combineList.map(i => BigInt(i.seed));
+        setConfirmedCombineList([...combineList]); // lock in the list before it changes
+      
         await combineInscriptions(user, seeds);
-        setCombineList([]);
-        setCombineMode(false);
+      
+        let i = 0;
+        const step = Math.max(1500 / combineList.length, 100);
+      
+        const interval = setInterval(() => {
+          setFadeOutIndex(i);
+          i++;
+          if (i >= combineList.length) {
+            clearInterval(interval);
+            setTimeout(() => {
+              setConfirmedCombineList(null); // allow full list again
+              setCombineList([]);
+              setCombineMode(false);
+              setFadeOutIndex(null);
+            }, 400);
+          }
+        }, step);
       }
+      
 
       const label =
         action === "destabilize" && selectedInscription?.type === "Growing"
@@ -286,10 +309,6 @@ useEffect(() => {
       };
 
       if (action !== "combine") reload();
-      if (action === "combine") {
-        setCombineList([]);
-        setCombineMode(false);
-      }
     }
 
 
@@ -316,51 +335,62 @@ useEffect(() => {
         {visibleTokens
           .flatMap((token) => inscriptions[token.key] || [])
           .filter((i) =>
-            combineList.length === 0
-              ? false
-              : i.id.startsWith(combineList.at(0)!.id.split("-")[0])
+            confirmedCombineList
+              ? confirmedCombineList.some((sel) => sel.id === i.id)
+              : combineList.length > 0 &&
+                i.id.startsWith(combineList[0].id.split("-")[0])
           )
           
-          .map((insc) => {
-            const isSelected = combineList.some((i) => i.id === insc.id);
-            return (
-              <div
-                key={insc.id}
-                onClick={() =>
-                  setCombineList((prev) =>
-                    isSelected
-                      ? prev.filter((i) => i.id !== insc.id)
-                      : [...prev, insc]
-                  )
-                }
-                className={`border rounded shadow p-2 bg-white cursor-pointer ${
-                  isSelected ? "ring-4 ring-blue-500 shadow-[0_0_0_2px_rgba(96,165,250,0.7)]" : ""
+          
+.map((insc, idx) => {
+  const isSelected = combineList.some((i) => i.id === insc.id);
+  const hasFadedOut =
+    fadeOutIndex !== null && idx <= fadeOutIndex;
 
-                }`}
-              >
-                <div
-                  className="aspect-square w-full mb-1"
-                  dangerouslySetInnerHTML={{ __html: insc.svg }}
-                />
-                <div className="text-xs text-gray-400">Tokens: {insc.seed}</div>
-              </div>
-            );
-          })}
+  return (
+    <div
+      key={insc.id}
+      onClick={() =>
+        setCombineList((prev) =>
+          isSelected
+            ? prev.filter((i) => i.id !== insc.id)
+            : [...prev, insc]
+        )
+      }
+      className={`border rounded shadow p-2 bg-white cursor-pointer transition-transform duration-500 ease-in-out
+        ${isSelected ? "ring-4 ..." : ""}
+        ${fadeOutIndex !== null && combineList[fadeOutIndex]?.id === insc.id
+          ? "animate-shake-fade"
+          : ""
+        }
+        ${hasFadedOut ? "opacity-0 pointer-events-none" : ""}
+      `}
+    >
+      <div
+        className="aspect-square w-full mb-1"
+        dangerouslySetInnerHTML={{ __html: insc.svg }}
+      />
+      <div className="text-xs text-gray-400">Tokens: {insc.seed}</div>
+    </div>
+  );
+})}
+
       </div>
 
       {combineList.length < 2 && (
         <p className="text-sm text-red-600 mb-4">You must select at least 2 inscriptions.</p>
       )}
       <div className="flex justify-between mt-4">
-        <button
-          onClick={() => {
-            setCombineMode(false);
-            setCombineList([]);
-          }}
-          className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
-        >
-          Cancel
-        </button>
+<button
+  onClick={() => {
+    setCombineMode(false);
+    setCombineList([]);
+    setConfirmedCombineList(null); // ensure full list repopulates on reopen
+  }}
+  className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
+>
+  Cancel
+</button>
         <button
           disabled={combineList.length < 2}
           onClick={() =>
