@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -68,22 +67,21 @@ useEffect(() => {
   if (!isFrameReady) setFrameReady();
 }, [isFrameReady, setFrameReady]);
 useEffect(() => {
-  if (typeof window !== "undefined" && window.parent !== window) {
-    const hardLoop = setInterval(() => {
-      const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-      const hasMini = !!mini && mini.length > 0;
-      const hasWagmi = !!wagmiAddress && wagmiAddress.length > 0;
-
-      if (hasMini || hasWagmi) {
-        clearInterval(hardLoop);
-      } else {
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      const miniAddress = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+      if (!miniAddress) {
         window.location.reload();
       }
-    }, 3000);
+    }
+  };
 
-    return () => clearInterval(hardLoop);
-  }
-}, [context, wagmiAddress]);
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+
+  return () => {
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+  };
+}, [context]);
 
 useEffect(() => {
   if (address) {
