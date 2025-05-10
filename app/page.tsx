@@ -73,7 +73,7 @@ useEffect(() => {
 useEffect(() => {
   const interval = setInterval(() => {
     const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-    if (mini || wagmiAddress) {
+    if (!mini || wagmiAddress) {
       clearInterval(interval);
       window.location.reload();
     }
@@ -84,7 +84,8 @@ useEffect(() => {
 
 
 useEffect(() => {
-  if (address) {
+      const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+  if (address || mini) {
     setTimeout(() => setShowMiniKit(true), 100); 
     setTimeout(() => setShowDescription(true), 700); 
     setTimeout(() => setShowTokens(true), 1400); 
@@ -95,7 +96,8 @@ useEffect(() => {
 
 
 useEffect(() => {
-  if (!address) return;
+        const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+  if (!address || !mini) return;
   const timeout = setTimeout(() => {
     setShowVideo(false);
   }, 1000);
