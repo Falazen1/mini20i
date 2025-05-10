@@ -3,7 +3,6 @@
 import {
   readContract,
   waitForTransactionReceipt,
-  getBalance,
 } from "@wagmi/core";
 import { useWalletClient } from "wagmi";
 import {
