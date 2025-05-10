@@ -77,7 +77,7 @@ useEffect(() => {
       clearInterval(interval);
       window.location.reload();
     }
-  }, 500);
+  }, 3000);
 
   return () => clearInterval(interval);
 }, [context, wagmiAddress]);
