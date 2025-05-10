@@ -382,7 +382,8 @@ useEffect(() => {
         )
       }
       className={`border rounded shadow p-2 bg-white cursor-pointer transition-transform duration-500 ease-in-out
-        ${isSelected ? "ring-4 ..." : ""}
+${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
+
         ${fadeOutIndex !== null && combineList[fadeOutIndex]?.id === insc.id
           ? "animate-shake-fade"
           : ""
