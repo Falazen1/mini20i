@@ -74,20 +74,24 @@ const [confirmUnstash, setConfirmUnstash] = useState<null | Inscription>(null);
 useEffect(() => {
   const handleVisibilityChange = () => {
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
-    if (document.visibilityState === 'visible' && isMobile) {
-      const miniAddress = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-      if (!miniAddress) {
-        window.location.reload();
-      }
+    const isInFrame = typeof window !== "undefined" && window.parent !== window;
+    const miniAddress = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+
+    if (
+      document.visibilityState === "visible" &&
+      isMobile &&
+      isInFrame &&
+      !(miniAddress || wagmiAddress)
+    ) {
+      window.location.reload();
     }
   };
 
-  document.addEventListener('visibilitychange', handleVisibilityChange);
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+  return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+}, [context, wagmiAddress]);
 
-  return () => {
-    document.removeEventListener('visibilitychange', handleVisibilityChange);
-  };
-}, [context]);
+
 
 useEffect(() => {
   if (address) {
@@ -104,7 +108,7 @@ useEffect(() => {
   if (!address) return;
   const timeout = setTimeout(() => {
     setShowVideo(false);
-  }, 3000);
+  }, 1000);
   return () => clearTimeout(timeout);
 }, [address, showVideo]);
 
