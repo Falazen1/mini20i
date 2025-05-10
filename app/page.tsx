@@ -84,8 +84,7 @@ useEffect(() => {
 
 
 useEffect(() => {
-      const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-  if (address || mini) {
+  if (address) {
     setTimeout(() => setShowMiniKit(true), 100); 
     setTimeout(() => setShowDescription(true), 700); 
     setTimeout(() => setShowTokens(true), 1400); 
@@ -96,8 +95,7 @@ useEffect(() => {
 
 
 useEffect(() => {
-        const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-  if (!address || !mini) return;
+  if (!address) return;
   const timeout = setTimeout(() => {
     setShowVideo(false);
   }, 1000);
