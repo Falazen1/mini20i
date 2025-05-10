@@ -33,7 +33,7 @@ type Inscription = {
 export default function Page() {
   const context = useMiniKit();
   const wagmiAddress = useAccount().address;
-const [address, setAddress] = useState<`0x${string}` | null>(null);
+  const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
@@ -74,19 +74,23 @@ useEffect(() => {
       if (!mini && !address) {
         window.location.reload();
       }
-    }, 3000);
+    }, 2000);
 
     return () => clearInterval(interval);
   }
 }, [context, address]);
 useEffect(() => {
-  const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-  if (mini) {
-    setAddress(mini);
-  } else if (wagmiAddress) {
-    setAddress(wagmiAddress);
-  }
+  const interval = setInterval(() => {
+    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+    if (mini || wagmiAddress) {
+      clearInterval(interval);
+      window.location.reload();
+    }
+  }, 500);
+
+  return () => clearInterval(interval);
 }, [context, wagmiAddress]);
+
 useEffect(() => {
   if (address) {
     setTimeout(() => setShowMiniKit(true), 100); 
