@@ -19,12 +19,15 @@ import SwapModal from "./components/SwapModal";
 import Image from "next/image";
 import ShareButton from "./components/ShareButton";
 import Head from "next/head";
-
+import { FUNGUS_COLOR_NAMES } from "./helpers/colors";
+import { PEPI_COLOR_NAMES } from "./helpers/colors";
+import { FROGGI_HATS, FROGGI_EYEWEAR, FROGGI_CLOTHES } from "./helpers/froggi";
 type Inscription = {
   id: string;
   svg: string;
   seed: string;
   type: "Growing" | "Safe";
+  meta?: Record<string, unknown>; // 
 };
 
 export default function Page() {
@@ -118,19 +121,29 @@ useEffect(() => {
           }) as Seed;
 
           if (dynamic.seed && dynamic.seed !== 0n) {
-            const svg = await readContract(config, {
-              abi,
-              address: contractAddress,
-              functionName: "getSvg",
-              args: [dynamic],
-            }) as string;
+const [svg, meta] = await Promise.all([
+  readContract(config, {
+    abi,
+    address: contractAddress,
+    functionName: "getSvg",
+    args: [dynamic],
+  }) as Promise<string>,
+  readContract(config, {
+    abi,
+    address: contractAddress,
+    functionName: "getMeta",
+    args: [dynamic],
+  }) as Promise<string>,
+]);
 
-            list.push({
-              id: `${token.key}-dynamic`,
-              svg,
-              seed: dynamic.seed.toString(),
-              type: "Growing",
-            });
+list.push({
+  id: `${token.key}-dynamic`,
+  svg,
+  seed: dynamic.seed.toString(),
+  type: "Growing",
+  meta: JSON.parse(meta),
+});
+
           }
         } catch {}
 
@@ -151,19 +164,29 @@ useEffect(() => {
                 args: [address, i],
               }) as Seed;
 
-              const svg = await readContract(config, {
-                abi,
-                address: contractAddress,
-                functionName: "getSvg",
-                args: [seed],
-              }) as string;
+const [svg, meta] = await Promise.all([
+  readContract(config, {
+    abi,
+    address: contractAddress,
+    functionName: "getSvg",
+    args: [seed],
+  }) as Promise<string>,
+  readContract(config, {
+    abi,
+    address: contractAddress,
+    functionName: "getMeta",
+    args: [seed],
+  }) as Promise<string>,
+]);
 
-              list.push({
-                id: `${token.key}-stable-${i}`,
-                svg,
-                seed: seed.seed.toString(),
-                type: "Safe",
-              });
+list.push({
+  id: `${token.key}-stable-${i}`,
+  svg,
+  seed: seed.seed.toString(),
+  type: "Safe",
+  meta: JSON.parse(meta),
+});
+
             } catch {}
           }
         } catch {}
@@ -316,6 +339,65 @@ useEffect(() => {
 
 
   }
+  
+function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fungi" | "pepi", seedStr: string): string[] {
+  const traits: { label: string; value: string }[] = [];
+
+  if (project === "froggi") {
+const seedNum = parseInt(seedStr, 10);
+
+
+
+    if (seedNum <= 2999) {
+      if (meta.egg) traits.push({ label: "Pattern", value: meta.egg as string });
+      if (meta.eggPalette) traits.push({ label: "Palette", value: meta.eggPalette as string });
+      if (meta.eggAnimation) traits.push({ label: "Wiggle", value: meta.eggAnimation as string });
+      if (meta.animateBg === "true") traits.push({ label: "Anim BG", value: "Yes" });
+    } else {
+      if (meta.hatBool === "true") traits.push({ label: "Hat", value: FROGGI_HATS[meta.hat as string] || meta.hat as string });
+      if (meta.eyewearBool === "true") traits.push({ label: "Eyes", value: FROGGI_EYEWEAR[meta.eyewear as string] || meta.eyewear as string });
+      if (meta.clothesBool === "true") traits.push({ label: "Clothes", value: FROGGI_CLOTHES[meta.clothes as string] || meta.clothes as string });
+      if (meta.animateBg === "true") traits.push({ label: "BGR", value: "Anim" });
+      if (meta.animateBody === "true") traits.push({ label: "Body", value: "Anim" });
+      if (meta.expression) traits.push({ label: "Face", value: meta.expression as string });
+      if (meta.eyes) traits.push({ label: "Eyes", value: meta.eyes as string });
+      if (meta.body) traits.push({ label: "Body", value: meta.body as string });
+      if (meta.bg) traits.push({ label: "BGR", value: meta.bg as string });
+    }
+  }
+
+  if (project === "fungi") {
+    const resolveFungiColor = (hex: string) => FUNGUS_COLOR_NAMES[hex.toLowerCase()] || hex;
+
+    if (meta.hasDots === "true") traits.push({ label: "Dots", value: resolveFungiColor(meta.dotsColor as string) });
+    if (meta.cap !== undefined) traits.push({ label: "Cap", value: meta.cap as string });
+    if (meta.capColor) traits.push({ label: "Color", value: resolveFungiColor(meta.capColor as string) });
+    if (meta.stem) traits.push({ label: "Stem", value: meta.stem as string });
+    if (meta.stemColor) traits.push({ label: "Spore", value: resolveFungiColor(meta.stemColor as string) });
+    if (meta.groundColor) traits.push({ label: "Ground", value: resolveFungiColor(meta.groundColor as string) });
+    if (meta.background) traits.push({ label: "BGR", value: resolveFungiColor(meta.background as string) });
+  }
+
+  if (project === "pepi") {
+    const resolvePepiColor = (hex: string) => PEPI_COLOR_NAMES[hex.toLowerCase()] || hex;
+
+    if ((meta.hat && meta.hat !== "0") || meta["Head"]) traits.push({ label: "Hat", value: (meta["Head Item"] || meta.hat) as string });
+    if (meta.accessory && meta.accessory !== "0") traits.push({ label: "Accessory", value: meta.accessory as string });
+    if (meta.ears && meta.ears !== "0") traits.push({ label: "Ears", value: meta.ears as string });
+    if (meta.eyes && meta.eyes !== "0") traits.push({ label: "Eyes", value: meta.eyes as string });
+    if (meta.mouth && meta.mouth !== "0") traits.push({ label: "Mouth", value: meta.mouth as string });
+    if (meta.clothes && meta.clothes !== "0") traits.push({ label: "Clothes", value: meta.clothes as string });
+    if (meta.bodyColor) traits.push({ label: "Color", value: resolvePepiColor(meta.bodyColor as string) });
+    if (meta.background) traits.push({ label: "BGR", value: resolvePepiColor(meta.background as string) });
+  }
+
+  const seen = new Set<string>();
+  return traits
+    .filter((t) => !seen.has(t.label) && seen.add(t.label))
+    .slice(0, 6)
+    .map((t) => `${t.label}: ${t.value}`);
+}
+
 
   return (
     <>
@@ -696,8 +778,37 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
     className="w-full aspect-square mb-2 rounded overflow-hidden bg-black"
     dangerouslySetInnerHTML={{ __html: inscription.svg }}
   />
-  <div className="text-xs text-white/80">Tokens: {inscription.seed}</div>
-  <div className="text-xs text-white/80">Type: {inscription.type}</div>
+<div className="flex flex-col gap-1 mt-2 text-xs text-white/80">
+<div className="text-xs text-white/80">
+  <div className="flex flex-wrap gap-x-6 mb-1 sm:justify-center">
+    <span>Tokens: {inscription.seed}</span>
+    <span>Type: {inscription.type}</span>
+  </div>
+
+    <div className="grid grid-cols-3 gap-1">
+{inscription.meta && (
+  <div className="grid grid-cols-3 gap-1 mt-1 text-white/80 text-xs">
+    {(typeof window !== "undefined" && window.innerWidth > 768) || selectedInscription?.id === inscription.id ? (
+      extractTopTraits(
+        inscription.meta,
+        inscription.id.split("-")[0] as "froggi" | "fungi" | "pepi",
+        inscription.seed
+      ).map((trait, i) => (
+        <div
+          key={`trait-${i}`}
+          className="px-1 py-0.5 bg-white/10 rounded shadow text-center"
+        >
+          {trait}
+        </div>
+      ))
+    ) : null}
+  </div>
+)}
+
+    </div>
+  </div>
+</div>
+
 </div>
 
     );
@@ -711,8 +822,8 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
       setSwapTokenKey(token.key as "froggi" | "fungi" | "pepi");
     }}
   >
-<div className="w-full aspect-square mb-11 rounded flex items-center justify-center">
-  <div className="mt-9 w-full h-full flex items-start">
+<div className="w-full mb-6 rounded flex items-center justify-center">
+  <div className="mt-6 w-full h-full flex items-start">
     <Image
       src={`${token.buyImage}`}
       alt={`${token.name} buy more`}
@@ -740,10 +851,23 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
     {selectedInscription && (
       <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
   <div className="bg-[#1c1e24] border border-white/10 rounded-xl shadow-xl p-6 max-w-lg w-full text-white">
-          <div className="flex justify-between mb-4">
-            <h2 className="text-xl font-semibold">Inscription Detail</h2>
-            <button onClick={() => setSelectedInscription(null)}>✕</button>
-          </div>
+<div className="flex flex-col items-center justify-center mb-4 relative text-white/90">
+  <div className="flex gap-6 text-lg">
+    <div>
+      <span className="font-semibold">Tokens: </span> {selectedInscription.seed}
+    </div>
+    <div>
+      <span className="font-semibold">Type: </span> {selectedInscription.type}
+    </div>
+  </div>
+  <button
+    onClick={() => setSelectedInscription(null)}
+    className="absolute top-0 right-0 text-white/80 hover:text-white"
+  >
+    ✕
+  </button>
+</div>
+
           <div className="w-full aspect-square mb-4 relative bg-black rounded overflow-hidden">
   <div
     className={`absolute inset-0 w-full h-full z-10 transition-opacity duration-[500ms] ${
@@ -765,10 +889,24 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
     />
   )}
 </div>
+{selectedInscription.meta && (
+  <div className="grid grid-cols-3 gap-1 mt-4 text-xs text-white/80">
+    {extractTopTraits(
+      selectedInscription.meta,
+      selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi",
+      selectedInscription.seed
+    ).map((trait, i) => (
+      <div
+        key={`trait-${i}`}
+        className="px-1 py-0.5 bg-white/10 rounded shadow text-center"
+      >
+        {trait}
+      </div>
+    ))}
+  </div>
+)}
 
 
-          <div className="text-sm text-white/90 mb-2"><span className="font-semibold">Tokens: </span> {selectedInscription.seed}</div>
-          <div className="text-sm text-white/90 mb-4"><span className="font-semibold">Type: </span> {selectedInscription.type}</div>
           <div className="flex flex-row justify-between items-end mt-4 gap-3">
           <div className="flex gap-3 flex-wrap">
   {selectedInscription.id.startsWith("froggi") && selectedInscription.type === "Safe" && (

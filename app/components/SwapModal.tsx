@@ -15,6 +15,10 @@ import { base } from "viem/chains";
 import { useTransaction } from "../helpers/useTransaction";
 import { useTokenStore } from "../helpers/useTokenStore";
 import Image from "next/image";
+import { FROGGI_HATS, FROGGI_EYEWEAR, FROGGI_CLOTHES } from "../helpers/froggi";
+import { FUNGUS_COLOR_NAMES } from "../helpers/colors";
+import { PEPI_COLOR_NAMES } from "../helpers/colors";
+import ShareButton from "./ShareButton";
 
 const ethBase: Token = {
   name: "Ethereum",
@@ -57,6 +61,55 @@ const TOKENS: Record<"froggi" | "fungi" | "pepi", Token> = {
     image: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/pepi_logo.jpg",
   },
 };
+function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fungi" | "pepi", seedStr: string): string[] {
+  const traits: { label: string; value: string }[] = [];
+
+  if (project === "froggi") {
+    const seedNum = parseInt(seedStr, 10);
+    if (seedNum <= 2999) {
+      if (meta.egg) traits.push({ label: "Pattern", value: meta.egg as string });
+      if (meta.eggPalette) traits.push({ label: "Palette", value: meta.eggPalette as string });
+      if (meta.eggAnimation) traits.push({ label: "Wiggle", value: meta.eggAnimation as string });
+      if (meta.animateBg === "true") traits.push({ label: "Anim BG", value: "Yes" });
+    } else {
+      if (meta.hatBool === "true") traits.push({ label: "Hat", value: FROGGI_HATS[meta.hat as string] || meta.hat as string });
+      if (meta.eyewearBool === "true") traits.push({ label: "Eyes", value: FROGGI_EYEWEAR[meta.eyewear as string] || meta.eyewear as string });
+      if (meta.clothesBool === "true") traits.push({ label: "Clothes", value: FROGGI_CLOTHES[meta.clothes as string] || meta.clothes as string });
+      if (meta.animateBg === "true") traits.push({ label: "BGR", value: "Anim" });
+      if (meta.animateBody === "true") traits.push({ label: "Body", value: "Anim" });
+      if (meta.expression) traits.push({ label: "Face", value: meta.expression as string });
+      if (meta.eyes) traits.push({ label: "Eyes", value: meta.eyes as string });
+      if (meta.body) traits.push({ label: "Body", value: meta.body as string });
+      if (meta.bg) traits.push({ label: "BGR", value: meta.bg as string });
+    }
+  }
+
+  if (project === "fungi") {
+    const resolve = (hex: string) => FUNGUS_COLOR_NAMES[hex.toLowerCase()] || hex;
+    if (meta.hasDots === "true") traits.push({ label: "Dots", value: resolve(meta.dotsColor as string) });
+    if (meta.cap) traits.push({ label: "Cap", value: meta.cap as string });
+    if (meta.capColor) traits.push({ label: "Color", value: resolve(meta.capColor as string) });
+    if (meta.stem) traits.push({ label: "Stem", value: meta.stem as string });
+    if (meta.stemColor) traits.push({ label: "Spore", value: resolve(meta.stemColor as string) });
+    if (meta.groundColor) traits.push({ label: "Ground", value: resolve(meta.groundColor as string) });
+    if (meta.background) traits.push({ label: "BGR", value: resolve(meta.background as string) });
+  }
+
+  if (project === "pepi") {
+    const resolve = (hex: string) => PEPI_COLOR_NAMES[hex.toLowerCase()] || hex;
+    if ((meta.hat && meta.hat !== "0") || meta["Head"]) traits.push({ label: "Hat", value: (meta["Head Item"] || meta.hat) as string });
+    if (meta.accessory && meta.accessory !== "0") traits.push({ label: "Accessory", value: meta.accessory as string });
+    if (meta.ears && meta.ears !== "0") traits.push({ label: "Ears", value: meta.ears as string });
+    if (meta.eyes && meta.eyes !== "0") traits.push({ label: "Eyes", value: meta.eyes as string });
+    if (meta.mouth && meta.mouth !== "0") traits.push({ label: "Mouth", value: meta.mouth as string });
+    if (meta.clothes && meta.clothes !== "0") traits.push({ label: "Clothes", value: meta.clothes as string });
+    if (meta.bodyColor) traits.push({ label: "Color", value: resolve(meta.bodyColor as string) });
+    if (meta.background) traits.push({ label: "BGR", value: resolve(meta.background as string) });
+  }
+
+  const seen = new Set<string>();
+  return traits.filter((t) => !seen.has(t.label) && seen.add(t.label)).slice(0, 6).map(t => `${t.label}: ${t.value}`);
+}
 
 export default function SwapModal({
   tokenKey,
@@ -68,11 +121,12 @@ export default function SwapModal({
   onClose: () => void;
   onSuccess: () => void;
   inscriptionList: {
-    id: string;
-    svg: string;
-    seed: string;
-    type: "Growing" | "Safe";
-  }[];
+  id: string;
+  svg: string;
+  seed: string;
+  type: "Growing" | "Safe";
+  meta?: Record<string, unknown>;
+}[];
 }) {
   const { address } = useAccount();
   const token = TOKENS[tokenKey];
@@ -140,7 +194,7 @@ export default function SwapModal({
             setShowFinalMessage(true);
           }, 2500);
         } else {
-          setShowFinalMessage(true); // fallback if no level up
+          setShowFinalMessage(true); // keep for fallback on LEVELUP
         }
         
 
@@ -167,8 +221,8 @@ const handleStabilize = async () => {
     await tokenStore.setTokenByKey(tokenKey);
     const seed = BigInt(inscriptionList.find(i => i.id === inscriptionId)?.seed || "0");
     await stabilizeInscription(address, seed);
-    onSuccess(); // trigger parent to reload list
-    onClose();   // then close modal
+    onSuccess();
+    onClose(); 
   }
 };
 
@@ -251,7 +305,6 @@ const handleStabilize = async () => {
 <div className="w-full h-full relative flex items-center justify-center">
 
 
-  {/* LEVEL UP TEXT */}
   {justLeveledUp && (
     <div className="absolute inset-20 flex justify-center items-start pt-10 z-30">
       <div className="text-4xl sm:text-5xl font-bold text-yellow-300 drop-shadow-[0_0_10px_rgba(255,255,0,0.8)] animate-levelup-text">
@@ -260,7 +313,6 @@ const handleStabilize = async () => {
     </div>
   )}
 
-{/* GLOWING BORDER AROUND SVG */}
 {justLeveledUp && (
   <div className="absolute inset-[-6px] rounded-lg border-4 border-yellow-300 animate-glow-fade z-30 pointer-events-none" />
 )}
@@ -284,41 +336,62 @@ const handleStabilize = async () => {
                 <div><span className="font-semibold">Mode:</span> Growing</div>
               </div>
             )}
+{(() => {
+  const meta = inscriptionList.find(i => i.id === inscriptionId)?.meta;
+  if (!meta) return null;
+  const traits = extractTopTraits(meta, tokenKey, seedValue ?? "0");
+  return (
+    <div className="grid grid-cols-3 gap-1 mt-2 text-xs text-white/80">
+      {traits.map((trait, i) => (
+        <div
+          key={`trait-${i}`}
+          className="px-1 py-0.5 bg-white/10 rounded shadow text-center"
+        >
+          {trait}
+        </div>
+      ))}
+    </div>
+  );
+})()}
 
-            <div className="w-full pt-1 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-y-4 items-end">
-              <div className={`flex flex-wrap gap-2 ${fadeInButtons ? 'animate-fade-in2' : 'opacity-0'}`}>
-                {tokenKey === "froggi" && (
-                  <button
-                    onClick={handleStabilize}
-                    className="bg-green-100 text-green-900 px-4 py-2 rounded hover:bg-green-200"
-                  >
-                    Stash
-                  </button>
-                )}
-                <button
-                  onClick={() => {
-                    setSwapDone(false);
-                    setNewInscription(null);
-                    setInscriptionId(null);
-                    setFadeInButtons(false);
-                    
-                  }}
-                  className="bg-yellow-100 text-yellow-900 px-4 py-2 rounded hover:bg-yellow-200"
-                >
-                  Add more
-                </button>
+<div className="flex flex-row justify-between items-end mt-4 gap-3">
+  <div className={`flex gap-3 flex-wrap ${fadeInButtons ? 'animate-fade-in2' : 'opacity-0'}`}>
+    {tokenKey === "froggi" && (
+      <button
+        onClick={handleStabilize}
+        className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded"
+      >
+        Stash
+      </button>
+    )}
+    <button
+      onClick={() => {
+        setSwapDone(false);
+        setNewInscription(null);
+        setInscriptionId(null);
+        setFadeInButtons(false);
+      }}
+      className="px-4 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
+    >
+      Add more
+    </button>
+  </div>
 
-              </div>
+  <div className={`flex flex-col gap-2 ${fadeInButtons ? 'animate-fade-in2' : 'opacity-0'}`}>
+    <ShareButton
+      seed={seedValue!}
+      project={tokenKey}
+      svg={newInscription!}
+    />
+    <button
+      onClick={onClose}
+      className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
+    >
+      Close
+    </button>
+  </div>
+</div>
 
-              <div className="flex justify-end">
-                <button
-                  onClick={onClose}
-                  className="bg-white text-black px-4 py-2 rounded hover:bg-gray-200"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
           </>
         ) : (
           <OnchainKitProvider
