@@ -68,17 +68,23 @@ useEffect(() => {
   if (!isFrameReady) setFrameReady();
 }, [isFrameReady, setFrameReady]);
 useEffect(() => {
-  if (window.parent !== window) {
-    const interval = setInterval(() => {
+  if (typeof window !== "undefined" && window.parent !== window) {
+    const hardLoop = setInterval(() => {
       const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-      if (!mini && !address) {
+      const hasMini = !!mini && mini.length > 0;
+      const hasWagmi = !!wagmiAddress && wagmiAddress.length > 0;
+
+      if (hasMini || hasWagmi) {
+        clearInterval(hardLoop);
+      } else {
         window.location.reload();
       }
-    }, 2000);
+    }, 3000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(hardLoop);
   }
-}, [context, address]);
+}, [context, wagmiAddress]);
+
 useEffect(() => {
   if (address) {
     setTimeout(() => setShowMiniKit(true), 100); 
