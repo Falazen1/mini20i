@@ -74,7 +74,7 @@ useEffect(() => {
       if (!mini && !address) {
         window.location.reload();
       }
-    }, 3000);
+    }, 2000);
 
     return () => clearInterval(interval);
   }
@@ -94,7 +94,7 @@ useEffect(() => {
   if (!address) return;
   const timeout = setTimeout(() => {
     setShowVideo(false);
-  }, 1000);
+  }, 3000);
   return () => clearTimeout(timeout);
 }, [address, showVideo]);
 
@@ -780,8 +780,8 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
   />
 <div className="text-center text-white/80 text-xs">
   <div className="flex flex-wrap justify-center gap-x-10 mb-1">
-    <span>Tokens: {inscription.seed}</span>
     <span>Type: {inscription.type}</span>
+    <span>Tokens: {inscription.seed}</span>
   </div>
 
   {/* traits: only shown on md+ */}
@@ -850,10 +850,10 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
 <div className="flex flex-col items-center justify-center mb-4 relative text-white/90">
   <div className="flex gap-6 text-lg">
     <div>
-      <span className="font-semibold">Tokens: </span> {selectedInscription.seed}
-    </div>
-    <div>
       <span className="font-semibold">Type: </span> {selectedInscription.type}
+    </div>
+        <div>
+      <span className="font-semibold">Tokens: </span> {selectedInscription.seed}
     </div>
   </div>
   <button
