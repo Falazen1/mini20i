@@ -12,7 +12,6 @@ export async function GET() {
       "splashImageUrl": "https://mini20i.vercel.app/logo.png",
       "splashBackgroundColor": "#000000",
       "homeUrl": "https://mini20i.vercel.app",
-      "webhookUrl": "",
       "subtitle": "pocket inscriptions",
       "description": "Explore Fungi, Froggi, and Pepi — Living art on evolving tokens",
       "screenshotUrls": [
