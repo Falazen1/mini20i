@@ -69,23 +69,20 @@ const [confirmUnstash, setConfirmUnstash] = useState<null | Inscription>(null);
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
 }, [isFrameReady, setFrameReady]);
+
 useEffect(() => {
-  const handleVisibilityChange = () => {
-    const isMobile = window.matchMedia("(max-width: 768px)").matches;
-    if (document.visibilityState === 'visible' && isMobile) {
-      const miniAddress = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-      if (!miniAddress) {
+  if (window.parent !== window) {
+    const interval = setInterval(() => {
+      const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+      if (mini && !address) {
         window.location.reload();
       }
-    }
-  };
+    }, 2000);
 
-  document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => clearInterval(interval);
+  }
+}, [context, address]);
 
-  return () => {
-    document.removeEventListener('visibilitychange', handleVisibilityChange);
-  };
-}, [context]);
 
 useEffect(() => {
   if (address) {
