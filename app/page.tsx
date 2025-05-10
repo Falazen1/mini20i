@@ -778,17 +778,15 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
     className="w-full aspect-square mb-2 rounded overflow-hidden bg-black"
     dangerouslySetInnerHTML={{ __html: inscription.svg }}
   />
-<div className="flex flex-col gap-1 mt-2 text-xs text-white/80">
-<div className="text-xs text-white/80">
-  <div className="flex flex-wrap gap-x-6 mb-1 sm:justify-center">
+<div className="text-center text-white/80 text-xs">
+  <div className="flex flex-wrap justify-center gap-x-10 mb-1">
     <span>Tokens: {inscription.seed}</span>
     <span>Type: {inscription.type}</span>
   </div>
 
-    <div className="grid grid-cols-3 gap-1">
-{inscription.meta && (
-  <div className="grid grid-cols-3 gap-1 mt-1 text-white/80 text-xs">
-    {(typeof window !== "undefined" && window.innerWidth > 768) || selectedInscription?.id === inscription.id ? (
+  {/* traits: only shown on md+ */}
+  <div className="hidden md:grid grid-cols-3 gap-1 mt-1">
+    {inscription.meta &&
       extractTopTraits(
         inscription.meta,
         inscription.id.split("-")[0] as "froggi" | "fungi" | "pepi",
@@ -800,14 +798,12 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
         >
           {trait}
         </div>
-      ))
-    ) : null}
-  </div>
-)}
-
-    </div>
+      ))}
   </div>
 </div>
+
+
+
 
 </div>
 
