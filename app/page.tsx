@@ -71,17 +71,16 @@ useEffect(() => {
 }, [isFrameReady, setFrameReady]);
 
 useEffect(() => {
-  if (window.parent !== window) {
-    const interval = setInterval(() => {
-      const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-      if (mini && !address) {
-        window.location.reload();
-      }
-    }, 2000);
+  const interval = setInterval(() => {
+    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+    if (mini || wagmiAddress) {
+      clearInterval(interval);
+      window.location.reload();
+    }
+  }, 500);
 
-    return () => clearInterval(interval);
-  }
-}, [context, address]);
+  return () => clearInterval(interval);
+}, [context, wagmiAddress]);
 
 
 useEffect(() => {
