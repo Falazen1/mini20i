@@ -2,7 +2,7 @@
 import { NextRequest } from "next/server";
 import { mkdir, writeFile, readFile } from "fs/promises";
 import path from "path";
-import { imageCache } from "../../../../../lib/memory"; // make sure this path matches your setup
+import { imageCache } from "../../../../../lib/memory";
 
 export async function POST(
   req: NextRequest,
@@ -20,15 +20,12 @@ export async function POST(
 
   const buffer = Buffer.from(image.split(",")[1], "base64");
 
-  // ✅ Save to disk in dev
   if (process.env.NODE_ENV === "development") {
     const dirPath = path.join(process.cwd(), "public", "og", project);
     const filePath = path.join(dirPath, `${seed}_${address}.png`);
     await mkdir(dirPath, { recursive: true });
     await writeFile(filePath, buffer);
   }
-
-  // ✅ Also store in memory (for prod fallback)
   imageCache.set(id, buffer);
 
   return new Response(
@@ -52,7 +49,6 @@ export async function GET(
   const address = searchParams.get("address")?.toLowerCase() ?? "anon";
   const id = `${project}-${seed}-${address}`;
 
-  // ✅ Try loading from disk first in dev mode
   if (process.env.NODE_ENV === "development") {
     try {
       const filePath = path.join(
@@ -70,11 +66,10 @@ export async function GET(
         },
       });
     } catch {
-      // fall through to in-memory
+
     }
   }
 
-  // ✅ Fallback to in-memory cache
   const buffer = imageCache.get(id);
   if (!buffer) {
     return new Response("Image not found", { status: 404 });

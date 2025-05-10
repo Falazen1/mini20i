@@ -57,7 +57,6 @@ export default function ShareButton({ seed, project, svg }: ShareButtonProps) {
     const { url } = await postRes.json();
     const fullImageUrl = `https://mini20i.vercel.app${url}`;
 
-    // ✅ PRELOAD THE IMAGE TO ENSURE WARPCAST CAN SEE IT
     const preload = new Image();
     preload.src = fullImageUrl;
     await new Promise((res) => (preload.onload = res));
