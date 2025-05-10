@@ -31,12 +31,7 @@ type Inscription = {
 };
 
 export default function Page() {
-  const { setFrameReady, isFrameReady, context } = useMiniKit();
-
-  useEffect(() => {
-  if (!isFrameReady) setFrameReady();
-}, [isFrameReady, setFrameReady]);
-
+  const context = useMiniKit();
   const wagmiAddress = useAccount().address;
   const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
   const { connect, connectors } = useConnect();
@@ -59,6 +54,7 @@ const [showDescription, setShowDescription] = useState(false);
 const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
+const { setFrameReady, isFrameReady } = useMiniKit();
 const [fadeOutIndex, setFadeOutIndex] = useState<number | null>(null);
 const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] | null>(null);
 const [failedTxCount, setFailedTxCount] = useState(0);
@@ -70,28 +66,29 @@ const LOADING_GIFS: Record<"froggi" | "fungi" | "pepi", string> = {
 const [showRollingGif, setShowRollingGif] = useState<null | "froggi" | "fungi" | "pepi">(null);
 const [confirmUnstash, setConfirmUnstash] = useState<null | Inscription>(null);
 
-
+useEffect(() => {
+  if (!isFrameReady) setFrameReady();
+}, [isFrameReady, setFrameReady]);
 useEffect(() => {
   const handleVisibilityChange = () => {
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
     const isInFrame = typeof window !== "undefined" && window.parent !== window;
-    const miniAddress = (context as { walletAddress?: `0x${string}` })?.walletAddress;
 
-    if (
-      document.visibilityState === "visible" &&
-      isMobile &&
-      isInFrame &&
-      !(miniAddress || wagmiAddress)
-    ) {
-      window.location.reload();
+    if (document.visibilityState === "visible" && isMobile && isInFrame) {
+      setTimeout(() => {
+        const miniAddress = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+        if (!miniAddress) {
+          window.location.reload();
+        }
+      }, 150); 
     }
   };
 
   document.addEventListener("visibilitychange", handleVisibilityChange);
-  return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-}, [context, wagmiAddress]);
-
-
+  return () => {
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+  };
+}, [context]);
 
 useEffect(() => {
   if (address) {
