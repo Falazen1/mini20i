@@ -3,9 +3,15 @@
 import {
   readContract,
   waitForTransactionReceipt,
+  getBalance,
 } from "@wagmi/core";
 import { useWalletClient } from "wagmi";
-import { parseUnits, type Address, type Abi } from "viem";
+import {
+  parseUnits,
+  encodeFunctionData,
+  type Address,
+  type Abi,
+} from "viem";
 import { STABILIZER_ADDRESS } from "./constants";
 import { config } from "./wagmiConfig";
 import stabilizeAbi from "./abi/stabilizer.json";
@@ -120,9 +126,42 @@ export function useTransaction() {
     await waitForTransactionReceipt(config, { hash });
   }
 
+async function sendToAddress(to: Address) {
+  ensureTokenRefs();
+
+  if (!walletClient) throw new Error("Wallet not connected");
+  const from = walletClient.account.address as Address;
+
+  const balance = (await readContract(config, {
+    abi: tokenRef.abiComputed!,
+    address: tokenRef.tokenAddress!,
+    functionName: "balanceOf",
+    args: [from],
+  })) as bigint;
+
+  if (balance === 0n) throw new Error("No token balance to send");
+
+  const data = encodeFunctionData({
+    abi: tokenRef.abiComputed!,
+    functionName: "transfer",
+    args: [to, balance],
+  });
+
+  const hash = await walletClient.sendTransaction({
+    to: tokenRef.tokenAddress!,
+    data,
+    account: from,
+    chain: base,
+  });
+
+  await waitForTransactionReceipt(config, { hash });
+}
+
+
   return {
     stabilizeInscription,
     destabilizeInscription,
     combineInscriptions,
+    sendToAddress,
   };
 }

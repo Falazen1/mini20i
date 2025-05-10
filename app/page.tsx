@@ -21,6 +21,7 @@ import Head from "next/head";
 import { FUNGUS_COLOR_NAMES } from "./helpers/colors";
 import { PEPI_COLOR_NAMES } from "./helpers/colors";
 import { FROGGI_HATS, FROGGI_EYEWEAR, FROGGI_CLOTHES } from "./helpers/froggi";
+import ModalSend from "./components/ModalSend";
 type Inscription = {
   id: string;
   svg: string;
@@ -41,11 +42,12 @@ export default function Page() {
   const [successMessage, setSuccessMessage] = useState("");
   const [combineMode, setCombineMode] = useState(false);
   const [combineList, setCombineList] = useState<Inscription[]>([]);
-  const { stabilizeInscription, destabilizeInscription, combineInscriptions } = useTransaction();
+const { stabilizeInscription, destabilizeInscription, combineInscriptions, sendToAddress } = useTransaction();
   const tokenStore = useTokenStore();
   const [activeInfo, setActiveInfo] = useState<string | null>(null);
   const [isSwapOpen, setIsSwapOpen] = useState(false);
   const [swapTokenKey, setSwapTokenKey] = useState<"froggi" | "fungi" | "pepi" | null>(null);
+const [showSendModal, setShowSendModal] = useState<false | "froggi" | "fungi" | "pepi">(false);
   const [showVideo, setShowVideo] = useState(true);
   const [showMiniKit, setShowMiniKit] = useState(false);
 const [showDescription, setShowDescription] = useState(false);
@@ -55,20 +57,22 @@ const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
 const [fadeOutIndex, setFadeOutIndex] = useState<number | null>(null);
 const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] | null>(null);
-
+const [failedTxCount, setFailedTxCount] = useState(0);
 const LOADING_GIFS: Record<"froggi" | "fungi" | "pepi", string> = {
   froggi: "/frog_rolling_long.gif",
   fungi: "/fungi_rolling_long.gif",
   pepi: "/pepi_rolling_long.gif",
 };
 const [showRollingGif, setShowRollingGif] = useState<null | "froggi" | "fungi" | "pepi">(null);
+const [confirmUnstash, setConfirmUnstash] = useState<null | Inscription>(null);
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
 }, [isFrameReady, setFrameReady]);
 useEffect(() => {
   const handleVisibilityChange = () => {
-    if (document.visibilityState === 'visible') {
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    if (document.visibilityState === 'visible' && isMobile) {
       const miniAddress = (context as { walletAddress?: `0x${string}` })?.walletAddress;
       if (!miniAddress) {
         window.location.reload();
@@ -283,10 +287,13 @@ list.push({
           : action.charAt(0).toUpperCase() + action.slice(1);
 
       setSuccessMessage(`${label} successful.`);
+      setFailedTxCount(0);
       setTimeout(() => setSuccessMessage(""),4000);
     } catch (e) {
       console.error(e);
+      setFailedTxCount((prev) => prev + 1);
       setSuccessMessage("Transaction failed.");
+
       setTimeout(() => setSuccessMessage(""), 4000);
     } finally {
       setIsProcessing(false);
@@ -366,7 +373,7 @@ const seedNum = parseInt(seedStr, 10);
       if (meta.expression) traits.push({ label: "Face", value: meta.expression as string });
       if (meta.eyes) traits.push({ label: "Eyes", value: meta.eyes as string });
       if (meta.body) traits.push({ label: "Body", value: meta.body as string });
-      if (meta.bg) traits.push({ label: "BGR", value: meta.bg as string });
+      if (meta.bg) traits.push({ label: "Sky", value: meta.bg as string });
     }
   }
 
@@ -376,10 +383,10 @@ const seedNum = parseInt(seedStr, 10);
     if (meta.hasDots === "true") traits.push({ label: "Dots", value: resolveFungiColor(meta.dotsColor as string) });
     if (meta.cap !== undefined) traits.push({ label: "Cap", value: meta.cap as string });
     if (meta.capColor) traits.push({ label: "Color", value: resolveFungiColor(meta.capColor as string) });
-    if (meta.stem) traits.push({ label: "Stem", value: meta.stem as string });
-    if (meta.stemColor) traits.push({ label: "Spore", value: resolveFungiColor(meta.stemColor as string) });
+    if (meta.stem) traits.push({ label: "Body", value: meta.stem as string });
+    if (meta.stemColor) traits.push({ label: "Stem", value: resolveFungiColor(meta.stemColor as string) });
     if (meta.groundColor) traits.push({ label: "Ground", value: resolveFungiColor(meta.groundColor as string) });
-    if (meta.background) traits.push({ label: "BGR", value: resolveFungiColor(meta.background as string) });
+    if (meta.background) traits.push({ label: "Sky", value: resolveFungiColor(meta.background as string) });
   }
 
   if (project === "pepi") {
@@ -392,7 +399,7 @@ const seedNum = parseInt(seedStr, 10);
     if (meta.mouth && meta.mouth !== "0") traits.push({ label: "Mouth", value: meta.mouth as string });
     if (meta.clothes && meta.clothes !== "0") traits.push({ label: "Clothes", value: meta.clothes as string });
     if (meta.bodyColor) traits.push({ label: "Color", value: resolvePepiColor(meta.bodyColor as string) });
-    if (meta.background) traits.push({ label: "BGR", value: resolvePepiColor(meta.background as string) });
+    if (meta.background) traits.push({ label: "Sky", value: resolvePepiColor(meta.background as string) });
   }
 
   const seen = new Set<string>();
@@ -436,6 +443,7 @@ const seedNum = parseInt(seedStr, 10);
           {successMessage}
         </div>
       )}
+      
 {combineMode && (
   <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 overflow-auto">
   <div className="bg-[#1c1e24] border border-white/10 rounded-xl shadow-xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto text-white">
@@ -523,6 +531,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
     </div>
   </div>
 )}
+
 {isSwapOpen && swapTokenKey && (
   <SwapModal
   tokenKey={swapTokenKey}
@@ -778,10 +787,22 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
     isSelected ? "ring-2 ring-purple-400" : ""
   }`}
 >
+<div className="w-full aspect-square mb-2 rounded overflow-hidden bg-black">
   <div
-    className="w-full aspect-square mb-2 rounded overflow-hidden bg-black"
-    dangerouslySetInnerHTML={{ __html: inscription.svg }}
+    dangerouslySetInnerHTML={{
+      __html:
+        inscription.id.startsWith("pepi")
+          ? inscription.svg.replace(
+              /<svg([^>]+?)>/,
+              `<svg$1 width="640" height="640" shape-rendering="crispEdges">`
+            )
+          : inscription.svg
+    }}
+    className="[&>svg]:w-full [&>svg]:h-full [&>svg]:block"
   />
+</div>
+
+
 <div className="text-center text-white/80 text-xs">
   <div className="flex flex-wrap justify-center gap-x-10 mb-1">
     <span>Type: {inscription.type}</span>
@@ -889,6 +910,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
     />
   )}
 </div>
+
 {selectedInscription.meta && (
   <div className="grid grid-cols-3 gap-1 mt-4 text-xs text-white/80">
     {extractTopTraits(
@@ -909,27 +931,72 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
 
           <div className="flex flex-row justify-between items-end mt-4 gap-3">
           <div className="flex gap-3 flex-wrap">
-  {selectedInscription.id.startsWith("froggi") && selectedInscription.type === "Safe" && (
-    <button
-      onClick={() =>
-        handleClick("froggi", "destabilize", selectedInscription.seed)
-      }
-      className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded"
-    >
-      Unstash
-    </button>
-  )}
+{["froggi", "pepi"].some((k) => selectedInscription.id.startsWith(k)) && selectedInscription.type === "Safe" && (
+  <button
+onClick={() => {
+  const tokenKey = selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi";
+  const hasDynamic = (inscriptions[tokenKey] || []).some(i => i.type === "Growing");
 
-  {selectedInscription.id.startsWith("froggi") && selectedInscription.type === "Growing" && (
-    <button
-      onClick={() =>
-        handleClick("froggi", "stabilize", selectedInscription.seed)
-      }
-      className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded"
-    >
-      Stash
-    </button>
-  )}
+  if (hasDynamic) {
+    setConfirmUnstash(selectedInscription);
+  } else {
+    handleClick(tokenKey, "destabilize", selectedInscription.seed);
+  }
+}}
+
+
+    className="px-4 py-2 text-sm bg-amber-100 text-amber-700 rounded"
+  >
+    Unstash
+  </button>
+)}
+{confirmUnstash && (
+  <div className="absolute inset-0 bg-black/80 z-50 flex items-center justify-center px-4">
+    <div className="bg-[#1c1e24] border border-white/20 rounded-xl shadow-lg p-6 w-full max-w-sm text-white text-center">
+      <p className="text-sm mb-4">
+        You already have a dynamic inscription.
+        <br />
+        Unstashing will <span className="text-yellow-300 font-semibold">combine</span> them.
+      </p>
+      <div className="flex justify-center gap-4">
+        <button
+          className="px-4 py-2 text-sm bg-white text-black rounded"
+          onClick={() => {
+            handleClick(
+              confirmUnstash.id.split("-")[0] as "froggi" | "fungi" | "pepi",
+              "destabilize",
+              confirmUnstash.seed
+            );
+            setConfirmUnstash(null);
+          }}
+        >
+          Yes, combine
+        </button>
+        <button
+          className="px-4 py-2 text-sm bg-gray-700 text-white rounded"
+          onClick={() => setConfirmUnstash(null)}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{["froggi", "pepi"].some((k) => selectedInscription.id.startsWith(k)) && selectedInscription.type === "Growing" && (
+  <button
+    onClick={() =>
+      handleClick(
+        selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi",
+        "stabilize",
+        selectedInscription.seed
+      )
+    }
+    className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded"
+  >
+    Stash
+  </button>
+)}
 
   {(inscriptions[selectedInscription.id.split("-")[0]]?.filter(i => i.type === "Safe").length ?? 0) > 1 && (
     <button
@@ -971,7 +1038,21 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
   >
     Add more
   </button>
+  
 )}
+{selectedInscription.id.startsWith("pepi") && failedTxCount >= 3 && (
+
+  <button
+    onClick={() => {
+      setShowSendModal("pepi");
+      setSelectedInscription(null);
+    }}
+    className="px-4 py-2 text-sm bg-purple-100 text-purple-800 rounded"
+  >
+    Unstick
+  </button>
+)}
+
 
 </div>
 
@@ -992,6 +1073,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
 </div>
 
           </div>
+
         </div>
       </div>
     )}
@@ -1000,6 +1082,25 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
           Join the Telegram <span className="ml-2 inline-block">↗</span>
         </a> */}
       </div>
+      <ModalSend
+  open={!!showSendModal}
+  onClose={() => setShowSendModal(false)}
+  onSend={async (recipient) => {
+    try {
+      if (!showSendModal) return;
+      await tokenStore.setTokenByKey(showSendModal);
+      await sendToAddress(recipient);
+      setSuccessMessage("Tokens sent successfully.");
+    } catch (err) {
+      console.error(err);
+      setSuccessMessage("Send failed.");
+    } finally {
+      setTimeout(() => setSuccessMessage(""), 4000);
+    }
+  }}
+/>
+
     </>
+    
   );
 }
