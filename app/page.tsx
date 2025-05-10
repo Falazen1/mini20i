@@ -8,7 +8,7 @@ import { readContract } from "@wagmi/core";
 import { config } from "./helpers/wagmiConfig";
 import abis from "./helpers/abi";
 import tokens from "./helpers/tokens.json";
-import { TELEGRAM_URL } from "./helpers/constants";
+{/*import { TELEGRAM_URL } from "./helpers/constants"; */}
 import Topnav from "./components/Topnav";
 import { getFunctionNames } from "./helpers/abi/mapping";
 import { type Seed } from "./helpers/types";
@@ -17,7 +17,7 @@ import { Address } from "viem";
 import { useTokenStore } from "./helpers/useTokenStore";
 import SwapModal from "./components/SwapModal";
 import Image from "next/image";
-{/*import ShareButton from "./components/ShareButton";*/}
+import ShareButton from "./components/ShareButton";
 import Head from "next/head";
 
 type Inscription = {
@@ -837,14 +837,12 @@ useEffect(() => {
 </div>
 
 <div className="flex flex-col gap-2">
-{/*
-{typeof window !== "undefined" && (
+
 <ShareButton
   seed={selectedInscription.seed}
   project={selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi"}
   svg={selectedInscription.svg}
 />
-*/}
 
   <button
     onClick={() => setSelectedInscription(null)}
@@ -859,9 +857,9 @@ useEffect(() => {
       </div>
     )}
 
-        <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="border rounded-full py-2 px-4 text-sm inline-block hover:bg-gray-100 mt-10">
+       {/* <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="border rounded-full py-2 px-4 text-sm inline-block hover:bg-gray-100 mt-10">
           Join the Telegram <span className="ml-2 inline-block">↗</span>
-        </a>
+        </a> */}
       </div>
     </>
   );
