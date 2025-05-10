@@ -72,21 +72,18 @@ useEffect(() => {
 useEffect(() => {
   const handleVisibilityChange = () => {
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
-    const isInFrame = typeof window !== "undefined" && window.parent !== window;
-
-    if (document.visibilityState === "visible" && isMobile && isInFrame) {
-      setTimeout(() => {
-        const miniAddress = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-        if (!miniAddress) {
-          window.location.reload();
-        }
-      }, 150); 
+    if (document.visibilityState === 'visible' && isMobile) {
+      const miniAddress = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+      if (!miniAddress) {
+        window.location.reload();
+      }
     }
   };
 
-  document.addEventListener("visibilitychange", handleVisibilityChange);
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+
   return () => {
-    document.removeEventListener("visibilitychange", handleVisibilityChange);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
   };
 }, [context]);
 
