@@ -80,18 +80,6 @@ useEffect(() => {
   }
 }, [context, address]);
 useEffect(() => {
-  const interval = setInterval(() => {
-    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-    if (mini || wagmiAddress) {
-      clearInterval(interval);
-      window.location.reload();
-    }
-  }, 500);
-
-  return () => clearInterval(interval);
-}, [context, wagmiAddress]);
-
-useEffect(() => {
   if (address) {
     setTimeout(() => setShowMiniKit(true), 100); 
     setTimeout(() => setShowDescription(true), 700); 
