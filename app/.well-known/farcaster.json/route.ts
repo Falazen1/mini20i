@@ -6,30 +6,31 @@ export async function GET() {
       "signature": "MHhjNjNlZjI5NDVjMjJhMzE5OGZmZjIwZWNhNDhlZWI5NWFiZGRiMjViMTUwMWJjM2MzODBiODM5MjlmZjdhZWJjM2Y1OWM3NTI3NTZkMTljYWM4ZDQ0ZDQ0NjU3NTVmYWI0YTllODk1N2IwMDg4ZmVjZGZkY2RkMWYzMDdmNDM5NTFi"
     },
     frame: {
-      "version": "next",
+      "version": "1",
       "name": "Mini-20i",
-      "subtitle": "Swap ERC20i Inscriptions",
-      "tagline": "Your base inscriptions hub",
-      "description": "Explore Fungi, Froggi, and Pepi — Tokens Evolved",
-      "homeUrl": "https://mini20i.vercel.app",
       "iconUrl": "https://mini20i.vercel.app/favicon.png",
-      "imageUrl": "https://mini20i.vercel.app/favicon.png",
-      "logo": "https://mini20i.vercel.app/logo.png",
-      "appIcon": "https://mini20i.vercel.app/favicon.png",
+      "splashImageUrl": "https://mini20i.vercel.app/logo.png",
+      "splashBackgroundColor": "#000000",
+      "homeUrl": "https://mini20i.vercel.app",
+      "webhookUrl": "",
+      "subtitle": "swap erc20i inscriptions",
+      "description": "Explore Fungi, Froggi, and Pepi — Tokens Evolved",
+      "screenshotUrls": [
+
+      ],
+      primaryCategory: "art-creativity",
+      tags: [
+        "collect",
+        "erc20i",
+        "swap",
+        "game",
+        "nft"
+      ],
       "heroImageUrl": "https://mini20i.vercel.app/favicon.png",
-      "primaryCategory": "art-creativity",
-      "tags": ["erc20i", "NFT", "swap", "game", "collectible"],
+      "tagline": "Your base inscriptions hub",
       "ogTitle": "Swap ERC20i Inscriptions",
       "ogDescription": "Explore Fungi, Froggi, and Pepi — Tokens Evolved",
-      "ogImageUrl": "https://mini20i.vercel.app/favicon.png",
-      "button": {
-        "title": "Launch Mini20i",
-        "action": {
-          "type": "launch_frame",
-          "name": "mini20i",
-          "url": "https://mini20i.vercel.app"
-        }
-      }
+      "ogImageUrl": "https://mini20i.vercel.app/favicon.png"
     }
   });
 }
