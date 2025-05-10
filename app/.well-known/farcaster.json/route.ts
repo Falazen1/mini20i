@@ -8,18 +8,18 @@ export async function GET() {
     frame: {
       "version": "1",
       "name": "Mini-20i",
-      "iconUrl": "https://mini20i.vercel.app/favicon.png",
+      "iconUrl": "https://mini20i.vercel.app/logo_main.png",
       "splashImageUrl": "https://mini20i.vercel.app/logo.png",
       "splashBackgroundColor": "#000000",
       "homeUrl": "https://mini20i.vercel.app",
       "webhookUrl": "",
-      "subtitle": "swap erc20i inscriptions",
-      "description": "Explore Fungi, Froggi, and Pepi — Tokens Evolved",
+      "subtitle": "pocket inscriptions",
+      "description": "Explore Fungi, Froggi, and Pepi — Living art on evolving tokens",
       "screenshotUrls": [
 
       ],
-      primaryCategory: "art-creativity",
-      tags: [
+      "primaryCategory": "art-creativity",
+      "tags": [
         "collect",
         "erc20i",
         "swap",
@@ -27,9 +27,9 @@ export async function GET() {
         "nft"
       ],
       "heroImageUrl": "https://mini20i.vercel.app/favicon.png",
-      "tagline": "Your base inscriptions hub",
-      "ogTitle": "Swap ERC20i Inscriptions",
-      "ogDescription": "Explore Fungi, Froggi, and Pepi — Tokens Evolved",
+      "tagline": "Simplified Base Inscriptions",
+      "ogTitle": "Mini-20i - Pocket Inscriptions",
+      "ogDescription": "Explore ERC20i - A living and evolving Token standard",
       "ogImageUrl": "https://mini20i.vercel.app/favicon.png"
     }
   });
