@@ -1067,6 +1067,7 @@ onClick={() => {
   svg={selectedInscription.svg}
 />
 
+
   <button
     onClick={() => setSelectedInscription(null)}
     className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
