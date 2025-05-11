@@ -3,6 +3,8 @@ import { mkdir, writeFile, readFile } from "fs/promises";
 import path from "path";
 import { put } from "@vercel/blob";
 
+const forceBlob = true;
+
 export async function POST(
   req: NextRequest,
   { params }: { params: { project: string; seed: string } }
@@ -10,16 +12,15 @@ export async function POST(
   const { project, seed } = params;
   const searchParams = new URL(req.url).searchParams;
   const address = searchParams.get("address")?.toLowerCase() ?? "anon";
-  const id = `${project}-${seed}-${address}`;
-
   const { image } = await req.json();
+
   if (!image || !image.startsWith("data:image/png")) {
     return new Response("Invalid PNG", { status: 400 });
   }
 
   const buffer = Buffer.from(image.split(",")[1], "base64");
 
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === "development" && !forceBlob) {
     const dirPath = path.join(process.cwd(), "public", "og", project);
     const filePath = path.join(dirPath, `${seed}_${address}.png`);
     await mkdir(dirPath, { recursive: true });
@@ -31,6 +32,7 @@ export async function POST(
     });
   }
 
+  // ✅ Always hit Blob when forceBlob is enabled
   const blob = await put(`og/${project}/${seed}_${address}.png`, buffer, {
     access: "public",
   });
