@@ -20,10 +20,10 @@ export async function GET() {
       "primaryCategory": "art-creativity",
       "tags": [
         "collect",
-        "erc20i",
-        "swap",
+        "20i",
+        "mini20i",
         "game",
-        "nft"
+        "inscription"
       ],
       "heroImageUrl": "https://mini-20i.app/favicon.png",
       "tagline": "Simplified Base Inscriptions",
