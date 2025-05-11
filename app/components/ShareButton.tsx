@@ -135,14 +135,15 @@ export default function ShareButton({ seed, project, svg, traits }: ShareButtonP
         ? ` with ${trait1}!`
         : "!";
 
-    const message = `Check out my ${project}${traitText}`;
+    const message = `Check out my ${project}${traitText}! #Mini20i #${project}`;
 
     if (canShare) {
       await share({
         title: message,
         body: message,
         image: fullImageUrl,
-        url: `https://mini20i.vercel.app`,
+        url: `https://mini20i.vercel.app/view/${project}/${seed}?address=${address}`,
+
       });
     } else {
       openUrl(
