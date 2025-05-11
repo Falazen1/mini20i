@@ -135,7 +135,7 @@ export default function ShareButton({ seed, project, svg, traits }: ShareButtonP
         ? ` with ${trait1}!`
         : "!";
 
-    const message = `Check out my ${project}${traitText}! Mini-20i.app $${project}`;
+    const message = `Check out my ${project}${traitText} Mini-20i.app $${project}`;
 
     if (canShare) {
       await share({
