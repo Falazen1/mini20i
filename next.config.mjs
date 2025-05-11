@@ -12,7 +12,8 @@ const nextConfig = {
       "pepe-erc20i.vip",
       "truffi.xyz",
       "d38ulo0p1ibxtf.cloudfront.net",
-      "mini20i.vercel.app"
+      "mini20i.vercel.app",
+      "mini-20i.app"
     ],
   },
   webpack: (config) => {

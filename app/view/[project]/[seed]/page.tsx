@@ -12,14 +12,14 @@ export async function generateMetadata({ params, searchParams }: PageProps) {
   return {
     title: "Mini20i Viewer",
     openGraph: {
-      images: [`https://mini20i.vercel.app/api/png/${project}/${seed}?address=${address}`],
+      images: [`https://mini-20i.app/api/png/${project}/${seed}?address=${address}`],
     },
     other: {
       "fc:frame": "vNext",
-      "fc:frame:image": `https://mini20i.vercel.app/api/png/${project}/${seed}?address=${address}`,
+      "fc:frame:image": `https://mini-20i.app/api/png/${project}/${seed}?address=${address}`,
       "fc:frame:button:1": "Launch Mini20i",
       "fc:frame:button:1:action": "post_redirect",
-      "fc:frame:post_url": `https://mini20i.vercel.app/`,
+      "fc:frame:post_url": `https://mini-20i.app/`,
     },
   };
 }

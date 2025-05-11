@@ -402,7 +402,7 @@ const handleStabilize = async () => {
                 mode: "dark",
                 theme: "default",
                 name: "mini20i",
-                logo: `https://mini20i.vercel.app/logo.png`,
+                logo: `https://mini-20i.app/logo.png`,
               },
             }}
           >

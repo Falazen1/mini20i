@@ -382,7 +382,7 @@ const seedNum = parseInt(seedStr, 10);
 
   if (project === "fungi") {
     const resolveFungiColor = (hex: string) => FUNGUS_COLOR_NAMES[hex.toLowerCase()] || hex;
-    
+
         if (meta.capColor) traits.push({ label: "Color", value: resolveFungiColor(meta.capColor as string) });
         if (meta.hasDots === "true") traits.push({ label: "Dots", value: resolveFungiColor(meta.dotsColor as string) });
         if (meta.background) traits.push({ label: "Sky", value: resolveFungiColor(meta.background as string) });
@@ -422,13 +422,13 @@ const seedNum = parseInt(seedStr, 10);
       name="fc:frame"
       content={JSON.stringify({
         version: "next",
-        imageUrl: `https://mini20i.vercel.app/api/png/${selectedInscription.id.split("-")[0]}/${selectedInscription.seed}?address=${address}`,
+        imageUrl: `https://mini-20i.app/`,
         button: {
           title: "Launch Mini20i",
           action: {
             type: "launch_frame",
             name: "mini20i",
-            url: `https://mini20i.vercel.app/view/${selectedInscription.id.split("-")[0]}/${selectedInscription.seed}?address=${address}`,
+            url: `https://mini-20i.app/`,
           },
         },
       })}

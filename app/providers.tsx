@@ -21,7 +21,7 @@ export function Providers({ children }: PropsWithChildren) {
           config={{
             appearance: {
               name: "mini20i",
-              logo: "https://mini20i.vercel.app/logo.png",
+              logo: "https://mini-20i.app/logo.png",
               theme: "default",
               mode: "auto",
             },

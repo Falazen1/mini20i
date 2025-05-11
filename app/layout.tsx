@@ -16,16 +16,16 @@ export async function generateMetadata(): Promise<Metadata> {
     other: {
       "fc:frame": JSON.stringify({
         version: "next",
-        appIcon: "https://mini20i.vercel.app/favicon.png",
-        appLogoUrl: "https://mini20i.vercel.app/logo.png",
-        logo: "https://mini20i.vercel.app/logo.png",
-        imageUrl: "https://mini20i.vercel.app/favicon.png",
+        appIcon: "https://mini-20i.app/favicon.png",
+        appLogoUrl: "https://mini-20i.app/logo.png",
+        logo: "https://mini-20i.app/logo.png",
+        imageUrl: "https://mini-20i.app/favicon.png",
         button: {
           title: "Launch Mini20i",
           action: {
             type: "launch_frame",
             name: "mini20i",
-            url: "https://mini20i.vercel.app",
+            url: "https://mini-20i.app",
           },
         },
       }),
