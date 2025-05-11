@@ -634,18 +634,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
     <div className="relative z-10 text-white text-center px-6">
       <div
         className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
-        onClick={() => {
-          const userAgent = navigator.userAgent || "";
-          const isWarpcast = userAgent.includes("warpcast");
-          const miniConnect = (context as { connect?: () => void }).connect;
-
-          if (isWarpcast && typeof miniConnect === "function") {
-            miniConnect(); // this shows the Warpcast wallet popup
-          } else {
-            connect({ connector: connectors[0] }); // fallback to injected
-          }
-        }}
-
+        onClick={() => connect({ connector: connectors[0] })}
       >
         <p className="text-lg font-semibold mb-2">Wallet Required</p>
         <p className="text-sm">Click here to connect your wallet.</p>
