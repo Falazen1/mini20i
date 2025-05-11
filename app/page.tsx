@@ -775,7 +775,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
             ["Level 2", "525,000+ tokens"],
             ["Level 3", "1,050,000+ tokens"],
             ["Level 4", "1,575,000+ tokens"],
-            ["Level 5", "2,100,000+ tokens"],
+            ["Level 5", "2,100,000 or more tokens"],
           ],
           "progression-froggi": `7 tiers of $Froggi from colorful eggs to fully decked out denizens. Holding more tokens evolves your egg, with more trait combinations unlocking at higher levels.`,
           "levels-froggi": [
@@ -785,7 +785,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
             ["Level 3", "10,000+ tokens"],
             ["Level 4", "30,000+ tokens"],
             ["Level 5", "60,000+ tokens"],
-            ["Level 6", "120,000+ tokens"],
+            ["Level 6", "120,000 or more tokens"],
           ],
           "progression-pepi": `6 levels of $Pepi let you see your Pepi grow from egg cluster, to tadpole, to fully mature. Each tier of Pepi offers a unique stage of growth for your inscription.`,
           "levels-pepi": [
@@ -794,8 +794,18 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
             ["Level 2", "22–32 tokens"],
             ["Level 3", "33–43 tokens"],
             ["Level 4", "44–55 tokens"],
-            ["Level 5", "56+ tokens"],
+            ["Level 5", "56 or more tokens"],
           ],
+          "progression-jelli": `6 stages of $Jelli — from floating polyps to full Medusa form. Accumulating more tokens evolves your jelly inscription through the ocean depths.`,
+            "levels-jelli": [
+            ["Level 0", "1,000 tokens or less"],
+            ["Level 1", "1,001+ tokens"],
+            ["Level 2", "21,001+ tokens"],
+            ["Level 3", "105,001+ tokens"],
+            ["Level 4", "420,001+ tokens"],
+            ["Level 5", "1,050,001 or more tokens"],
+            ],
+
         };
 
         const val = raw[activeInfo as keyof typeof raw];
