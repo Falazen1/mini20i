@@ -631,15 +631,37 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
       <source src="/aidos_head.mp4" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
-    <div className="relative z-10 text-white text-center px-6">
-      <div
-        className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
-        onClick={() => connect({ connector: connectors[0] })}
-      >
-        <p className="text-lg font-semibold mb-2">Wallet Required</p>
-        <p className="text-sm">Click here to connect your wallet.</p>
-      </div>
-    </div>
+<div className="relative z-10 text-white text-center px-6">
+  <div
+    className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
+    onClick={() => connect({ connector: connectors[0] })}
+  >
+    {(() => {
+      if (typeof window !== "undefined") {
+        const isMobile = window.innerWidth < 768;
+        const userAgent = navigator.userAgent || "";
+        const isWarpcast = userAgent.includes("warpcast");
+
+        if (isMobile && isWarpcast) {
+          return (
+            <>
+              <p className="text-lg font-semibold mb-2">Warpcaster Detected</p>
+              <p className="text-sm">Initializing connection. . .</p>
+            </>
+          );
+        }
+      }
+
+      return (
+        <>
+          <p className="text-lg font-semibold mb-2">Wallet Required</p>
+          <p className="text-sm">Click here to connect your wallet.</p>
+        </>
+      );
+    })()}
+  </div>
+</div>
+
   </div>
 ) : null}
 
