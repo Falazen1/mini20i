@@ -32,9 +32,12 @@ export async function POST(
     });
   }
 
-  const blob = await put(`og/${project}/${seed}_${address}.png`, buffer, {
-    access: "public",
-  });
+const blob = await put(`og/${project}/${seed}_${address}_${Date.now()}.png`, buffer, {
+  access: "public",
+  token: process.env.VERCEL_BLOB_READ_WRITE_TOKEN,
+});
+
+
 
   return Response.json({
     ok: true,
