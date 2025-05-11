@@ -32,6 +32,7 @@ export async function POST(
     });
   }
 
+
   const blob = await put(`og/${project}/${seed}_${address}.png`, buffer, {
     access: "public",
   });
@@ -50,7 +51,7 @@ export async function GET(
   const searchParams = new URL(req.url).searchParams;
   const address = searchParams.get("address")?.toLowerCase() ?? "anon";
 
-  if (process.env.NODE_ENV === "development" && !forceBlob) {
+  if (process.env.NODE_ENV === "development") {
     try {
       const filePath = path.join(
         process.cwd(),
