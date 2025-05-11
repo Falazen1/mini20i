@@ -10,10 +10,10 @@ export async function GET() {
       "name": "Mini-20i",
       "iconUrl": "https://mini-20i.app/logo_main.png",
       "splashImageUrl": "https://mini-20i.app/logo.png",
-      "splashBackgroundColor": "#000000",
-      "homeUrl": "https://mini-20i.app",
-      "subtitle": "pocket inscriptions",
-      "description": "Explore Fungi, Froggi, and Pepi — Living art on evolving tokens",
+      "splashBackgroundColor": "#282c34",
+      "homeUrl": "mini-20i.app",
+      "subtitle": "swap erc20i inscriptions",
+      "description": "Explore Fungi, Froggi, Pepi, Jelli — ERC20i evolving tokens with the mini20i app",
       "screenshotUrls": [
 
       ],

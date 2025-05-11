@@ -46,8 +46,8 @@ const { stabilizeInscription, destabilizeInscription, combineInscriptions, sendT
   const tokenStore = useTokenStore();
   const [activeInfo, setActiveInfo] = useState<string | null>(null);
   const [isSwapOpen, setIsSwapOpen] = useState(false);
-  const [swapTokenKey, setSwapTokenKey] = useState<"froggi" | "fungi" | "pepi" | null>(null);
-const [showSendModal, setShowSendModal] = useState<false | "froggi" | "fungi" | "pepi">(false);
+  const [swapTokenKey, setSwapTokenKey] = useState<"froggi" | "fungi" | "pepi" | "jelli" | null>(null);
+const [showSendModal, setShowSendModal] = useState<false | "froggi" | "fungi" | "pepi" | "jelli">(false);
   const [showVideo, setShowVideo] = useState(true);
   const [showMiniKit, setShowMiniKit] = useState(false);
 const [showDescription, setShowDescription] = useState(false);
@@ -67,18 +67,19 @@ useEffect(() => {
     const isWarpcast = userAgent.includes("warpcast");
 
     if (isMobile && isWarpcast) {
-      const timeout = setTimeout(() => setShowError(true), 7200);
+      const timeout = setTimeout(() => setShowError(true), 9000);
       return () => clearTimeout(timeout);
     }
   }
 }, []);
 
-const LOADING_GIFS: Record<"froggi" | "fungi" | "pepi", string> = {
+const LOADING_GIFS: Record<"froggi" | "fungi" | "pepi" | "jelli", string> = {
   froggi: "/frog_rolling_long.gif",
   fungi: "/fungi_rolling_long.gif",
   pepi: "/pepi_rolling_long.gif",
+  jelli: "/jelli_rolling_long.gif",
 };
-const [showRollingGif, setShowRollingGif] = useState<null | "froggi" | "fungi" | "pepi">(null);
+const [showRollingGif, setShowRollingGif] = useState<null | "froggi" | "fungi" | "pepi" | "jelli">(null);
 const [confirmUnstash, setConfirmUnstash] = useState<null | Inscription>(null);
 
 useEffect(() => {
@@ -131,9 +132,10 @@ useEffect(() => {
       const results: Record<string, Inscription[]> = {};
 
       for (const token of tokens) {
-        if (!["froggi", "fungi", "pepi"].includes(token.key)) continue;
+if (!["froggi", "fungi", "pepi", "jelli"].includes(token.key)) continue;
 
-        const abi = abis[token.key as "froggi" | "fungi" | "pepi"];
+
+        const abi = abis[token.key as "froggi" | "fungi" | "pepi" | "jelli"];
         const contractAddress = token.address as `0x${string}`;
         const fn = getFunctionNames(token.key);
         const list: Inscription[] = [];
@@ -226,7 +228,7 @@ list.push({
     loadInscriptions();
   }, [address, successMessage]);
 
-  const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi"].includes(t.key));
+const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].includes(t.key));
   const activeToken = visibleTokens.find((t) => t.key === activeFilter);
   const [mounted, setMounted] = useState(false);
 
@@ -256,7 +258,7 @@ list.push({
   if (!mounted) return null;
   
   async function handleClick(
-    key: "froggi" | "fungi" | "pepi",
+    key: "froggi" | "fungi" | "pepi" | "jelli",
     action: "stabilize" | "destabilize" | "combine",
     seed: string
   ) {
@@ -369,13 +371,11 @@ list.push({
 
   }
   
-function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fungi" | "pepi", seedStr: string): string[] {
+function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fungi" | "pepi" | "jelli", seedStr: string): string[] {
   const traits: { label: string; value: string }[] = [];
 
   if (project === "froggi") {
-const seedNum = parseInt(seedStr, 10);
-
-
+    const seedNum = parseInt(seedStr, 10);
 
     if (seedNum <= 2999) {
       if (meta.egg) traits.push({ label: "Pattern", value: meta.egg as string });
@@ -396,31 +396,36 @@ const seedNum = parseInt(seedStr, 10);
   }
 
   if (project === "fungi") {
-    const resolveFungiColor = (hex: string) => FUNGUS_COLOR_NAMES[hex.toLowerCase()] || hex;
-
-        if (meta.capColor) traits.push({ label: "Color", value: resolveFungiColor(meta.capColor as string) });
-        if (meta.hasDots === "true") traits.push({ label: "Dots", value: resolveFungiColor(meta.dotsColor as string) });
-        if (meta.background) traits.push({ label: "Sky", value: resolveFungiColor(meta.background as string) });
-        if (meta.stemColor) traits.push({ label: "Stem", value: resolveFungiColor(meta.stemColor as string) });
-        if (meta.groundColor) traits.push({ label: "Ground", value: resolveFungiColor(meta.groundColor as string) });
-        if (meta.cap !== undefined) traits.push({ label: "Cap", value: meta.cap as string });
-        if (meta.stem) traits.push({ label: "Body", value: meta.stem as string });
-
+    const resolve = (hex: string) => FUNGUS_COLOR_NAMES[hex.toLowerCase()] || hex;
+    if (meta.capColor) traits.push({ label: "Color", value: resolve(meta.capColor as string) });
+    if (meta.hasDots === "true") traits.push({ label: "Dots", value: resolve(meta.dotsColor as string) });
+    if (meta.background) traits.push({ label: "Sky", value: resolve(meta.background as string) });
+    if (meta.stemColor) traits.push({ label: "Stem", value: resolve(meta.stemColor as string) });
+    if (meta.groundColor) traits.push({ label: "Ground", value: resolve(meta.groundColor as string) });
+    if (meta.cap !== undefined) traits.push({ label: "Cap", value: meta.cap as string });
+    if (meta.stem) traits.push({ label: "Body", value: meta.stem as string });
   }
 
   if (project === "pepi") {
-    const resolvePepiColor = (hex: string) => PEPI_COLOR_NAMES[hex.toLowerCase()] || hex;
-
-    if (meta.bodyColor) traits.push({ label: "Color", value: resolvePepiColor(meta.bodyColor as string) });
-        if (meta.clothes && meta.clothes !== "0") traits.push({ label: "Clothes", value: meta.clothes as string });
+    const resolve = (hex: string) => PEPI_COLOR_NAMES[hex.toLowerCase()] || hex;
+    if (meta.bodyColor) traits.push({ label: "Color", value: resolve(meta.bodyColor as string) });
+    if (meta.clothes && meta.clothes !== "0") traits.push({ label: "Clothes", value: meta.clothes as string });
     if ((meta.hat && meta.hat !== "0") || meta["Head"]) traits.push({ label: "Hat", value: (meta["Head Item"] || meta.hat) as string });
     if (meta.accessory && meta.accessory !== "0") traits.push({ label: "Accessory", value: meta.accessory as string });
-        if (meta.background) traits.push({ label: "Sky", value: resolvePepiColor(meta.background as string) });
+    if (meta.background) traits.push({ label: "Sky", value: resolve(meta.background as string) });
     if (meta.eyes && meta.eyes !== "0") traits.push({ label: "Eyes", value: meta.eyes as string });
     if (meta.mouth && meta.mouth !== "0") traits.push({ label: "Mouth", value: meta.mouth as string });
-        if (meta.ears && meta.ears !== "0") traits.push({ label: "Ears", value: meta.ears as string });
+    if (meta.ears && meta.ears !== "0") traits.push({ label: "Ears", value: meta.ears as string });
   }
 
+  if (project === "jelli") {
+    if (meta.bellColor) traits.push({ label: "Color", value: meta.bellColor as string });
+    if (meta.tentacleColor) traits.push({ label: "Tentacle", value: meta.tentacleColor as string });
+    if (meta.background) traits.push({ label: "Sky", value: meta.background as string });
+    if (meta.hasGround === "true" && meta.groundColor) traits.push({ label: "Ground", value: meta.groundColor as string });
+    if (meta.hasBubble === "true" && meta.bubbleColor) traits.push({ label: "Bubble", value: meta.bubbleColor as string });
+    if (meta.hasWeed === "true" && meta.weedColor) traits.push({ label: "Weed", value: meta.weedColor as string });
+  }
   const seen = new Set<string>();
   return traits
     .filter((t) => !seen.has(t.label) && seen.add(t.label))
@@ -533,7 +538,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
           disabled={combineList.length < 2}
           onClick={() =>
             handleClick(
-              combineList[0].id.split("-")[0] as "froggi" | "fungi" | "pepi",
+              combineList[0].id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli",
               "combine",
               "0"
             )
@@ -596,38 +601,39 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
 
 
 
+<div className="flex flex-col items-center gap-2 mb-6">
+  <p className="text-lg text-white font-semibold mb-2 z-10">
+    {activeFilter === "all" ? "All" : `$${activeToken?.name}`}
+  </p>
 
-        <div className="flex flex-col items-center gap-2 mb-6">
-          <p className="text-lg text-white font-semibold mb-2 z-10">
-            {activeFilter === "all" ? "All" : `$${activeToken?.name}`}
-          </p>
+<div className="relative w-full flex justify-center gap-2 [&_img]:h-11 [&_img]:w-11 min-[320px]:gap-4 min-[440px]:[&_img]:h-16 min-[440px]:[&_img]:w-16">
 
-          <div className="relative w-full flex justify-center gap-4">
-          <Image
-  onClick={() => setActiveFilter("all")}
-  src="https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg"
-  alt="All Projects"
-  width={56}
-  height={56}
-  className={`h-14 w-14 rounded-full border cursor-pointer hover:opacity-80 ${activeFilter === "all" ? "ring-2 ring-black" : ""}`}
-/>
-            {visibleTokens.map((t) => {
-              const logo = t.key === "pepi"
-                ? "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/pepi_logo.jpg"
-                : t.logo;
 
-              return (
-<Image
-  key={t.key}
-  onClick={() => setActiveFilter(t.key)}
-  src={logo}
-  alt={t.name}
-  width={56}
-  height={56}
-  className={`h-14 w-14 rounded-full border cursor-pointer hover:opacity-80 ${activeFilter === t.key ? "ring-2 ring-black" : ""}`}
-/>
-              );
-            })}
+    <Image
+      onClick={() => setActiveFilter("all")}
+      src="https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg"
+      alt="All Projects"
+      width={56}
+      height={56}
+      className={`h-14 w-14 rounded-full border cursor-pointer hover:opacity-80 ${activeFilter === "all" ? "ring-2 ring-black" : ""}`}
+    />
+    {visibleTokens.map((t) => {
+      const logo = t.key === "pepi"
+        ? "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/pepi_logo.jpg"
+        : t.logo;
+
+      return (
+        <Image
+          key={t.key}
+          onClick={() => setActiveFilter(t.key)}
+          src={logo}
+          alt={t.name}
+          width={56}
+          height={56}
+          className={`h-14 w-14 rounded-full border cursor-pointer hover:opacity-80 ${activeFilter === t.key ? "ring-2 ring-black" : ""}`}
+        />
+      );
+    })}
 
 {(!(context as { walletAddress?: `0x${string}` })?.walletAddress && !wagmiAddress) || showVideo ? (
 
@@ -860,7 +866,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
     {inscription.meta &&
       extractTopTraits(
         inscription.meta,
-        inscription.id.split("-")[0] as "froggi" | "fungi" | "pepi",
+        inscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli",
         inscription.seed
       ).map((trait, i) => (
         <div
@@ -886,7 +892,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
     className="bg-[#1c1e24] border border-white/10 rounded-xl shadow-md p-3 cursor-pointer transition hover:scale-[1.02] hover:ring-1 hover:ring-white/20"
     onClick={() => {
       setIsSwapOpen(true);
-      setSwapTokenKey(token.key as "froggi" | "fungi" | "pepi");
+      setSwapTokenKey(token.key as "froggi" | "fungi" | "pepi" | "jelli");
     }}
   >
 <div className="w-full mb-6 rounded flex items-center justify-center">
@@ -961,7 +967,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
   <div className="grid grid-cols-3 gap-1 mt-4 text-xs text-white/80">
     {extractTopTraits(
       selectedInscription.meta,
-      selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi",
+      selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli",
       selectedInscription.seed
     ).map((trait, i) => (
       <div
@@ -980,7 +986,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
 {["froggi", "pepi"].some((k) => selectedInscription.id.startsWith(k)) && selectedInscription.type === "Safe" && (
   <button
 onClick={() => {
-  const tokenKey = selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi";
+  const tokenKey = selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli";
   const hasDynamic = (inscriptions[tokenKey] || []).some(i => i.type === "Growing");
 
   if (hasDynamic) {
@@ -1009,7 +1015,7 @@ onClick={() => {
           className="px-4 py-2 text-sm bg-white text-black rounded"
           onClick={() => {
             handleClick(
-              confirmUnstash.id.split("-")[0] as "froggi" | "fungi" | "pepi",
+              confirmUnstash.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli",
               "destabilize",
               confirmUnstash.seed
             );
@@ -1033,7 +1039,7 @@ onClick={() => {
   <button
     onClick={() =>
       handleClick(
-        selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi",
+        selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli",
         "stabilize",
         selectedInscription.seed
       )
@@ -1065,7 +1071,7 @@ onClick={() => {
     <button
       onClick={() => {
         setSelectedInscription(null);
-        setSwapTokenKey(selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi");
+        setSwapTokenKey(selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli");
         setIsSwapOpen(true);
       }}
       className="px-3 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
@@ -1077,7 +1083,7 @@ onClick={() => {
   <button
     onClick={() => {
       setSelectedInscription(null);
-      setSwapTokenKey(selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi");
+      setSwapTokenKey(selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli");
       setIsSwapOpen(true);
     }}
     className="px-4 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
@@ -1106,13 +1112,13 @@ onClick={() => {
 
 <ShareButton
   seed={selectedInscription.seed}
-  project={selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi"}
+  project={selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli"}
   svg={selectedInscription.svg}
   traits={
     selectedInscription.meta
       ? extractTopTraits(
           selectedInscription.meta,
-          selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi",
+          selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli",
           selectedInscription.seed
         ).slice(0, 2)
       : []

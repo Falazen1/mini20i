@@ -29,13 +29,19 @@ const ethBase: Token = {
   chainId: 8453,
 };
 
-const LOADING_GIFS: Record<"froggi" | "fungi" | "pepi", string> = {
+const LOADING_GIFS: Record<
+"froggi" | "fungi" | "pepi" | "jelli"
+, string> = {
   froggi: "/frog_rolling_long.gif",
   fungi: "/fungi_rolling_long.gif",
   pepi: "/pepi_rolling_long.gif",
+  jelli: "/jelli_rolling_long.gif",
 };
 
-const TOKENS: Record<"froggi" | "fungi" | "pepi", Token> = {
+const TOKENS: Record<
+  "froggi" | "fungi" | "pepi" | "jelli",
+  Token
+> = {
   froggi: {
     name: "Froggi",
     address: "0x88A78C5035BdC8C9A8bb5c029e6cfCDD14B822FE",
@@ -60,8 +66,19 @@ const TOKENS: Record<"froggi" | "fungi" | "pepi", Token> = {
     chainId: 8453,
     image: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/pepi_logo.jpg",
   },
+  jelli: {
+    name: "Jelli",
+    address: "0xA1b9d812926a529D8B002E69FCd070c8275eC73c",
+    symbol: "JELLI",
+    decimals: 9,
+    chainId: 8453,
+    image: "https://jelli.blue/images/fungi/logo.png",
+  },
 };
-function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fungi" | "pepi", seedStr: string): string[] {
+
+function extractTopTraits(meta: Record<string, unknown>, project: 
+"froggi" | "fungi" | "pepi" | "jelli"
+, seedStr: string): string[] {
   const traits: { label: string; value: string }[] = [];
 
   if (project === "froggi") {
@@ -117,7 +134,7 @@ export default function SwapModal({
   onSuccess,
   inscriptionList,
 }: {
-  tokenKey: "froggi" | "fungi" | "pepi";
+  tokenKey: "froggi" | "fungi" | "pepi" |"jelli";
   onClose: () => void;
   onSuccess: () => void;
   inscriptionList: {
@@ -142,19 +159,23 @@ export default function SwapModal({
   const tokenStore = useTokenStore();
   const { stabilizeInscription } = useTransaction();
   const [showFinalMessage, setShowFinalMessage] = useState(false);
-
-  function getLevel(tokenKey: "froggi" | "fungi" | "pepi", amount: number): number {
-    const thresholds: Record<typeof tokenKey, number[]> = {
-      froggi: [0, 1000, 3000, 10000, 30000, 60000, 120000],
-      fungi: [0, 21000, 525000, 1050000, 1575000, 2100000],
-      pepi: [0, 11, 22, 33, 44, 56],
-    };
-    const levels = thresholds[tokenKey];
-    for (let i = levels.length - 1; i >= 0; i--) {
-      if (amount >= levels[i]) return i;
-    }
-    return 0;
+function getLevel(
+  tokenKey: "froggi" | "fungi" | "pepi" | "jelli",
+  amount: number
+): number {
+  const thresholds: Record<typeof tokenKey, number[]> = {
+    froggi: [0, 1000, 3000, 10000, 30000, 60000, 120000],
+    fungi: [0, 21000, 525000, 1050000, 1575000, 2100000],
+    pepi: [0, 11, 22, 33, 44, 56],
+    jelli: [0, 1000, 21000, 105000, 420000, 1050000],
+  };
+  const levels = thresholds[tokenKey];
+  for (let i = levels.length - 1; i >= 0; i--) {
+    if (amount >= levels[i]) return i;
   }
+  return 0;
+}
+
 
   useEffect(() => {
     const timer = setTimeout(() => setDebounced(true), 500);
@@ -264,6 +285,8 @@ const handleStabilize = async () => {
       ? "Your Froggi has evolved!"
       : tokenKey === "fungi"
       ? "Your Fungi leveled up!"
+      : tokenKey === "jelli"
+      ? "Your Jelli has ascended!"
       : "Your Pepi leveled up!"
     : newInscription
     ? prevSvgRef.current === null
@@ -272,22 +295,25 @@ const handleStabilize = async () => {
       ? "Your Froggi has evolved!"
       : tokenKey === "fungi"
       ? "Your Fungi has grown!"
+      : tokenKey === "jelli"
+      ? "Your Jelli has morphed!"
       : "Your Pepi has transformed!"
     : `Swap ETH → ${token.symbol}`}
 </h2>
 
-
-        {swapDone ? (
-          <>
-            {!newInscription && (
-              <div className="mb-4 text-center text-sm">
-                {tokenKey === "froggi"
-                  ? "Your Froggi is evolving..."
-                  : tokenKey === "fungi"
-                  ? "Your Fungi is growing..."
-                  : "Your Pepi is transforming..."}
-              </div>
-            )}
+{swapDone ? (
+  <>
+    {!newInscription && (
+      <div className="mb-4 text-center text-sm">
+        {tokenKey === "froggi"
+          ? "Your Froggi is evolving..."
+          : tokenKey === "fungi"
+          ? "Your Fungi is growing..."
+          : tokenKey === "jelli"
+          ? "Your Jelli is materializing..."
+          : "Your Pepi is transforming..."}
+      </div>
+    )}
 
             <div className="w-full aspect-square rounded bg-[#0f1014] flex items-center justify-center relative mb-2">
               {!newInscription ? (

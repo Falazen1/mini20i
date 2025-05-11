@@ -11,7 +11,7 @@ import { createInscriptionReader } from "./useInscription";
 import { tokenRef } from "./useTransaction";
 import type { Inscription } from "./types";
 
-export type TokenKey = "froggi" | "fungi" | "pepi";
+export type TokenKey = "froggi" | "fungi" | "pepi" | "jelli";
 
 export type TokenInfo = {
   name: string;
@@ -27,9 +27,6 @@ export type TokenInfo = {
   telegram?: string;
   pairAddress?: `0x${string}`;
 };
-
-
-
 
 export function useTokenStore() {
   const { address } = useAccount();
@@ -82,8 +79,7 @@ export function useTokenStore() {
   function init() {
     // legacy stub — no-op.
   }
-  
-  
+
   return {
     inscriptions,
     balanceUnits,
@@ -96,5 +92,4 @@ export function useTokenStore() {
     setTokenByKey,
     init,
   };
-  
 }
