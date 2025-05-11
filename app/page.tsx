@@ -1065,7 +1065,9 @@ onClick={() => {
   seed={selectedInscription.seed}
   project={selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi"}
   svg={selectedInscription.svg}
+  meta={selectedInscription.meta}
 />
+
 
   <button
     onClick={() => setSelectedInscription(null)}
