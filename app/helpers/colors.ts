@@ -84,6 +84,13 @@ export const FUNGUS_COLOR_NAMES: Record<string, string> = {
   "#ffffff": "White",
 };
 export const PEPI_COLOR_NAMES: Record<string, string> = {
+  "#c37100": "Amber",
+  "#db4161": "Cherry",
+  "#9aeb00": "Lime",
+  "#9241f3": "Electric",
+  "#5182ff": "Periwinkle",
+  "#a2a2a2": "Gray",
+  "#fff392": "Canary",
   "#538234": "Frog Green",
   "#49a269": "Mint",
   "#67d487": "Lime",
@@ -101,5 +108,5 @@ export const PEPI_COLOR_NAMES: Record<string, string> = {
   "#d4a37c": "Beige",
   "#ffc0cb": "Pink",
   "#800080": "Purple",
-  "#8f00ff": "Violet"
+  "#8f00ff": "Violet",
 };

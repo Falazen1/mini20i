@@ -382,27 +382,28 @@ const seedNum = parseInt(seedStr, 10);
 
   if (project === "fungi") {
     const resolveFungiColor = (hex: string) => FUNGUS_COLOR_NAMES[hex.toLowerCase()] || hex;
+    
+        if (meta.capColor) traits.push({ label: "Color", value: resolveFungiColor(meta.capColor as string) });
+        if (meta.hasDots === "true") traits.push({ label: "Dots", value: resolveFungiColor(meta.dotsColor as string) });
+        if (meta.background) traits.push({ label: "Sky", value: resolveFungiColor(meta.background as string) });
+        if (meta.stemColor) traits.push({ label: "Stem", value: resolveFungiColor(meta.stemColor as string) });
+        if (meta.groundColor) traits.push({ label: "Ground", value: resolveFungiColor(meta.groundColor as string) });
+        if (meta.cap !== undefined) traits.push({ label: "Cap", value: meta.cap as string });
+        if (meta.stem) traits.push({ label: "Body", value: meta.stem as string });
 
-    if (meta.hasDots === "true") traits.push({ label: "Dots", value: resolveFungiColor(meta.dotsColor as string) });
-    if (meta.cap !== undefined) traits.push({ label: "Cap", value: meta.cap as string });
-    if (meta.capColor) traits.push({ label: "Color", value: resolveFungiColor(meta.capColor as string) });
-    if (meta.stem) traits.push({ label: "Body", value: meta.stem as string });
-    if (meta.stemColor) traits.push({ label: "Stem", value: resolveFungiColor(meta.stemColor as string) });
-    if (meta.groundColor) traits.push({ label: "Ground", value: resolveFungiColor(meta.groundColor as string) });
-    if (meta.background) traits.push({ label: "Sky", value: resolveFungiColor(meta.background as string) });
   }
 
   if (project === "pepi") {
     const resolvePepiColor = (hex: string) => PEPI_COLOR_NAMES[hex.toLowerCase()] || hex;
 
+    if (meta.bodyColor) traits.push({ label: "Color", value: resolvePepiColor(meta.bodyColor as string) });
+        if (meta.clothes && meta.clothes !== "0") traits.push({ label: "Clothes", value: meta.clothes as string });
     if ((meta.hat && meta.hat !== "0") || meta["Head"]) traits.push({ label: "Hat", value: (meta["Head Item"] || meta.hat) as string });
     if (meta.accessory && meta.accessory !== "0") traits.push({ label: "Accessory", value: meta.accessory as string });
-    if (meta.ears && meta.ears !== "0") traits.push({ label: "Ears", value: meta.ears as string });
+        if (meta.background) traits.push({ label: "Sky", value: resolvePepiColor(meta.background as string) });
     if (meta.eyes && meta.eyes !== "0") traits.push({ label: "Eyes", value: meta.eyes as string });
     if (meta.mouth && meta.mouth !== "0") traits.push({ label: "Mouth", value: meta.mouth as string });
-    if (meta.clothes && meta.clothes !== "0") traits.push({ label: "Clothes", value: meta.clothes as string });
-    if (meta.bodyColor) traits.push({ label: "Color", value: resolvePepiColor(meta.bodyColor as string) });
-    if (meta.background) traits.push({ label: "Sky", value: resolvePepiColor(meta.background as string) });
+        if (meta.ears && meta.ears !== "0") traits.push({ label: "Ears", value: meta.ears as string });
   }
 
   const seen = new Set<string>();
@@ -1065,7 +1066,17 @@ onClick={() => {
   seed={selectedInscription.seed}
   project={selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi"}
   svg={selectedInscription.svg}
+  traits={
+    selectedInscription.meta
+      ? extractTopTraits(
+          selectedInscription.meta,
+          selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi",
+          selectedInscription.seed
+        ).slice(0, 2)
+      : []
+  }
 />
+
 
   <button
     onClick={() => setSelectedInscription(null)}
