@@ -86,7 +86,7 @@ export const FROGGI_CLOTHES: Record<string, string> = {
   "21": "Cyborg",
   "22": "Cyborg",
   "23": "Cyborg",
-  "24": "Gold Chain",
+  "24": "AK47",
   "25": "Astronaut",
   "26": "Astronaut",
   "27": "Astronaut",
