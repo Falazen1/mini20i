@@ -55,21 +55,20 @@ export default function ShareButton({ seed, project, svg }: ShareButtonProps) {
     );
 
     const { url } = await postRes.json();
-    const fullImageUrl = `https://mini20i.vercel.app${url}`;
+    const fullImageUrl = url;
 
     const preload = new Image();
     preload.src = fullImageUrl;
     await new Promise((res) => (preload.onload = res));
 
-if (canShare) {
-  await share({
-    title: `Check out my ${project} inscription! #ERC20i`,
-    body: `Check out my ${project} inscription! #ERC20i`,
-    image: fullImageUrl,
-    url: `https://mini20i.vercel.app`,
-  });
-}
- else {
+    if (canShare) {
+      await share({
+        title: `Check out my ${project} inscription! #ERC20i`,
+        body: `Check out my ${project} inscription! #ERC20i`,
+        image: fullImageUrl,
+        url: `https://mini20i.vercel.app`,
+      });
+    } else {
       openUrl(
         `https://warpcast.com/~/compose?text=${encodeURIComponent(
           `Check out my ${project} inscription! #ERC20i`

@@ -1,8 +1,7 @@
-// /app/api/og/[project]/[seed]/route.ts
 import { NextRequest } from "next/server";
 import { mkdir, writeFile, readFile } from "fs/promises";
 import path from "path";
-import { imageCache } from "../../../../../lib/memory";
+import { put } from "@vercel/blob";
 
 export async function POST(
   req: NextRequest,
@@ -25,19 +24,21 @@ export async function POST(
     const filePath = path.join(dirPath, `${seed}_${address}.png`);
     await mkdir(dirPath, { recursive: true });
     await writeFile(filePath, buffer);
-  }
-  imageCache.set(id, buffer);
 
-  return new Response(
-    JSON.stringify({
+    return Response.json({
       ok: true,
-      url: `/api/og/${project}/${seed}?address=${address}`,
-    }),
-    {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    }
-  );
+      url: `/og/${project}/${seed}_${address}.png`,
+    });
+  }
+
+  const blob = await put(`og/${project}/${seed}_${address}.png`, buffer, {
+    access: "public",
+  });
+
+  return Response.json({
+    ok: true,
+    url: blob.url,
+  });
 }
 
 export async function GET(
@@ -47,7 +48,6 @@ export async function GET(
   const { project, seed } = params;
   const searchParams = new URL(req.url).searchParams;
   const address = searchParams.get("address")?.toLowerCase() ?? "anon";
-  const id = `${project}-${seed}-${address}`;
 
   if (process.env.NODE_ENV === "development") {
     try {
@@ -59,26 +59,16 @@ export async function GET(
         `${seed}_${address}.png`
       );
       const file = await readFile(filePath);
-      return new Response(new Uint8Array(file), {
+      return new Response(file as unknown as BodyInit, {
         headers: {
           "Content-Type": "image/png",
           "Cache-Control": "no-cache",
         },
       });
     } catch {
-
+      return new Response("Image not found", { status: 404 });
     }
   }
 
-  const buffer = imageCache.get(id);
-  if (!buffer) {
-    return new Response("Image not found", { status: 404 });
-  }
-
-  return new Response(new Uint8Array(buffer), {
-    headers: {
-      "Content-Type": "image/png",
-      "Cache-Control": "public, max-age=300",
-    },
-  });
+  return new Response("Use blob URL", { status: 410 });
 }
