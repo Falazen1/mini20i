@@ -67,7 +67,7 @@ useEffect(() => {
     const isWarpcast = userAgent.includes("warpcast");
 
     if (isMobile && isWarpcast) {
-      const timeout = setTimeout(() => setShowError(true), 4000);
+      const timeout = setTimeout(() => setShowError(true), 7200);
       return () => clearTimeout(timeout);
     }
   }
