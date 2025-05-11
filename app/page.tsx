@@ -58,6 +58,21 @@ const { setFrameReady, isFrameReady } = useMiniKit();
 const [fadeOutIndex, setFadeOutIndex] = useState<number | null>(null);
 const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] | null>(null);
 const [failedTxCount, setFailedTxCount] = useState(0);
+const [showError, setShowError] = useState(false);
+
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    const isMobile = window.innerWidth < 768;
+    const userAgent = navigator.userAgent || "";
+    const isWarpcast = userAgent.includes("warpcast");
+
+    if (isMobile && isWarpcast) {
+      const timeout = setTimeout(() => setShowError(true), 4000);
+      return () => clearTimeout(timeout);
+    }
+  }
+}, []);
+
 const LOADING_GIFS: Record<"froggi" | "fungi" | "pepi", string> = {
   froggi: "/frog_rolling_long.gif",
   fungi: "/fungi_rolling_long.gif",
@@ -647,6 +662,11 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
             <>
               <p className="text-lg font-semibold mb-2">Warpcaster Detected</p>
               <p className="text-sm">Initializing connection. . .</p>
+              {showError && (
+                <p className="text-sm text-red-400 mt-4">
+                  Something went wrong. Please refresh the application to connect.
+                </p>
+              )}
             </>
           );
         }
