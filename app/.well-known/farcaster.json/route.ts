@@ -11,9 +11,9 @@ export async function GET() {
       "iconUrl": "https://mini-20i.app/logo_main.png",
       "splashImageUrl": "https://mini-20i.app/logo.png",
       "splashBackgroundColor": "#282c34",
-      "homeUrl": "mini-20i.app",
+      "homeUrl": "https://mini-20i.app",
       "subtitle": "swap erc20i inscriptions",
-      "description": "Explore Fungi, Froggi, Pepi, Jelli — ERC20i evolving tokens with the mini20i app",
+      "description": "Explore Fungi, Froggi, Pepi, Jelli — ERC20i evolving tokens with the mini20i app.",
       "screenshotUrls": [
 
       ],
