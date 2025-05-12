@@ -382,7 +382,7 @@ const handleStabilize = async () => {
 
 <div className="flex flex-row justify-between items-end mt-4 gap-3">
   <div className={`flex gap-3 flex-wrap ${fadeInButtons ? 'animate-fade-in2' : 'opacity-0'}`}>
-    {tokenKey === "froggi" && (
+    {["froggi", "pepi", "jelli"].includes(tokenKey) && (
       <button
         onClick={handleStabilize}
         className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded"
@@ -397,7 +397,7 @@ const handleStabilize = async () => {
         setInscriptionId(null);
         setFadeInButtons(false);
       }}
-      className="px-4 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
+      className="px-1 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
     >
       Add more
     </button>

@@ -993,7 +993,8 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
 
           <div className="flex flex-row justify-between items-end mt-4 gap-3">
           <div className="flex gap-3 flex-wrap">
-{["froggi", "pepi"].some((k) => selectedInscription.id.startsWith(k)) && selectedInscription.type === "Safe" && (
+{["froggi", "pepi", "jelli"].some((k) => selectedInscription.id.startsWith(k)) && selectedInscription.type === "Safe" && (
+
   <button
 onClick={() => {
   const tokenKey = selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli";
@@ -1045,7 +1046,8 @@ onClick={() => {
   </div>
 )}
 
-{["froggi", "pepi"].some((k) => selectedInscription.id.startsWith(k)) && selectedInscription.type === "Growing" && (
+{["froggi", "pepi", "jelli"].some((k) => selectedInscription.id.startsWith(k)) && selectedInscription.type === "Growing" && (
+
   <button
     onClick={() =>
       handleClick(
@@ -1067,7 +1069,7 @@ onClick={() => {
         setCombineList([selectedInscription]);
         setSelectedInscription(null);
       }}
-      className="px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded"
+      className="px-2 py-2 text-sm bg-blue-100 text-blue-700 rounded"
     >
       Combine
     </button>
@@ -1096,7 +1098,7 @@ onClick={() => {
       setSwapTokenKey(selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli");
       setIsSwapOpen(true);
     }}
-    className="px-4 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
+    className="px-1 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
   >
     Add more
   </button>
