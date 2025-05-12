@@ -20,6 +20,20 @@ const nextConfig = {
     config.externals.push("pino-pretty", "lokijs", "encoding");
     return config;
   },
+
+  async headers() {
+    return [
+      {
+        source: "/logo.png",
+        headers: [
+          {
+            key: "Access-Control-Allow-Origin",
+            value: "*"
+          }
+        ]
+      }
+    ];
+  }
 };
 
 export default nextConfig;

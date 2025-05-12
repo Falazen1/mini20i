@@ -18,7 +18,7 @@ export const config = createConfig({
         name: "mini20i",
         description: "Swap and manage mini20i tokens",
         url: "https://mini-20i.app",
-        icons: ["https://mini-20i.app/logo.png"], 
+        icons: ["https://mini-20i.app/logo.png"],
       },
     }),
     coinbaseWallet({
@@ -35,18 +35,23 @@ if (typeof window !== 'undefined') {
     window.Buffer = Buffer;
   }
 
-  import('@web3modal/wagmi/react').then(({ createWeb3Modal }) => {
-createWeb3Modal({
-  wagmiConfig: config,
-  projectId: WC_PROJECT_ID,
-  enableAnalytics: true,
-  themeMode: "dark",
-  connectorImages: {
-    injected: "https://mini-20i.app/logo.png", 
-    coinbaseWallet: "https://mini-20i.app/logo.png", 
-    walletConnect: "https://mini-20i.app/logo.png", 
-  },
-});
+import('@web3modal/wagmi/react').then(({ createWeb3Modal }) => {
+
+    createWeb3Modal({
+      wagmiConfig: config,
+      projectId: WC_PROJECT_ID,
+      themeMode: 'dark',
+      enableAnalytics: true,
+      metadata: {
+        name: "Mini-20i",
+        description: "Collect and evolve ERC20i tokens",
+        url: "https://mini-20i.app",
+        icons: ["https://mini-20i.app/logo.png"],
+      },
+      featuredWalletIds: ['metaMask', 'coinbaseWallet'],
+      allWallets: 'SHOW',
+      enableOnramp: true,
+    });
 
   });
 }
