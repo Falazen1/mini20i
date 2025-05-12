@@ -162,7 +162,8 @@ let message = "";
 
 if (project === "froggi" && seedNum <= 2999) {
   const patternTrait = formatted.find((t) => t.includes("Egg"))?.replace(" Egg", "") ?? "";
-  message = `Check out my ${patternTrait} Froggi Egg! Mini-20i.app $froggi`;
+message = `Check out my ${patternTrait} Froggi Egg!\nwarpcast.com/miniapps/CL_gnv6CCuBy/mini-20i $froggi`;
+
 } else {
   let traitText = "!";
   if (formatted.length === 1) {
@@ -170,7 +171,8 @@ if (project === "froggi" && seedNum <= 2999) {
   } else if (formatted.length >= 2) {
     traitText = ` with ${formatted[0]} and ${formatted[1]}!`;
   }
-  message = `Check out my ${project}${traitText} Mini-20i.app $${project}`;
+message = `Check out my ${project}${traitText}\nwarpcast.com/miniapps/CL_gnv6CCuBy/mini-20i $${project}`;
+
 }
 
 
