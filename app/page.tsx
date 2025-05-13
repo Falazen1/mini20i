@@ -859,10 +859,10 @@ dangerouslySetInnerHTML={{
   __html: (() => {
     const id = inscription.id;
 if (["pepi", "fungi", "jelli", "froggi"].some(k => id.startsWith(k))) {
-  return inscription.svg.replace(
-    /<svg([^>]+?)>/,
-    `<svg$1 width="1000" height="1000" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
-  );
+return (inscription.svg ?? "").replace(
+  /<svg([^>]*?)>/,
+  `<svg$1 style="image-rendering: pixelated; shape-rendering: crispEdges;" preserveAspectRatio="xMidYMid meet">`
+);
 }
 
 
@@ -968,18 +968,16 @@ if (["pepi", "fungi", "jelli", "froggi"].some(k => id.startsWith(k))) {
 </div>
 
 <div
-  className="w-full max-w-[1000px] mx-auto aspect-square mb-4 relative bg-black rounded overflow-hidden"
+  className="w-full aspect-square mb-4 relative bg-black rounded overflow-hidden"
 >
   <div
     className={`absolute inset-0 z-10 transition-opacity duration-[500ms] ${
       showRollingGif ? "opacity-0 delay-[100ms]" : "opacity-100"
     } [&>svg]:w-full [&>svg]:h-full [&>svg]:block`}
-    style={{
-      imageRendering: "pixelated",
-      transform: "scale(1)",
-    }}
-    dangerouslySetInnerHTML={{ __html: selectedInscription.svg }}
+    style={{ imageRendering: "pixelated" }}
+    dangerouslySetInnerHTML={{ __html: selectedInscription.svg ?? "" }}
   />
+
 
 
 
