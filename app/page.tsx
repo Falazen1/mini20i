@@ -855,15 +855,25 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
 >
 <div className="w-full aspect-square mb-2 rounded overflow-hidden bg-black">
   <div
-    dangerouslySetInnerHTML={{
-      __html:
-        inscription.id.startsWith("pepi")
-          ? inscription.svg.replace(
-              /<svg([^>]+?)>/,
-              `<svg$1 width="640" height="640" shape-rendering="crispEdges">`
-            )
-          : inscription.svg
-    }}
+dangerouslySetInnerHTML={{
+  __html: (() => {
+    const id = inscription.id;
+    if (id.startsWith("pepi")) {
+      return inscription.svg.replace(
+        /<svg([^>]+?)>/,
+        `<svg$1 width="640" height="640" shape-rendering="crispEdges">`
+      );
+    }
+    if (id.startsWith("fungi")) {
+      return inscription.svg.replace(
+        /<svg([^>]+?)>/,
+        `<svg$1 width="720" height="720" shape-rendering="crispEdges">`
+      );
+    }
+    return inscription.svg;
+  })()
+}}
+
     className="[&>svg]:w-full [&>svg]:h-full [&>svg]:block"
   />
 </div>
@@ -916,8 +926,8 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
       src={`${token.buyImage}`}
       alt={`${token.name} buy more`}
       className="w-full h-auto object-contain hover:opacity-90 transition"
-      width={576}
-      height={576}
+      width={512}
+      height={512}
     />
   </div>
 </div>
