@@ -858,18 +858,13 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
 dangerouslySetInnerHTML={{
   __html: (() => {
     const id = inscription.id;
-    if (id.startsWith("pepi")) {
-      return inscription.svg.replace(
-        /<svg([^>]+?)>/,
-        `<svg$1 width="640" height="640" shape-rendering="crispEdges">`
-      );
-    }
-if (id.startsWith("fungi")) {
+if (["pepi", "fungi", "jelli", "froggi"].some(k => id.startsWith(k))) {
   return inscription.svg.replace(
     /<svg([^>]+?)>/,
-    `<svg$1 width="720" height="720" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
+    `<svg$1 width="1000" height="1000" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
   );
 }
+
 
     return inscription.svg;
   })()
