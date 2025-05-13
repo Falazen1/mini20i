@@ -985,7 +985,7 @@ return svg.replace(
   needsFix
     ? `<svg$1 width="720" height="720" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
     : isPepi
-    ? `<svg$1 shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
+    ? `<svg$1 width="800" height="800" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
     : `<svg$1>`
 );
 
