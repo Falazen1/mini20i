@@ -978,13 +978,17 @@ dangerouslySetInnerHTML={{
   dangerouslySetInnerHTML={{
     __html: (() => {
       const svg = selectedInscription?.svg ?? "";
-      const needsFix = selectedInscription?.id?.startsWith("fungi") || selectedInscription?.id?.startsWith("jelli");
-      return needsFix
-        ? svg.replace(
-            /<svg([^>]+?)>/,
-            `<svg$1 width="720" height="720" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
-          )
-        : svg;
+const needsFix = selectedInscription?.id?.startsWith("fungi") || selectedInscription?.id?.startsWith("jelli");
+const isPepi = selectedInscription?.id?.startsWith("pepi");
+return svg.replace(
+  /<svg([^>]+?)>/,
+  needsFix
+    ? `<svg$1 width="720" height="720" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
+    : isPepi
+    ? `<svg$1 shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
+    : `<svg$1>`
+);
+
     })()
   }}
 />
