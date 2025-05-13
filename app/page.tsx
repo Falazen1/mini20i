@@ -864,12 +864,13 @@ dangerouslySetInnerHTML={{
         `<svg$1 width="640" height="640" shape-rendering="crispEdges">`
       );
     }
-    if (id.startsWith("fungi")) {
-      return inscription.svg.replace(
-        /<svg([^>]+?)>/,
-        `<svg$1 width="720" height="720" shape-rendering="crispEdges">`
-      );
-    }
+if (id.startsWith("fungi")) {
+  return inscription.svg.replace(
+    /<svg([^>]+?)>/,
+    `<svg$1 width="720" height="720" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
+  );
+}
+
     return inscription.svg;
   })()
 }}
@@ -970,12 +971,30 @@ dangerouslySetInnerHTML={{
   </button>
 </div>
 
-          <div className="w-full aspect-square mb-4 relative bg-black rounded overflow-hidden">
+<div
+  className="w-full aspect-square mb-4 relative bg-black rounded overflow-hidden"
+>
   <div
-    className={`absolute inset-0 w-full h-full z-10 transition-opacity duration-[500ms] ${
-      showRollingGif ? 'opacity-0 delay-[100ms]' : 'opacity-100'
+    className={`absolute inset-0 z-10 transition-opacity duration-[500ms] ${
+      showRollingGif ? "opacity-0 delay-[100ms]" : "opacity-100"
     }`}
-    dangerouslySetInnerHTML={{ __html: selectedInscription.svg }}
+    style={
+      ["fungi", "jelli"].some(k =>
+        selectedInscription.id.startsWith(k)
+      )
+        ? {
+            width: "720px",
+            height: "720px",
+            maxWidth: "100%",
+            imageRendering: "pixelated",
+            transform: "scale(1)",
+            margin: "0 auto",
+          }
+        : {}
+    }
+    dangerouslySetInnerHTML={{
+      __html: selectedInscription.svg,
+    }}
   />
 
 

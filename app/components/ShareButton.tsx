@@ -163,7 +163,7 @@ const handleShare = async () => {
   if (!container) throw new Error("share-capture element not found");
   if (controls) controls.style.display = "none";
 
-  container.classList.add("screenshot-mode"); // ⬅️ ADD THIS LINE
+  container.classList.add("screenshot-mode");
 
   try {
     const png = await svgToPng();
