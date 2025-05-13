@@ -1,6 +1,7 @@
 "use client";
 
 import { useMiniKit, useOpenUrl } from "@coinbase/onchainkit/minikit";
+import html2canvas from "html2canvas";
 
 type ShareButtonProps = {
   seed: string;
@@ -8,47 +9,22 @@ type ShareButtonProps = {
   svg: string;
   traits?: string[];
 };
+import { FROGGI_HATS, FROGGI_EYEWEAR, FROGGI_CLOTHES } from "../helpers/froggi";
 
 function formatTraitsForShare(traits: string[]): string[] {
   const isEgg = traits.some((t) => t.startsWith("Pattern:"));
 
   return traits
     .filter((trait) => {
-      const key = trait.split(":")[0].trim();
-      if (isEgg) {
-        // Only keep Pattern and Wiggle for eggs
-        return key === "Pattern" || key === "Wiggle";
-      }
+      const key = trait.split(":")[0]?.trim();
+      if (!key) return false;
+      if (isEgg) return key === "Pattern" || key === "Wiggle";
       return true;
     })
     .slice(0, 6)
     .map((trait) => {
-      const colonIndex = trait.indexOf(":");
-      if (colonIndex === -1) return trait.trim();
-
-      const key = trait.slice(0, colonIndex).trim();
-      const val = trait.slice(colonIndex + 1).trim();
-
-      if (key === "Eyes" || key === "Eyewear") {
-        if (["Goggles", "Monocle", "3D Glasses", "Shades", "Scouter"].some((v) => val.includes(v))) {
-          return val;
-        }
-        return `${val} Glasses`;
-      }
-
-      if (key === "Clothes") {
-        const clothesMap: Record<string, string> = {
-          Chain: "Gold Chain",
-          Knight: "Knight Armor",
-          Cyborg: "Cyborg Armor",
-          Astronaut: "Astronaut Suit",
-          Leather: "Leather Jacket",
-        };
-        return clothesMap[val] || val;
-      }
-
-      if (key === "Hat") {
-        const hatMap: Record<string, string> = {
+      const [keyRaw, valRaw] = trait.split(":").map(s => s.trim());
+          const hatNameMap: Record<string, string> = {
           Brain: "Exposed Brain",
           Wizard: "Wizard Hat",
           Knight: "Knight Helmet",
@@ -66,22 +42,73 @@ function formatTraitsForShare(traits: string[]): string[] {
           Beanie: "Beanie",
           Mohawk: "Mohawk",
           Leaf: "Leaf Crown",
-        };
-        return hatMap[val] || `${val} Hat`;
+          Warty: "Warty Cap",
+        };    const id = /^\d+$/.test(valRaw) ? valRaw : null;
+
+      if (keyRaw === "Hat") {
+        const label = id ? FROGGI_HATS[id] : valRaw;
+
+        return hatNameMap[label] || label || "Unknown Hat";
+      }
+const eyewearMap: Record<string, string> = {
+  Glasses: "Classic Glasses",
+  Goggles: "Froggi Goggles",
+  Shiny: "Shiny Lenses",
+  Red: "Red Glasses",
+  Styled: "Styled Frames",
+  Reflex: "Reflective Shades",
+  Dark: "Dark Glasses",
+  Shades: "Cool Shades",
+  Scouter: "Power Scouter",
+  Broken: "Broken Glasses",
+  Reading: "Reading Glasses",
+  "3D": "3D Glasses",
+  Monocle: "Monocle",
+  Jungle: "Jungle Goggles",
+};
+if (keyRaw === "Eyewear" || keyRaw === "Eyes") {
+  const raw = id ? FROGGI_EYEWEAR[id] : valRaw;
+  const label = eyewearMap[raw] || `${raw} Glasses`;
+  return label;
+}
+
+
+      if (keyRaw === "Clothes") {
+        const label = id ? FROGGI_CLOTHES[id] : valRaw;
+const reworded: Record<string, string> = {
+  Bowtie: "Bowtie",
+  Cape: "Hero Cape",
+  Collar: "Dress Collar",
+  Hoodie: "Hoodie",
+  Suit: "Formal Suit",
+  Turtleneck: "Turtleneck Sweater",
+  Scarf: "Wool Scarf",
+  Leather: "Leather Jacket",
+  Bandana: "Bandana",
+  Stripes: "Striped Shirt",
+  Plaid: "Plaid Shirt",
+  Knight: "Knight Armor",
+  Chain: "Gold Chain",
+  Cyborg: "Cyborg Armor",
+  Astronaut: "Astronaut Suit",
+  GoldChain: "Gold Chain", // in case mapped directly
+};
+
+        return reworded[label] || label;
       }
 
-      if (key === "Pattern") {
-        const patternMap: Record<string, string> = {
-          "0": "Tye-dye Egg",
+      if (keyRaw === "Pattern") {
+        const eggMap: Record<string, string> = {
+          "0": "Unique Egg",
           "1": "Spotted Egg",
           "2": "Wavey Egg",
           "3": "Striped Egg",
           "4": "Fractal Egg",
         };
-        return patternMap[val] || `${val} Egg`;
+        return eggMap[valRaw] || `${valRaw} Egg`;
       }
 
-      if (key === "Wiggle") {
+      if (keyRaw === "Wiggle") {
         const wiggleMap: Record<string, string> = {
           "2": "Shaking Wiggle",
           "3": "Floating Wiggle",
@@ -89,52 +116,58 @@ function formatTraitsForShare(traits: string[]): string[] {
           "5": "Pulsing Wiggle",
           "6": "Rocking Wiggle",
         };
-        return wiggleMap[val] || `${val} Wiggle`;
+        return wiggleMap[valRaw] || `${valRaw} Wiggle`;
       }
 
-      if (["Color", "Sky", "Ground", "Stem", "Dots"].includes(key)) {
-        return `${val} ${key}`;
+      if (["Color", "Sky", "Ground", "Stem", "Dots"].includes(keyRaw)) {
+        return `${valRaw} ${keyRaw}`;
       }
 
-      if (key === "Anim BG") return "Animated Background";
-      if (key === "Anim Body") return "Animated Body";
+if (keyRaw === "BGR" && valRaw === "Anim") return "Background Animation";
+if (keyRaw === "Anim Body") return "Animated Body";
 
-      return `${key} ${val}`;
+
+      return `${keyRaw} ${valRaw}`;
     });
 }
 
 
-export default function ShareButton({ seed, project, svg, traits }: ShareButtonProps) {
+
+export default function ShareButton({ seed, project, traits }: ShareButtonProps) {
   // @ts-expect-error: share exists at runtime in MiniKit environments
   const { share } = useMiniKit();
   const openUrl = useOpenUrl();
 
   const isFrame = typeof window !== "undefined" && window.parent !== window;
   const canShare = isFrame && typeof share === "function";
+const svgToPng = async (): Promise<string> => {
+  const el = document.getElementById("share-capture");
+  if (!el) throw new Error("share-capture element not found");
 
-  const svgToPng = async (svg: string): Promise<string> => {
-    const blob = new Blob([svg], { type: "image/svg+xml" });
-    const url = URL.createObjectURL(blob);
-    const img = new Image();
-    img.src = url;
-    await new Promise((resolve) => (img.onload = resolve));
+  await document.fonts.ready;
+  await new Promise((r) => setTimeout(r, 1)); // Let layout stabilize
 
-    const canvas = document.createElement("canvas");
-    canvas.width = 600;
-    canvas.height = 600;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("Canvas context not available");
+  const canvas = await html2canvas(el, {
+    backgroundColor: "#1c1e24",
+    scale: 2,
+    useCORS: true,
+  });
 
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, 600, 600);
-    URL.revokeObjectURL(url);
+  return canvas.toDataURL("image/png");
+};
 
-    return canvas.toDataURL("image/png");
-  };
+const handleShare = async () => {
+  const controls = document.getElementById("share-controls");
+  const container = document.getElementById("share-capture");
 
-  const handleShare = async () => {
-    const png = await svgToPng(svg);
+  if (!container) throw new Error("share-capture element not found");
+  if (controls) controls.style.display = "none";
+
+  container.classList.add("screenshot-mode"); // ⬅️ ADD THIS LINE
+
+  try {
+    const png = await svgToPng();
+
     const address =
       (typeof window !== "undefined" &&
         (window as Window & { ethereum?: { selectedAddress?: string } })
@@ -156,25 +189,24 @@ export default function ShareButton({ seed, project, svg, traits }: ShareButtonP
     preload.src = fullImageUrl;
     await new Promise((res) => (preload.onload = res));
 
-const formatted = formatTraitsForShare(traits ?? []);
-const seedNum = parseInt(seed, 10);
-let message = "";
+    const formatted = formatTraitsForShare(traits ?? []);
+    const seedNum = parseInt(seed, 10);
+    let message = "";
 
-if (project === "froggi" && seedNum <= 2999) {
-  const patternTrait = formatted.find((t) => t.includes("Egg"))?.replace(" Egg", "") ?? "";
-message = `Check out my ${patternTrait} Froggi Egg!\nwarpcast.com/miniapps/CL_gnv6CCuBy/mini-20i $froggi`;
-
-} else {
-  let traitText = "!";
-  if (formatted.length === 1) {
-    traitText = ` with ${formatted[0]}!`;
-  } else if (formatted.length >= 2) {
-    traitText = ` with ${formatted[0]} and ${formatted[1]}!`;
-  }
-message = `Check out my ${project}${traitText}\nwarpcast.com/miniapps/CL_gnv6CCuBy/mini-20i $${project}`;
-
-}
-
+    if (project === "froggi" && seedNum <= 2999) {
+      const patternTrait = formatted.find((t) =>
+        t.includes("Egg")
+      )?.replace(" Egg", "") ?? "";
+      message = `Check out my ${patternTrait} Froggi Egg!\nwarpcast.com/miniapps/CL_gnv6CCuBy/mini-20i $froggi`;
+    } else {
+      let traitText = "!";
+      if (formatted.length === 1) {
+        traitText = ` with ${formatted[0]}!`;
+      } else if (formatted.length >= 2) {
+        traitText = ` with ${formatted[0]} and ${formatted[1]}!`;
+      }
+      message = `Check out my ${project}${traitText}\nwarpcast.com/miniapps/CL_gnv6CCuBy/mini-20i $${project}`;
+    }
 
     if (canShare) {
       await share({
@@ -182,7 +214,6 @@ message = `Check out my ${project}${traitText}\nwarpcast.com/miniapps/CL_gnv6CCu
         body: message,
         image: fullImageUrl,
         url: "https://mini-20i.app",
-
       });
     } else {
       openUrl(
@@ -191,7 +222,12 @@ message = `Check out my ${project}${traitText}\nwarpcast.com/miniapps/CL_gnv6CCu
         )}&embeds[]=${encodeURIComponent(fullImageUrl)}`
       );
     }
-  };
+  } finally {
+    container.classList.remove("screenshot-mode"); // ⬅️ REMOVE after screenshot
+    if (controls) controls.style.display = "";
+  }
+};
+
 
   return (
     <button

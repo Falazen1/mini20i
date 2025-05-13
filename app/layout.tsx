@@ -12,39 +12,24 @@ export const viewport: Viewport = {
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "mini-20i",
-    description: "ERC20i inscriptions simplified — Froggi, Fungi, Pepi, Jelli",
-    applicationName: "mini-20i",
-    keywords: [
-      "ERC20i",
-      "inscriptions",
-      "Froggi",
-      "Fungi",
-      "Pepi",
-      "Jelli",
-      "Mini App",
-      "onchain",
-      "Mini20i",
-      "Warpcast",
-    ],
+    title: "Mini-20i",
+    description: "ERC20i inscriptions simplified",
     icons: {
       icon: "/favicon.png",
       shortcut: "/favicon.png",
     },
     openGraph: {
-      title: "mini-20i",
+      title: "Mini-20i",
       description: "Explore ERC20i inscriptions with mini20i",
       url: "https://mini-20i.app",
       siteName: "mini-20i",
-      locale: "en_US",
-      type: "website",
     },
     other: {
       "fc:frame": JSON.stringify({
         version: "next",
-        appIcon: "https://mini-20i.app/favicon.png",
+        appIcon: "/favicon.png",
         appLogoUrl: "https://mini-20i.app/logo.png",
-        logo: "https://mini-20i.app/logo.png",
+        logo: "/logo.png",
         imageUrl: "https://mini-20i.app/favicon.png",
         button: {
           title: "Launch Mini-20i",

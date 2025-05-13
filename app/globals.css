@@ -112,7 +112,17 @@ body {
   animation: shakeFade 5s ease forwards;
 }
 
+@media screen {
+  .screenshot-mode [data-trait-text] {
+    transform: none;
+  }
+}
 
+@media print, (min-resolution: 1dppx) {
+  .screenshot-mode [data-trait-text] {
+    transform: translateY(-7px);
+  }
+}
 
 
 .animate-fade-in     { animation: fadeIn 0.5s ease-out forwards; }

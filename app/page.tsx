@@ -21,6 +21,8 @@ import Head from "next/head";
 import { FUNGUS_COLOR_NAMES } from "./helpers/colors";
 import { PEPI_COLOR_NAMES } from "./helpers/colors";
 import { FROGGI_HATS, FROGGI_EYEWEAR, FROGGI_CLOTHES } from "./helpers/froggi";
+import { JELLI_COLOR_NAMES } from "./helpers/colors";
+
 import ModalSend from "./components/ModalSend";
 type Inscription = {
   id: string;
@@ -419,12 +421,14 @@ function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fu
   }
 
   if (project === "jelli") {
-    if (meta.bellColor) traits.push({ label: "Color", value: meta.bellColor as string });
-    if (meta.tentacleColor) traits.push({ label: "Tentacle", value: meta.tentacleColor as string });
-    if (meta.background) traits.push({ label: "Sky", value: meta.background as string });
-    if (meta.hasGround === "true" && meta.groundColor) traits.push({ label: "Ground", value: meta.groundColor as string });
-    if (meta.hasBubble === "true" && meta.bubbleColor) traits.push({ label: "Bubble", value: meta.bubbleColor as string });
-    if (meta.hasWeed === "true" && meta.weedColor) traits.push({ label: "Weed", value: meta.weedColor as string });
+    const resolve = (hex: string) => JELLI_COLOR_NAMES[hex.toLowerCase()] || hex;
+    if (meta.bellColor) traits.push({ label: "Color", value: resolve(meta.bellColor as string) });
+    if (meta.tentacleColor) traits.push({ label: "Tentacle", value: resolve(meta.tentacleColor as string) });
+    if (meta.background) traits.push({ label: "Sky", value: resolve(meta.background as string) });
+    if (meta.hasGround === "true" && meta.groundColor) traits.push({ label: "Ground", value: resolve(meta.groundColor as string) });
+    if (meta.hasBubble === "true" && meta.bubbleColor) traits.push({ label: "Bubble", value: resolve(meta.bubbleColor as string) });
+    if (meta.hasWeed === "true" && meta.weedColor) traits.push({ label: "Weed", value: resolve(meta.weedColor as string) });
+
   }
   const seen = new Set<string>();
   return traits
@@ -879,12 +883,13 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
         inscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli",
         inscription.seed
       ).map((trait, i) => (
-        <div
-          key={`trait-${i}`}
-          className="px-1 py-0.5 bg-white/10 rounded shadow text-center"
-        >
-          {trait}
-        </div>
+<div
+  key={`trait-${i}`}
+  className="px-1 py-0.5 bg-white/10 rounded shadow text-center"
+>
+  <span data-trait-text>{trait}</span>
+</div>
+
       ))}
   </div>
 </div>
@@ -911,8 +916,8 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
       src={`${token.buyImage}`}
       alt={`${token.name} buy more`}
       className="w-full h-auto object-contain hover:opacity-90 transition"
-      width={512}
-      height={512}
+      width={576}
+      height={576}
     />
   </div>
 </div>
@@ -933,7 +938,11 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
 
     {selectedInscription && (
       <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-  <div className="bg-[#1c1e24] border border-white/10 rounded-xl shadow-xl p-6 max-w-lg w-full text-white">
+<div
+  id="share-capture"
+  className="bg-[#1c1e24] border border-white/10 rounded-xl shadow-xl p-6 max-w-lg w-full text-white"
+>
+
 <div className="flex flex-col items-center justify-center mb-4 relative text-white/90">
   <div className="flex gap-6 text-lg">
     <div>
@@ -980,19 +989,21 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
       selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli",
       selectedInscription.seed
     ).map((trait, i) => (
-      <div
-        key={`trait-${i}`}
-        className="px-1 py-0.5 bg-white/10 rounded shadow text-center"
-      >
-        {trait}
-      </div>
+<div
+  key={`trait-${i}`}
+  className="px-1 py-0.5 bg-white/10 rounded shadow text-center"
+>
+  <span data-trait-text>{trait}</span>
+</div>
+
     ))}
   </div>
 )}
 
 
-          <div className="flex flex-row justify-between items-end mt-4 gap-3">
-          <div className="flex gap-3 flex-wrap">
+<div className="flex flex-row justify-between items-end mt-4 gap-3" id="share-controls">
+  <div className="flex gap-3 flex-wrap">
+
 {["froggi", "pepi", "jelli"].some((k) => selectedInscription.id.startsWith(k)) && selectedInscription.type === "Safe" && (
 
   <button

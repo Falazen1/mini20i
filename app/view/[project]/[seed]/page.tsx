@@ -1,5 +1,3 @@
-// /app/view/[project]/[seed]/page.tsx
-
 type PageProps = {
   params: { project: string; seed: string };
   searchParams: { address?: string };

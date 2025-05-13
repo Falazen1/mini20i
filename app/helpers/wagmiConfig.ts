@@ -48,9 +48,6 @@ import('@web3modal/wagmi/react').then(({ createWeb3Modal }) => {
         url: "https://mini-20i.app",
         icons: ["https://mini-20i.app/logo.png"],
       },
-      featuredWalletIds: ['metaMask', 'coinbaseWallet'],
-      allWallets: 'SHOW',
-      enableOnramp: true,
     });
 
   });
