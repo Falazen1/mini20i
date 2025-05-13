@@ -223,7 +223,7 @@ const handleShare = async () => {
       );
     }
   } finally {
-    container.classList.remove("screenshot-mode"); // ⬅️ REMOVE after screenshot
+    container.classList.remove("screenshot-mode");
     if (controls) controls.style.display = "";
   }
 };
