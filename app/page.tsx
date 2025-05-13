@@ -866,6 +866,7 @@ if (["pepi", "fungi", "jelli", "froggi"].some(k => id.startsWith(k))) {
 }
 
 
+
     return inscription.svg;
   })()
 }}
@@ -967,30 +968,19 @@ if (["pepi", "fungi", "jelli", "froggi"].some(k => id.startsWith(k))) {
 </div>
 
 <div
-  className="w-full aspect-square mb-4 relative bg-black rounded overflow-hidden"
+  className="w-full max-w-[1000px] mx-auto aspect-square mb-4 relative bg-black rounded overflow-hidden"
 >
   <div
     className={`absolute inset-0 z-10 transition-opacity duration-[500ms] ${
       showRollingGif ? "opacity-0 delay-[100ms]" : "opacity-100"
-    }`}
-    style={
-      ["fungi", "jelli"].some(k =>
-        selectedInscription.id.startsWith(k)
-      )
-        ? {
-            width: "720px",
-            height: "720px",
-            maxWidth: "100%",
-            imageRendering: "pixelated",
-            transform: "scale(1)",
-            margin: "0 auto",
-          }
-        : {}
-    }
-    dangerouslySetInnerHTML={{
-      __html: selectedInscription.svg,
+    } [&>svg]:w-full [&>svg]:h-full [&>svg]:block`}
+    style={{
+      imageRendering: "pixelated",
+      transform: "scale(1)",
     }}
+    dangerouslySetInnerHTML={{ __html: selectedInscription.svg }}
   />
+
 
 
   {showRollingGif && (
