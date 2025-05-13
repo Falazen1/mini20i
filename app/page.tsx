@@ -858,15 +858,18 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
 dangerouslySetInnerHTML={{
   __html: (() => {
     const id = inscription.id;
-if (["pepi", "fungi", "jelli", "froggi"].some(k => id.startsWith(k))) {
-return (inscription.svg ?? "").replace(
-  /<svg([^>]*?)>/,
-  `<svg$1 style="image-rendering: pixelated; shape-rendering: crispEdges;" preserveAspectRatio="xMidYMid meet">`
-);
-}
-
-
-
+    if (id.startsWith("pepi")) {
+      return inscription.svg.replace(
+        /<svg([^>]+?)>/,
+        `<svg$1 width="640" height="640" shape-rendering="crispEdges">`
+      );
+    }
+    if (id.startsWith("fungi")) {
+      return inscription.svg.replace(
+        /<svg([^>]+?)>/,
+        `<svg$1 width="720" height="720" shape-rendering="crispEdges">`
+      );
+    }
     return inscription.svg;
   })()
 }}
@@ -967,17 +970,24 @@ return (inscription.svg ?? "").replace(
   </button>
 </div>
 
+          <div className="w-full aspect-square mb-4 relative bg-black rounded overflow-hidden">
 <div
-  className="w-full aspect-square mb-4 relative bg-black rounded overflow-hidden"
->
-  <div
-    className={`absolute inset-0 z-10 transition-opacity duration-[500ms] ${
-      showRollingGif ? "opacity-0 delay-[100ms]" : "opacity-100"
-    } [&>svg]:w-full [&>svg]:h-full [&>svg]:block`}
-    style={{ imageRendering: "pixelated" }}
-    dangerouslySetInnerHTML={{ __html: selectedInscription.svg ?? "" }}
-  />
-
+  className={`absolute inset-0 z-10 transition-opacity duration-[500ms] ${
+    showRollingGif ? 'opacity-0 delay-[100ms]' : 'opacity-100'
+  } [&>svg]:w-full [&>svg]:h-full [&>svg]:block`}
+  dangerouslySetInnerHTML={{
+    __html: (() => {
+      const svg = selectedInscription?.svg ?? "";
+      const needsFix = selectedInscription?.id?.startsWith("fungi") || selectedInscription?.id?.startsWith("jelli");
+      return needsFix
+        ? svg.replace(
+            /<svg([^>]+?)>/,
+            `<svg$1 width="720" height="720" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
+          )
+        : svg;
+    })()
+  }}
+/>
 
 
 
