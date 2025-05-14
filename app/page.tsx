@@ -676,8 +676,8 @@ const isInjected = typeof window !== "undefined" && !!(window as Window & { ethe
   >
  {showWalletWarning ? (
   <>
-    <p className="text-lg font-semibold mb-2 text-yellow-400">No Wallet Detected</p>
-    <p className="text-sm text-yellow-300">
+    <p className="text-lg font-semibold mb-2 text-yellow-500">No Wallet Detected</p>
+    <p className="text-sm text-yellow-400">
       Please open in{" "}
       <a
         href="https://go.cb-w.com/dapp?cb_url=https%3A%2F%2Fmini-20i.app"
