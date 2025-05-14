@@ -61,6 +61,7 @@ const [fadeOutIndex, setFadeOutIndex] = useState<number | null>(null);
 const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] | null>(null);
 const [failedTxCount, setFailedTxCount] = useState(0);
 const [showError, setShowError] = useState(false);
+const [showWalletWarning, setShowWalletWarning] = useState(false);
 
 useEffect(() => {
   if (typeof window !== "undefined") {
@@ -659,8 +660,26 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
 <div className="relative z-10 text-white text-center px-6">
   <div
     className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
-    onClick={() => connect({ connector: connectors[0] })}
+    onClick={() => {
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+const isInjected = typeof window !== "undefined" && !!(window as Window & { ethereum?: unknown }).ethereum;
+
+
+  if (isMobile && !isInjected) {
+    setShowWalletWarning(true);
+    return;
+  }
+
+  connect({ connector: connectors[0] });
+}}
+
   >
+    {showWalletWarning && (
+  <div className="mt-6 bg-yellow-100 text-yellow-900 px-4 py-3 rounded shadow-md max-w-md mx-auto text-sm">
+    No wallet detected. Please open in <strong>Coinbase Wallet</strong> or <strong>Warpcast</strong> browser.
+  </div>
+)}
+
     {(() => {
       if (typeof window !== "undefined") {
         const isMobile = window.innerWidth < 768;
