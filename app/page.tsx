@@ -689,7 +689,7 @@ const isInjected = typeof window !== "undefined" && !!(window as Window & { ethe
         if (isMobile && isWarpcast) {
           return (
             <>
-              <p className="text-lg font-semibold mb-2">Warpcaster Detected</p>
+              <p className="text-lg font-semibold mb-2">Warpcast Detected</p>
               <p className="text-sm">Initializing connection. . .</p>
               {showError && (
                 <p className="text-sm text-red-400 mt-4">
