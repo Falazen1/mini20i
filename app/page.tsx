@@ -683,7 +683,7 @@ const isInjected = typeof window !== "undefined" && !!(window as Window & { ethe
         href="https://go.cb-w.com/dapp?cb_url=https%3A%2F%2Fmini-20i.app"
         target="_blank"
         rel="noopener noreferrer"
-        className="underline text-blue-300 hover:text-blue-300"
+        className="underline text-purple-300 hover:text-blue-300"
       >
         Coinbase Wallet
       </a>{" "}
