@@ -674,40 +674,59 @@ const isInjected = typeof window !== "undefined" && !!(window as Window & { ethe
 }}
 
   >
-    {showWalletWarning && (
-  <div className="mt-6 bg-yellow-100 text-yellow-900 px-4 py-3 rounded shadow-md max-w-md mx-auto text-sm">
-    No wallet detected. Please open in <strong>Coinbase Wallet</strong> or <strong>Warpcast</strong> browser.
-  </div>
-)}
+ {showWalletWarning ? (
+  <>
+    <p className="text-lg font-semibold mb-2 text-yellow-400">No Wallet Detected</p>
+    <p className="text-sm text-yellow-100">
+      Please open in{" "}
+      <a
+        href="https://go.cb-w.com/dapp?cb_url=https%3A%2F%2Fmini-20i.app"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline text-white hover:text-blue-300"
+      >
+        Coinbase Wallet
+      </a>{" "}
+      or{" "}
+      <a
+        href="https://warpcast.com/miniapps/CL_gnv6CCuBy/mini-20i"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline text-white hover:text-blue-300"
+      >
+        Warpcast
+      </a>{" "}
+      browser to continue.
+    </p>
+  </>
+) : (() => {
+  if (typeof window !== "undefined") {
+    const isMobile = window.innerWidth < 768;
+    const isWarpcast = navigator.userAgent.includes("warpcast");
 
-    {(() => {
-      if (typeof window !== "undefined") {
-        const isMobile = window.innerWidth < 768;
-        const userAgent = navigator.userAgent || "";
-        const isWarpcast = userAgent.includes("warpcast");
-
-        if (isMobile && isWarpcast) {
-          return (
-            <>
-              <p className="text-lg font-semibold mb-2">Warpcast Detected</p>
-              <p className="text-sm">Initializing connection. . .</p>
-              {showError && (
-                <p className="text-sm text-red-400 mt-4">
-                  Something went wrong. Please refresh the application to connect.
-                </p>
-              )}
-            </>
-          );
-        }
-      }
-
+    if (isMobile && isWarpcast) {
       return (
         <>
-          <p className="text-lg font-semibold mb-2">Wallet Required</p>
-          <p className="text-sm">Click here to connect your wallet.</p>
+          <p className="text-lg font-semibold mb-2">Warpcast Detected</p>
+          <p className="text-sm">Initializing connection. . .</p>
+          {showError && (
+            <p className="text-sm text-red-400 mt-4">
+              Something went wrong. Please refresh the application to connect.
+            </p>
+          )}
         </>
       );
-    })()}
+    }
+  }
+
+  return (
+    <>
+      <p className="text-lg font-semibold mb-2">Wallet Required</p>
+      <p className="text-sm">Click here to connect your wallet.</p>
+    </>
+  );
+})()}
+
   </div>
 </div>
 
