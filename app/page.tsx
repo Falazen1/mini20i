@@ -677,13 +677,13 @@ const isInjected = typeof window !== "undefined" && !!(window as Window & { ethe
  {showWalletWarning ? (
   <>
     <p className="text-lg font-semibold mb-2 text-yellow-400">No Wallet Detected</p>
-    <p className="text-sm text-yellow-100">
+    <p className="text-sm text-yellow-300">
       Please open in{" "}
       <a
         href="https://go.cb-w.com/dapp?cb_url=https%3A%2F%2Fmini-20i.app"
         target="_blank"
         rel="noopener noreferrer"
-        className="underline text-white hover:text-blue-300"
+        className="underline text-purple hover:text-blue-300"
       >
         Coinbase Wallet
       </a>{" "}
@@ -692,7 +692,7 @@ const isInjected = typeof window !== "undefined" && !!(window as Window & { ethe
         href="https://warpcast.com/miniapps/CL_gnv6CCuBy/mini-20i"
         target="_blank"
         rel="noopener noreferrer"
-        className="underline text-white hover:text-blue-300"
+        className="underline text-purple hover:text-blue-300"
       >
         Warpcast
       </a>{" "}
