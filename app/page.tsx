@@ -107,21 +107,21 @@ useEffect(() => {
 useEffect(() => {
   if (typeof window === "undefined") return;
 
-  const userAgent = navigator.userAgent || "";
-  const isWarpcast = userAgent.includes("warpcast");
-
+  const isWarpcast = navigator.userAgent.includes("warpcast");
   if (!isWarpcast) return;
 
   const interval = setInterval(() => {
     const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-    if (!mini || !wagmiAddress) {
+
+    // Only reload if MiniKit has wallet but address still hasn't hydrated
+    if (mini && !address) {
       clearInterval(interval);
       window.location.reload();
     }
   }, 2500);
 
   return () => clearInterval(interval);
-}, [context, wagmiAddress]);
+}, [context, address]);
 
 
 useEffect(() => {
