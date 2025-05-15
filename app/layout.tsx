@@ -14,6 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Mini-20i",
     description: "ERC20i inscriptions simplified",
+    applicationName: "mini-20i",
     icons: {
       icon: "/favicon.png",
       shortcut: "/favicon.png",

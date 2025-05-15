@@ -29,7 +29,7 @@ type Inscription = {
   svg: string;
   seed: string;
   type: "Growing" | "Safe";
-  meta?: Record<string, unknown>; // 
+  meta?: Record<string, unknown>; 
 };
 
 export default function Page() {
@@ -291,12 +291,12 @@ const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].
       
         if (action === "destabilize") {
         await destabilizeInscription(user, value);
-        setSelectedInscription(null); // ← This is the only missing part
+        setSelectedInscription(null); 
       }
 
       if (action === "combine") {
         const seeds = combineList.map(i => BigInt(i.seed));
-        setConfirmedCombineList([...combineList]); // lock in the list before it changes
+        setConfirmedCombineList([...combineList]); 
       
         await combineInscriptions(user, seeds);
       
@@ -309,7 +309,7 @@ const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].
           if (i >= combineList.length) {
             clearInterval(interval);
             setTimeout(() => {
-              setConfirmedCombineList(null); // allow full list again
+              setConfirmedCombineList(null);
               setCombineList([]);
               setCombineMode(false);
               setFadeOutIndex(null);
@@ -548,7 +548,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
   onClick={() => {
     setCombineMode(false);
     setCombineList([]);
-    setConfirmedCombineList(null); // ensure full list repopulates on reopen
+    setConfirmedCombineList(null);
   }}
   className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
 >
@@ -655,7 +655,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
       );
     })}
 
-{(!(context as { walletAddress?: `0x${string}` })?.walletAddress && !wagmiAddress) || showVideo ? (
+{(!address && showVideo) ? (
 
   <div
     className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ${
@@ -1153,7 +1153,7 @@ onClick={() => {
       }
 
       setSelectedInscription(null);
-      setCombineMode(true); // ← move this after combineList is set
+      setCombineMode(true); 
     }}
     className="px-2 py-2 text-sm bg-blue-100 text-blue-700 rounded"
   >
