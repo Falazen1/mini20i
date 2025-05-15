@@ -101,25 +101,6 @@ useEffect(() => {
   if (!isFrameReady) setFrameReady();
 }, [isFrameReady, setFrameReady]);
 
-useEffect(() => {
-  if (typeof window === "undefined") return;
-
-  const userAgent = navigator.userAgent || "";
-  const isWarpcast = userAgent.includes("warpcast");
-
-  if (!isWarpcast) return;
-
-  const interval = setInterval(() => {
-    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-    if (mini || !wagmiAddress) {
-      clearInterval(interval);
-      window.location.reload();
-    }
-  }, 2500);
-
-  return () => clearInterval(interval);
-}, [context, wagmiAddress]);
-
 
 useEffect(() => {
   if (address) {
