@@ -60,7 +60,6 @@ const { setFrameReady, isFrameReady } = useMiniKit();
 const [fadeOutIndex, setFadeOutIndex] = useState<number | null>(null);
 const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] | null>(null);
 const [failedTxCount, setFailedTxCount] = useState(0);
-const [showError, setShowError] = useState(false);
 const [showWalletWarning, setShowWalletWarning] = useState(false);
 const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].includes(t.key));
   const activeToken = visibleTokens.find((t) => t.key === activeFilter);
@@ -223,18 +222,6 @@ list.push({
     loadInscriptions();
   }, [address, successMessage]);
 
-  useEffect(() => {
-  if (typeof window !== "undefined") {
-    const isMobile = window.innerWidth < 768;
-    const userAgent = navigator.userAgent || "";
-    const isWarpcast = userAgent.includes("warpcast");
-
-    if (isMobile && isWarpcast) {
-      const timeout = setTimeout(() => setShowError(true), 9000);
-      return () => clearTimeout(timeout);
-    }
-  }
-}, []);
 
   useEffect(() => {
     const vid = document.getElementById("glitch-video") as HTMLVideoElement | null;
@@ -701,25 +688,6 @@ const isInjected = typeof window !== "undefined" && !!(window as Window & { ethe
     </p>
   </>
 ) : (() => {
-  if (typeof window !== "undefined") {
-    const isMobile = window.innerWidth < 768;
-    const isWarpcast = navigator.userAgent.includes("warpcast");
-
-    if (isMobile && isWarpcast) {
-      return (
-        <>
-          <p className="text-lg font-semibold mb-2">Warpcast Detected</p>
-          <p className="text-sm">Initializing connection. . .</p>
-          {showError && (
-            <p className="text-sm text-red-400 mt-4">
-              Something went wrong. Please refresh the application to connect.
-            </p>
-          )}
-        </>
-      );
-    }
-  }
-
   return (
     <>
       <p className="text-lg font-semibold mb-2">Wallet Required</p>
