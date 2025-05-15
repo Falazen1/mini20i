@@ -62,7 +62,6 @@ const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] |
 const [failedTxCount, setFailedTxCount] = useState(0);
 const [showError, setShowError] = useState(false);
 
-
 useEffect(() => {
   if (typeof window !== "undefined") {
     const isMobile = window.innerWidth < 768;
@@ -277,10 +276,7 @@ const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].
         setSelectedInscription(null);
       }
       
-        if (action === "destabilize") {
-        await destabilizeInscription(user, value);
-        setSelectedInscription(null); // ← This is the only missing part
-      }
+      if (action === "destabilize") await destabilizeInscription(user, value);
 
       if (action === "combine") {
         const seeds = combineList.map(i => BigInt(i.seed));
@@ -674,7 +670,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
         if (isMobile && isWarpcast) {
           return (
             <>
-              <p className="text-lg font-semibold mb-2">Warpcast Detected</p>
+              <p className="text-lg font-semibold mb-2">Warpcaster Detected</p>
               <p className="text-sm">Initializing connection. . .</p>
               {showError && (
                 <p className="text-sm text-red-400 mt-4">
@@ -1066,13 +1062,11 @@ onClick={() => {
         <button
           className="px-4 py-2 text-sm bg-white text-black rounded"
           onClick={() => {
-            const key = confirmUnstash.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli";
-            const dynamic = inscriptions[key]?.find(i => i.type === "Growing");
-            if (!dynamic) return;
-
-            setCombineMode(true);
-            setCombineList([dynamic, confirmUnstash]);
-            setSelectedInscription(null);
+            handleClick(
+              confirmUnstash.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli",
+              "destabilize",
+              confirmUnstash.seed
+            );
             setConfirmUnstash(null);
           }}
         >
@@ -1089,7 +1083,6 @@ onClick={() => {
   </div>
 )}
 
-
 {["froggi", "pepi", "jelli"].some((k) => selectedInscription.id.startsWith(k)) && selectedInscription.type === "Growing" && (
 
   <button
@@ -1105,26 +1098,20 @@ onClick={() => {
     Stash
   </button>
 )}
-{(inscriptions[selectedInscription.id.split("-")[0]]?.length ?? 0) >= 2 && (
-  <button
-    onClick={() => {
-      const key = selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli";
-      const growing = inscriptions[key]?.find(i => i.type === "Growing");
 
-      if (growing && growing.id !== selectedInscription.id) {
-        setCombineList([growing, selectedInscription]);
-      } else {
+  {(inscriptions[selectedInscription.id.split("-")[0]]?.filter(i => i.type === "Safe").length ?? 0) > 1 && (
+    <button
+      onClick={() => {
+        setCombineMode(true);
         setCombineList([selectedInscription]);
-      }
+        setSelectedInscription(null);
+      }}
+      className="px-2 py-2 text-sm bg-blue-100 text-blue-700 rounded"
+    >
+      Combine
+    </button>
+  )}
 
-      setSelectedInscription(null);
-      setCombineMode(true); // ← move this after combineList is set
-    }}
-    className="px-2 py-2 text-sm bg-blue-100 text-blue-700 rounded"
-  >
-    Combine
-  </button>
-)}
 
 
 
