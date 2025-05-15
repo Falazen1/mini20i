@@ -12,7 +12,7 @@ const queryClient = new QueryClient();
 
 export function Providers({ children }: PropsWithChildren) {
   return (
-    
+   <MiniKitProvider>
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <OnchainKitProvider
@@ -27,9 +27,10 @@ export function Providers({ children }: PropsWithChildren) {
             },
           }}
         >
-          <MiniKitProvider>{children}</MiniKitProvider>
+          {children}
         </OnchainKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
+    </MiniKitProvider>
   );
 }
