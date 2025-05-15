@@ -33,7 +33,7 @@ type Inscription = {
 };
 
 export default function Page() {
-  const context = useMiniKit() as { walletAddress?: `0x${string}` };
+  const context = useMiniKit();
   const wagmiAddress = useAccount().address;
   const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
   const { connect, connectors } = useConnect();
@@ -62,7 +62,7 @@ const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] |
 const [failedTxCount, setFailedTxCount] = useState(0);
 const [showError, setShowError] = useState(false);
 const [showWalletWarning, setShowWalletWarning] = useState(false);
-const isWarpcast = typeof window !== "undefined" && navigator.userAgent.includes("warpcast");
+const [isReadyToCheckConnection, setIsReadyToCheckConnection] = useState(false);
 
 useEffect(() => {
   if (typeof window !== "undefined") {
@@ -246,6 +246,10 @@ const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].
   useEffect(() => {
     setMounted(true);
   }, []);
+  useEffect(() => {
+  setIsReadyToCheckConnection(true);
+}, []);
+
   useEffect(() => {
     const vid = document.getElementById("glitch-video") as HTMLVideoElement | null;
     if (!vid) return;
@@ -651,7 +655,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
       );
     })}
 
-{((!context?.walletAddress && !wagmiAddress) && !showMiniKit && !isWarpcast) || showVideo ? (
+{(isReadyToCheckConnection && (!(context as { walletAddress?: `0x${string}` })?.walletAddress && !wagmiAddress)) || showVideo ? (
 
 
   <div
