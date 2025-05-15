@@ -31,11 +31,24 @@ type Inscription = {
   type: "Growing" | "Safe";
   meta?: Record<string, unknown>; 
 };
+export function useActiveAddress() {
+  const context = useMiniKit();
+  const wagmiAddress = useAccount().address;
+  const [active, setActive] = useState<string | undefined>(
+    (context as { walletAddress?: string })?.walletAddress ?? wagmiAddress
+  );
 
+  useEffect(() => {
+    const mini = (context as { walletAddress?: string })?.walletAddress;
+    setActive(mini ?? wagmiAddress);
+  }, [context, wagmiAddress]);
+
+  return active;
+}
 export default function Page() {
   const context = useMiniKit();
   const wagmiAddress = useAccount().address;
-  const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
+const address = useActiveAddress();
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
@@ -62,6 +75,7 @@ const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] |
 const [failedTxCount, setFailedTxCount] = useState(0);
 const [showError, setShowError] = useState(false);
 const [showWalletWarning, setShowWalletWarning] = useState(false);
+
 type MiniKitContext = {
   walletAddress?: `0x${string}`;
 };
@@ -458,6 +472,7 @@ function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fu
 
 
   return (
+    
     <>
 {selectedInscription && (
   <Head>
