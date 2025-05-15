@@ -584,14 +584,12 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
     <p className="text-xs text-white-600 mt-1">View and swap ERC20i inscriptions</p>
   </div>
 </div>
-{((typeof navigator !== "undefined" && !navigator.userAgent.includes("warpcast")) &&
-  (!(context as { walletAddress?: `0x${string}` })?.walletAddress && !wagmiAddress)) || showVideo ? (
-
-
+{typeof navigator !== "undefined" &&
+ !navigator.userAgent.includes("warpcast") &&
+ !address &&
+ showVideo && (
   <div
-    className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ${
-      address ? "opacity-0 pointer-events-none" : "opacity-100"
-    }`}
+    className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 opacity-100"
   >
     <video
       autoPlay
@@ -605,8 +603,10 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
     </video>
 
     <div className="relative z-10 text-white text-center px-6">
-      <div className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
-           onClick={() => connect({ connector: connectors[0] })}>
+      <div
+        className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
+        onClick={() => connect({ connector: connectors[0] })}
+      >
         {showWalletWarning ? (
           <>
             <p className="text-lg font-semibold mb-2 text-yellow-500">No Wallet Detected</p>
@@ -632,21 +632,17 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
               browser to continue.
             </p>
           </>
-        ) : (() => {
-
-          return (
-            <>
-              <p className="text-lg font-semibold mb-2">Wallet Required</p>
-              <p className="text-sm">Click here to connect your wallet.</p>
-            </>
-          );
-        })()}
+        ) : (
+          <>
+            <p className="text-lg font-semibold mb-2">Wallet Required</p>
+            <p className="text-sm">Click here to connect your wallet.</p>
+          </>
+        )}
       </div>
     </div>
-
   </div>
+)}
 
-) : null}
 
 
 
