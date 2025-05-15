@@ -33,7 +33,7 @@ type Inscription = {
 };
 
 export default function Page() {
-  const context = useMiniKit();
+  const context = useMiniKit() as { walletAddress?: `0x${string}` };
   const wagmiAddress = useAccount().address;
   const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
   const { connect, connectors } = useConnect();
@@ -62,6 +62,7 @@ const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] |
 const [failedTxCount, setFailedTxCount] = useState(0);
 const [showError, setShowError] = useState(false);
 const [showWalletWarning, setShowWalletWarning] = useState(false);
+const isWarpcast = typeof window !== "undefined" && navigator.userAgent.includes("warpcast");
 
 useEffect(() => {
   if (typeof window !== "undefined") {
@@ -650,7 +651,8 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
       );
     })}
 
-{!address || showVideo ? (
+{((!context?.walletAddress && !wagmiAddress) && !showMiniKit && !isWarpcast) || showVideo ? (
+
 
   <div
     className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ${
