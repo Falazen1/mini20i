@@ -40,6 +40,25 @@ export default function Page() {
 
   const wagmiAddress = useAccount().address;
   const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
+useEffect(() => {
+  if (typeof window === "undefined") return;
+
+  const isWarpcast = navigator.userAgent.includes("warpcast");
+  if (!isWarpcast) return;
+
+  const interval = setInterval(() => {
+    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+
+    // Warpcast fix: MiniKit address is defined, but `address` isn't hydrated yet
+    if (mini && !address) {
+      window.location.reload();
+    }
+  }, 2500);
+
+  return () => clearInterval(interval);
+}, [context, address]);
+
+
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
