@@ -618,7 +618,9 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
     <p className="text-xs text-white-600 mt-1">View and swap ERC20i inscriptions</p>
   </div>
 </div>
-{(!(context as { walletAddress?: `0x${string}` })?.walletAddress && !wagmiAddress) || showVideo ? (
+{((typeof navigator !== "undefined" && !navigator.userAgent.includes("warpcast")) &&
+  (!(context as { walletAddress?: `0x${string}` })?.walletAddress && !wagmiAddress)) || showVideo ? (
+
 
   <div
     className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ${
