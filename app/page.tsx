@@ -114,7 +114,7 @@ useEffect(() => {
 
   const interval = setInterval(() => {
     const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-    if (mini || !wagmiAddress) {
+    if (!mini || !wagmiAddress) {
       clearInterval(interval);
       window.location.reload();
     }
