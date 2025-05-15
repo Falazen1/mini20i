@@ -64,8 +64,15 @@ const [showWalletWarning, setShowWalletWarning] = useState(false);
 const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].includes(t.key));
   const activeToken = visibleTokens.find((t) => t.key === activeFilter);
   const [mounted, setMounted] = useState(false);
-const isWarpcast =
-  typeof navigator !== "undefined" && navigator.userAgent.includes("warpcast");
+const [isWarpcast, setIsWarpcast] = useState(false);
+useEffect(() => {
+  if (typeof navigator !== "undefined") {
+    const ua = navigator.userAgent || "";
+    if (ua.includes("warpcast")) {
+      setIsWarpcast(true);
+    }
+  }
+}, []);
 const LOADING_GIFS: Record<"froggi" | "fungi" | "pepi" | "jelli", string> = {
   froggi: "/frog_rolling_long.gif",
   fungi: "/fungi_rolling_long.gif",
@@ -84,9 +91,6 @@ useEffect(() => {
 
 
 useEffect(() => {
-  const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "";
-  const isWarpcast = userAgent.includes("warpcast");
-
   if (address || isWarpcast) {
     setTimeout(() => setShowMiniKit(true), 100); 
     setTimeout(() => setShowDescription(true), 700); 
@@ -94,7 +98,7 @@ useEffect(() => {
     setTimeout(() => setShowBanners(true), 1400); 
     setTimeout(() => setShowTokenSwap(true), 2000); 
   }
-}, [address]);
+}, [address, isWarpcast]);
 
 
 useEffect(() => {
