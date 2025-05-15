@@ -1,6 +1,7 @@
 import { http, createConfig } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { injected, walletConnect, coinbaseWallet } from 'wagmi/connectors';
+import { farcasterFrame } from '@farcaster/frame-wagmi-connector';
 import { Buffer } from 'buffer';
 
 export const WC_PROJECT_ID = "5155899d6b66f997fb6c8554991c47ae";
@@ -11,6 +12,7 @@ export const config = createConfig({
     [base.id]: http("https://base-mainnet.g.alchemy.com/v2/h_Eo8VfIkLqa6vLqzrt023fm073ncKxJ"),
   },
   connectors: [
+    farcasterFrame(),
     injected(),
     walletConnect({
       projectId: WC_PROJECT_ID,
@@ -35,8 +37,7 @@ if (typeof window !== 'undefined') {
     window.Buffer = Buffer;
   }
 
-import('@web3modal/wagmi/react').then(({ createWeb3Modal }) => {
-
+  import('@web3modal/wagmi/react').then(({ createWeb3Modal }) => {
     createWeb3Modal({
       wagmiConfig: config,
       projectId: WC_PROJECT_ID,
@@ -52,6 +53,5 @@ import('@web3modal/wagmi/react').then(({ createWeb3Modal }) => {
       allWallets: 'SHOW',
       enableOnramp: true,
     });
-
   });
 }
