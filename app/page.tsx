@@ -34,6 +34,10 @@ type Inscription = {
 
 export default function Page() {
   const context = useMiniKit();
+  useEffect(() => {
+  console.log("MiniKit context:", context);
+}, [context]);
+
   const wagmiAddress = useAccount().address;
   const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
   const { connect, connectors } = useConnect();
