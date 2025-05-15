@@ -15,7 +15,6 @@ export async function GET() {
       "subtitle": "swap erc20i inscriptions",
       "description": "Explore Fungi, Froggi, Pepi, Jelli — ERC20i evolving tokens with the mini20i app.",
       "screenshotUrls": [
-
       ],
       "primaryCategory": "art-creativity",
       "tags": [

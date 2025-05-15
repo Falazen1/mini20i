@@ -64,7 +64,8 @@ const [showWalletWarning, setShowWalletWarning] = useState(false);
 const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].includes(t.key));
   const activeToken = visibleTokens.find((t) => t.key === activeFilter);
   const [mounted, setMounted] = useState(false);
-
+const isWarpcast =
+  typeof navigator !== "undefined" && navigator.userAgent.includes("warpcast");
 const LOADING_GIFS: Record<"froggi" | "fungi" | "pepi" | "jelli", string> = {
   froggi: "/frog_rolling_long.gif",
   fungi: "/fungi_rolling_long.gif",
@@ -552,7 +553,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
 )}
 
 <div className={`transition-opacity duration-700 ${showMiniKit ? "opacity-100" : "opacity-0"}`}>
-  <Topnav />
+  <Topnav address={address} isWarpcast={isWarpcast} />
 </div>
 
       <div className="px-4 max-w-6xl mx-auto mb-28">
@@ -613,7 +614,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
       );
     })}
 
-  {mounted && !navigator.userAgent.includes("warpcast") && (!address || showVideo) ? (
+ {mounted && !isWarpcast && (!address || showVideo) ? (
 
   <div
     className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ${
