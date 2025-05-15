@@ -22,6 +22,7 @@ import { FUNGUS_COLOR_NAMES } from "./helpers/colors";
 import { PEPI_COLOR_NAMES } from "./helpers/colors";
 import { FROGGI_HATS, FROGGI_EYEWEAR, FROGGI_CLOTHES } from "./helpers/froggi";
 import { JELLI_COLOR_NAMES } from "./helpers/colors";
+import { useActiveAddress } from "./helpers/useActiveAddress";
 
 import ModalSend from "./components/ModalSend";
 type Inscription = {
@@ -31,24 +32,11 @@ type Inscription = {
   type: "Growing" | "Safe";
   meta?: Record<string, unknown>; 
 };
-export function useActiveAddress() {
-  const context = useMiniKit();
-  const wagmiAddress = useAccount().address;
-  const [active, setActive] = useState<string | undefined>(
-    (context as { walletAddress?: string })?.walletAddress ?? wagmiAddress
-  );
 
-  useEffect(() => {
-    const mini = (context as { walletAddress?: string })?.walletAddress;
-    setActive(mini ?? wagmiAddress);
-  }, [context, wagmiAddress]);
-
-  return active;
-}
 export default function Page() {
   const context = useMiniKit();
   const wagmiAddress = useAccount().address;
-const address = useActiveAddress();
+  const address = useActiveAddress();
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
