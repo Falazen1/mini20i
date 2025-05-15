@@ -34,7 +34,6 @@ type Inscription = {
 
 export default function Page() {
   const context = useMiniKit();
-  const { setFrameReady, isFrameReady } = useMiniKit();
   const wagmiAddress = useAccount().address;
   const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
   const { connect, connectors } = useConnect();
@@ -57,16 +56,25 @@ const [showDescription, setShowDescription] = useState(false);
 const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
+const { setFrameReady, isFrameReady } = useMiniKit();
 const [fadeOutIndex, setFadeOutIndex] = useState<number | null>(null);
 const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] | null>(null);
 const [failedTxCount, setFailedTxCount] = useState(0);
+const [showError, setShowError] = useState(false);
 const [showWalletWarning, setShowWalletWarning] = useState(false);
+
 useEffect(() => {
-  setFrameReady();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  if (typeof window !== "undefined") {
+    const isMobile = window.innerWidth < 768;
+    const userAgent = navigator.userAgent || "";
+    const isWarpcast = userAgent.includes("warpcast");
+
+    if (isMobile && isWarpcast) {
+      const timeout = setTimeout(() => setShowError(true), 9000);
+      return () => clearTimeout(timeout);
+    }
+  }
 }, []);
-
-
 useEffect(() => {
   if (typeof window !== "undefined") {
     const isMobile = window.innerWidth < 768;
@@ -90,15 +98,38 @@ const [showRollingGif, setShowRollingGif] = useState<null | "froggi" | "fungi" |
 const [confirmUnstash, setConfirmUnstash] = useState<null | Inscription>(null);
 
 useEffect(() => {
-  if (isFrameReady && address) {
+  if (!isFrameReady) setFrameReady();
+}, [isFrameReady, setFrameReady]);
+
+useEffect(() => {
+  if (typeof window === "undefined") return;
+
+  const userAgent = navigator.userAgent || "";
+  const isWarpcast = userAgent.includes("warpcast");
+
+  if (!isWarpcast) return;
+
+  const interval = setInterval(() => {
+    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+    if (mini || !wagmiAddress) {
+      clearInterval(interval);
+      window.location.reload();
+    }
+  }, 2500);
+
+  return () => clearInterval(interval);
+}, [context, wagmiAddress]);
+
+
+useEffect(() => {
+  if (address) {
     setTimeout(() => setShowMiniKit(true), 100); 
     setTimeout(() => setShowDescription(true), 700); 
     setTimeout(() => setShowTokens(true), 1400); 
     setTimeout(() => setShowBanners(true), 1400); 
     setTimeout(() => setShowTokenSwap(true), 2000); 
   }
-}, [isFrameReady, address]);
-
+}, [address]);
 
 
 useEffect(() => {
@@ -587,65 +618,6 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
     <p className="text-xs text-white-600 mt-1">View and swap ERC20i inscriptions</p>
   </div>
 </div>
-{typeof navigator !== "undefined" &&
- !navigator.userAgent.includes("warpcast") &&
- !address &&
- showVideo && (
-  <div
-    className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 opacity-100"
-  >
-    <video
-      autoPlay
-      loop
-      muted
-      playsInline
-      className="w-full h-full object-cover absolute inset-0 z-0"
-    >
-      <source src="/aidos_head.mp4" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
-
-    <div className="relative z-10 text-white text-center px-6">
-      <div
-        className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
-        onClick={() => connect({ connector: connectors[0] })}
-      >
-        {showWalletWarning ? (
-          <>
-            <p className="text-lg font-semibold mb-2 text-yellow-500">No Wallet Detected</p>
-            <p className="text-sm text-yellow-400">
-              Please open in{" "}
-              <a
-                href="https://go.cb-w.com/dapp?cb_url=https%3A%2F%2Fmini-20i.app"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-purple-300 hover:text-blue-300"
-              >
-                Coinbase Wallet
-              </a>{" "}
-              or{" "}
-              <a
-                href="https://warpcast.com/miniapps/CL_gnv6CCuBy/mini-20i"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-purple-300 hover:text-blue-300"
-              >
-                Warpcast
-              </a>{" "}
-              browser to continue.
-            </p>
-          </>
-        ) : (
-          <>
-            <p className="text-lg font-semibold mb-2">Wallet Required</p>
-            <p className="text-sm">Click here to connect your wallet.</p>
-          </>
-        )}
-      </div>
-    </div>
-  </div>
-)}
-
 
 
 
@@ -683,7 +655,84 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
       );
     })}
 
+{(!(context as { walletAddress?: `0x${string}` })?.walletAddress && !wagmiAddress) || showVideo ? (
 
+  <div
+    className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ${
+      address ? "opacity-0 pointer-events-none" : "opacity-100"
+    }`}
+  >
+    <video
+      autoPlay
+      loop
+      muted
+      playsInline
+      className="w-full h-full object-cover absolute inset-0 z-0"
+    >
+      <source src="/aidos_head.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+<div className="relative z-10 text-white text-center px-6">
+<div className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
+     onClick={() => connect({ connector: connectors[0] })}>
+  {showWalletWarning ? (
+    <>
+      <p className="text-lg font-semibold mb-2 text-yellow-500">No Wallet Detected</p>
+      <p className="text-sm text-yellow-400">
+        Please open in{" "}
+        <a
+          href="https://go.cb-w.com/dapp?cb_url=https%3A%2F%2Fmini-20i.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-purple-300 hover:text-blue-300"
+        >
+          Coinbase Wallet
+        </a>{" "}
+        or{" "}
+        <a
+          href="https://warpcast.com/miniapps/CL_gnv6CCuBy/mini-20i"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-purple-300 hover:text-blue-300"
+        >
+          Warpcast
+        </a>{" "}
+        browser to continue.
+      </p>
+    </>
+  ) : (() => {
+    if (typeof window !== "undefined") {
+      const isMobile = window.innerWidth < 768;
+      const userAgent = navigator.userAgent || "";
+      const isWarpcast = userAgent.includes("warpcast");
+
+      if (isMobile && isWarpcast) {
+        return (
+          <>
+            <p className="text-lg font-semibold mb-2">Warpcast Detected</p>
+            <p className="text-sm">Initializing connection. . .</p>
+            {showError && (
+              <p className="text-sm text-red-400 mt-4">
+                Something went wrong. Please refresh the application to connect.
+              </p>
+            )}
+          </>
+        );
+      }
+    }
+
+    return (
+      <>
+        <p className="text-lg font-semibold mb-2">Wallet Required</p>
+        <p className="text-sm">Click here to connect your wallet.</p>
+      </>
+    );
+  })()}
+</div>
+</div>
+
+  </div>
+) : null}
 
           </div>
 
