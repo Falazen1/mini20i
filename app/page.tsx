@@ -75,6 +75,18 @@ useEffect(() => {
     }
   }
 }, []);
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    const isMobile = window.innerWidth < 768;
+    const ua = navigator.userAgent.toLowerCase();
+    const isWarpcast = ua.includes("warpcast");
+    const isCoinbase = ua.includes("coinbase");
+
+    if (isMobile && !isWarpcast && !isCoinbase) {
+      setShowWalletWarning(true);
+    }
+  }
+}, []);
 
 const LOADING_GIFS: Record<"froggi" | "fungi" | "pepi" | "jelli", string> = {
   froggi: "/frog_rolling_long.gif",
@@ -661,76 +673,62 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
       Your browser does not support the video tag.
     </video>
 <div className="relative z-10 text-white text-center px-6">
-  <div
-    className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
-    onClick={() => {
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-const isInjected = typeof window !== "undefined" && !!(window as Window & { ethereum?: unknown }).ethereum;
-
-
-  if (isMobile && !isInjected) {
-    setShowWalletWarning(true);
-    return;
-  }
-
-  connect({ connector: connectors[0] });
-}}
-
-  >
- {showWalletWarning ? (
-  <>
-    <p className="text-lg font-semibold mb-2 text-yellow-500">No Wallet Detected</p>
-    <p className="text-sm text-yellow-400">
-      Please open in{" "}
-      <a
-        href="https://go.cb-w.com/dapp?cb_url=https%3A%2F%2Fmini-20i.app"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="underline text-purple-300 hover:text-blue-300"
-      >
-        Coinbase Wallet
-      </a>{" "}
-      or{" "}
-      <a
-        href="https://warpcast.com/miniapps/CL_gnv6CCuBy/mini-20i"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="underline text-purple-300 hover:text-blue-300"
-      >
-        Warpcast
-      </a>{" "}
-      browser to continue.
-    </p>
-  </>
-) : (() => {
-  if (typeof window !== "undefined") {
-    const isMobile = window.innerWidth < 768;
-    const isWarpcast = navigator.userAgent.includes("warpcast");
-
-    if (isMobile && isWarpcast) {
-      return (
-        <>
-          <p className="text-lg font-semibold mb-2">Welcome to Mini20i</p>
-          <p className="text-sm">Initializing connection. . .</p>
-          {showError && (
-            <p className="text-sm text-red-400 mt-4">
-              Something went wrong. Please refresh the application to connect.
-            </p>
-          )}
-        </>
-      );
-    }
-  }
-
-  return (
+<div className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
+     onClick={() => connect({ connector: connectors[0] })}>
+  {showWalletWarning ? (
     <>
-      <p className="text-lg font-semibold mb-2">Wallet Required</p>
-      <p className="text-sm">Click here to connect your wallet.</p>
+      <p className="text-lg font-semibold mb-2 text-yellow-500">No Wallet Detected</p>
+      <p className="text-sm text-yellow-400">
+        Please open in{" "}
+        <a
+          href="https://go.cb-w.com/dapp?cb_url=https%3A%2F%2Fmini-20i.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-purple-300 hover:text-blue-300"
+        >
+          Coinbase Wallet
+        </a>{" "}
+        or{" "}
+        <a
+          href="https://warpcast.com/miniapps/CL_gnv6CCuBy/mini-20i"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-purple-300 hover:text-blue-300"
+        >
+          Warpcast
+        </a>{" "}
+        browser to continue.
+      </p>
     </>
-  );
-})()}
+  ) : (() => {
+    if (typeof window !== "undefined") {
+      const isMobile = window.innerWidth < 768;
+      const userAgent = navigator.userAgent || "";
+      const isWarpcast = userAgent.includes("warpcast");
 
-  </div>
+      if (isMobile && isWarpcast) {
+        return (
+          <>
+            <p className="text-lg font-semibold mb-2">Warpcast Detected</p>
+            <p className="text-sm">Initializing connection. . .</p>
+            {showError && (
+              <p className="text-sm text-red-400 mt-4">
+                Something went wrong. Please refresh the application to connect.
+              </p>
+            )}
+          </>
+        );
+      }
+    }
+
+    return (
+      <>
+        <p className="text-lg font-semibold mb-2">Wallet Required</p>
+        <p className="text-sm">Click here to connect your wallet.</p>
+      </>
+    );
+  })()}
+</div>
 </div>
 
   </div>
