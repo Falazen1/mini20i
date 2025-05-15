@@ -62,8 +62,10 @@ const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] |
 const [failedTxCount, setFailedTxCount] = useState(0);
 const [showWalletWarning, setShowWalletWarning] = useState(false);
 useEffect(() => {
-  if (!isFrameReady) setFrameReady();
-}, [isFrameReady, setFrameReady]);
+  setFrameReady();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
+
 
 useEffect(() => {
   if (typeof window !== "undefined") {
@@ -88,14 +90,15 @@ const [showRollingGif, setShowRollingGif] = useState<null | "froggi" | "fungi" |
 const [confirmUnstash, setConfirmUnstash] = useState<null | Inscription>(null);
 
 useEffect(() => {
-  if (address) {
+  if (isFrameReady && address) {
     setTimeout(() => setShowMiniKit(true), 100); 
     setTimeout(() => setShowDescription(true), 700); 
     setTimeout(() => setShowTokens(true), 1400); 
     setTimeout(() => setShowBanners(true), 1400); 
     setTimeout(() => setShowTokenSwap(true), 2000); 
   }
-}, [address]);
+}, [isFrameReady, address]);
+
 
 
 useEffect(() => {
