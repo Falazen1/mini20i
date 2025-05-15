@@ -29,7 +29,7 @@ type Inscription = {
   svg: string;
   seed: string;
   type: "Growing" | "Safe";
-  meta?: Record<string, unknown>; // 
+  meta?: Record<string, unknown>;
 };
 
 export default function Page() {
@@ -62,6 +62,9 @@ const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] |
 const [failedTxCount, setFailedTxCount] = useState(0);
 const [showError, setShowError] = useState(false);
 const [showWalletWarning, setShowWalletWarning] = useState(false);
+const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].includes(t.key));
+  const activeToken = visibleTokens.find((t) => t.key === activeFilter);
+  const [mounted, setMounted] = useState(false);
 
 const LOADING_GIFS: Record<"froggi" | "fungi" | "pepi" | "jelli", string> = {
   froggi: "/frog_rolling_long.gif",
@@ -69,31 +72,15 @@ const LOADING_GIFS: Record<"froggi" | "fungi" | "pepi" | "jelli", string> = {
   pepi: "/pepi_rolling_long.gif",
   jelli: "/jelli_rolling_long.gif",
 };
-
 const [showRollingGif, setShowRollingGif] = useState<null | "froggi" | "fungi" | "pepi" | "jelli">(null);
 const [confirmUnstash, setConfirmUnstash] = useState<null | Inscription>(null);
-const [mounted, setMounted] = useState(false);
-
-const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].includes(t.key));
-const activeToken = visibleTokens.find((t) => t.key === activeFilter);
-
-useEffect(() => {
-  if (typeof window !== "undefined") {
-    const isMobile = window.innerWidth < 768;
-    const userAgent = navigator.userAgent || "";
-    const isWarpcast = userAgent.includes("warpcast");
-
-    if (isMobile && isWarpcast) {
-      const timeout = setTimeout(() => setShowError(true), 9000);
-      return () => clearTimeout(timeout);
-    }
-  }
-}, []);
 
 useEffect(() => {
   if (!isFrameReady) setFrameReady();
 }, [isFrameReady, setFrameReady]);
-
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 useEffect(() => {
   if (typeof window === "undefined") return;
 
@@ -113,15 +100,17 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, [context, wagmiAddress]);
 
+
 useEffect(() => {
   if (address) {
-    setTimeout(() => setShowMiniKit(true), 100);
-    setTimeout(() => setShowDescription(true), 700);
-    setTimeout(() => setShowTokens(true), 1400);
-    setTimeout(() => setShowBanners(true), 1400);
-    setTimeout(() => setShowTokenSwap(true), 2000);
+    setTimeout(() => setShowMiniKit(true), 100); 
+    setTimeout(() => setShowDescription(true), 700); 
+    setTimeout(() => setShowTokens(true), 1400); 
+    setTimeout(() => setShowBanners(true), 1400); 
+    setTimeout(() => setShowTokenSwap(true), 2000); 
   }
 }, [address]);
+
 
 useEffect(() => {
   if (!address) return;
@@ -131,243 +120,260 @@ useEffect(() => {
   return () => clearTimeout(timeout);
 }, [address, showVideo]);
 
-useEffect(() => {
-  if (!address) return;
+  useEffect(() => {
+    if (!address) return;
 
-  async function loadInscriptions() {
-    const results: Record<string, Inscription[]> = {};
+    async function loadInscriptions() {
+      const results: Record<string, Inscription[]> = {};
 
-    for (const token of tokens) {
-      if (!["froggi", "fungi", "pepi", "jelli"].includes(token.key)) continue;
+      for (const token of tokens) {
+if (!["froggi", "fungi", "pepi", "jelli"].includes(token.key)) continue;
 
-      const abi = abis[token.key as "froggi" | "fungi" | "pepi" | "jelli"];
-      const contractAddress = token.address as `0x${string}`;
-      const fn = getFunctionNames(token.key);
-      const list: Inscription[] = [];
 
-      try {
-        const dynamic = await readContract(config, {
-          abi,
-          address: contractAddress,
-          functionName: fn.sporesDegree,
-          args: [address],
-        }) as Seed;
+        const abi = abis[token.key as "froggi" | "fungi" | "pepi" | "jelli"];
+        const contractAddress = token.address as `0x${string}`;
+        const fn = getFunctionNames(token.key);
+        const list: Inscription[] = [];
 
-        if (dynamic.seed && dynamic.seed !== 0n) {
-          const [svg, meta] = await Promise.all([
-            readContract(config, {
+        try {
+          const dynamic = await readContract(config, {
+            abi,
+            address: contractAddress,
+            functionName: fn.sporesDegree,
+            args: [address],
+          }) as Seed;
+
+          if (dynamic.seed && dynamic.seed !== 0n) {
+const [svg, meta] = await Promise.all([
+  readContract(config, {
+    abi,
+    address: contractAddress,
+    functionName: "getSvg",
+    args: [dynamic],
+  }) as Promise<string>,
+  readContract(config, {
+    abi,
+    address: contractAddress,
+    functionName: "getMeta",
+    args: [dynamic],
+  }) as Promise<string>,
+]);
+
+list.push({
+  id: `${token.key}-dynamic`,
+  svg,
+  seed: dynamic.seed.toString(),
+  type: "Growing",
+  meta: JSON.parse(meta),
+});
+
+          }
+        } catch {}
+
+        try {
+          const count = await readContract(config, {
+            abi,
+            address: contractAddress,
+            functionName: fn.mushroomCount,
+            args: [address],
+          }) as bigint;
+
+          for (let i = 0n; i < count; i++) {
+            try {
+              const seed = await readContract(config, {
+                abi,
+                address: contractAddress,
+                functionName: fn.mushroomOfOwnerByIndex,
+                args: [address, i],
+              }) as Seed;
+
+const [svg, meta] = await Promise.all([
+  readContract(config, {
+    abi,
+    address: contractAddress,
+    functionName: "getSvg",
+    args: [seed],
+  }) as Promise<string>,
+  readContract(config, {
+    abi,
+    address: contractAddress,
+    functionName: "getMeta",
+    args: [seed],
+  }) as Promise<string>,
+]);
+
+list.push({
+  id: `${token.key}-stable-${i}`,
+  svg,
+  seed: seed.seed.toString(),
+  type: "Safe",
+  meta: JSON.parse(meta),
+});
+
+            } catch {}
+          }
+        } catch {}
+
+        results[token.key] = list;
+      }
+
+      setInscriptions(results);
+    }
+
+    loadInscriptions();
+  }, [address, successMessage]);
+
+  useEffect(() => {
+  if (typeof window !== "undefined") {
+    const isMobile = window.innerWidth < 768;
+    const userAgent = navigator.userAgent || "";
+    const isWarpcast = userAgent.includes("warpcast");
+
+    if (isMobile && isWarpcast) {
+      const timeout = setTimeout(() => setShowError(true), 9000);
+      return () => clearTimeout(timeout);
+    }
+  }
+}, []);
+
+  useEffect(() => {
+    const vid = document.getElementById("glitch-video") as HTMLVideoElement | null;
+    if (!vid) return;
+  
+    vid.playbackRate = 0.5; 
+  
+    const glitchInterval = setInterval(() => {
+      if (!vid || vid.paused || vid.readyState < 2) return;
+  
+      const shouldGlitch = Math.random() < 0.5; 
+      if (shouldGlitch) {
+        const duration = vid.duration;
+        const jumpTime = Math.random() * duration;
+        vid.currentTime = jumpTime;
+      }
+    }, 500); // check every 0.5s
+  
+    return () => clearInterval(glitchInterval);
+  }, []);
+  
+  if (!mounted) return null;
+  
+  async function handleClick(
+    key: "froggi" | "fungi" | "pepi" | "jelli",
+    action: "stabilize" | "destabilize" | "combine",
+    seed: string
+  ) {
+    try {
+      setIsProcessing(true);
+      setSuccessMessage("");
+      await tokenStore.setTokenByKey(key);
+      const value = BigInt(seed);
+      const user = address as Address;
+
+      if (action === "stabilize") {
+        await stabilizeInscription(user, value);
+        setSelectedInscription(null);
+      }
+      
+        if (action === "destabilize") {
+        await destabilizeInscription(user, value);
+        setSelectedInscription(null); 
+      }
+
+      if (action === "combine") {
+        const seeds = combineList.map(i => BigInt(i.seed));
+        setConfirmedCombineList([...combineList]); 
+      
+        await combineInscriptions(user, seeds);
+      
+        let i = 0;
+        const step = Math.max(1500 / combineList.length, 100);
+      
+        const interval = setInterval(() => {
+          setFadeOutIndex(i);
+          i++;
+          if (i >= combineList.length) {
+            clearInterval(interval);
+            setTimeout(() => {
+              setConfirmedCombineList(null);
+              setCombineList([]);
+              setCombineMode(false);
+              setFadeOutIndex(null);
+            }, 400);
+          }
+        }, step);
+      }
+      
+
+      const label =
+        action === "destabilize" && selectedInscription?.type === "Growing"
+          ? "Re-roll"
+          : action.charAt(0).toUpperCase() + action.slice(1);
+
+      setSuccessMessage(`${label} successful.`);
+      setFailedTxCount(0);
+      setTimeout(() => setSuccessMessage(""),4000);
+    } catch (e) {
+      console.error(e);
+      setFailedTxCount((prev) => prev + 1);
+      setSuccessMessage("Transaction failed.");
+
+      setTimeout(() => setSuccessMessage(""), 4000);
+    } finally {
+      setIsProcessing(false);
+
+      const reload = async () => {
+        const tokenKey = key;
+        const abi = abis[tokenKey];
+        const contractAddress = tokens.find(t => t.key === tokenKey)?.address as `0x${string}`;
+        const fn = getFunctionNames(tokenKey);
+
+        try {
+          const dynamic = await readContract(config, {
+            abi,
+            address: contractAddress,
+            functionName: fn.sporesDegree,
+            args: [address],
+          }) as Seed;
+
+          if (dynamic.seed && dynamic.seed !== 0n) {
+            const svg = await readContract(config, {
               abi,
               address: contractAddress,
               functionName: "getSvg",
               args: [dynamic],
-            }) as Promise<string>,
-            readContract(config, {
-              abi,
-              address: contractAddress,
-              functionName: "getMeta",
-              args: [dynamic],
-            }) as Promise<string>,
-          ]);
+            }) as string;
 
-          list.push({
-            id: `${token.key}-dynamic`,
-            svg,
-            seed: dynamic.seed.toString(),
-            type: "Growing",
-            meta: JSON.parse(meta),
-          });
-        }
-      } catch {}
-
-      try {
-        const count = await readContract(config, {
-          abi,
-          address: contractAddress,
-          functionName: fn.mushroomCount,
-          args: [address],
-        }) as bigint;
-
-        for (let i = 0n; i < count; i++) {
-          try {
-            const seed = await readContract(config, {
-              abi,
-              address: contractAddress,
-              functionName: fn.mushroomOfOwnerByIndex,
-              args: [address, i],
-            }) as Seed;
-
-            const [svg, meta] = await Promise.all([
-              readContract(config, {
-                abi,
-                address: contractAddress,
-                functionName: "getSvg",
-                args: [seed],
-              }) as Promise<string>,
-              readContract(config, {
-                abi,
-                address: contractAddress,
-                functionName: "getMeta",
-                args: [seed],
-              }) as Promise<string>,
-            ]);
-
-            list.push({
-              id: `${token.key}-stable-${i}`,
+            const latest: Inscription = {
+              id: `${tokenKey}-dynamic`,
               svg,
-              seed: seed.seed.toString(),
-              type: "Safe",
-              meta: JSON.parse(meta),
-            });
-          } catch {}
-        }
-      } catch {}
+              seed: dynamic.seed.toString(),
+              type: "Growing",
+            };
 
-      results[token.key] = list;
-    }
+            const prevSvg = selectedInscription?.svg ?? null;
+            const isNew = latest.svg !== prevSvg;
 
-    setInscriptions(results);
-  }
-
-  loadInscriptions();
-}, [address, successMessage]);
-
-useEffect(() => {
-  setMounted(true);
-}, []);
-
-useEffect(() => {
-  const vid = document.getElementById("glitch-video") as HTMLVideoElement | null;
-  if (!vid) return;
-
-  vid.playbackRate = 0.5;
-
-  const glitchInterval = setInterval(() => {
-    if (!vid || vid.paused || vid.readyState < 2) return;
-
-    const shouldGlitch = Math.random() < 0.5;
-    if (shouldGlitch) {
-      const duration = vid.duration;
-      const jumpTime = Math.random() * duration;
-      vid.currentTime = jumpTime;
-    }
-  }, 500);
-
-  return () => clearInterval(glitchInterval);
-}, []);
-
-if (!mounted) return null;
-
-async function handleClick(
-  key: "froggi" | "fungi" | "pepi" | "jelli",
-  action: "stabilize" | "destabilize" | "combine",
-  seed: string
-) {
-  try {
-    setIsProcessing(true);
-    setSuccessMessage("");
-    await tokenStore.setTokenByKey(key);
-    const value = BigInt(seed);
-    const user = address as Address;
-
-    if (action === "stabilize") {
-      await stabilizeInscription(user, value);
-      setSelectedInscription(null);
-    }
-
-    if (action === "destabilize") {
-      await destabilizeInscription(user, value);
-      setSelectedInscription(null);
-    }
-
-    if (action === "combine") {
-      const seeds = combineList.map(i => BigInt(i.seed));
-      setConfirmedCombineList([...combineList]);
-
-      await combineInscriptions(user, seeds);
-
-      let i = 0;
-      const step = Math.max(1500 / combineList.length, 100);
-
-      const interval = setInterval(() => {
-        setFadeOutIndex(i);
-        i++;
-        if (i >= combineList.length) {
-          clearInterval(interval);
-          setTimeout(() => {
-            setConfirmedCombineList(null);
-            setCombineList([]);
-            setCombineMode(false);
-            setFadeOutIndex(null);
-          }, 400);
-        }
-      }, step);
-    }
-
-    const label =
-      action === "destabilize" && selectedInscription?.type === "Growing"
-        ? "Re-roll"
-        : action.charAt(0).toUpperCase() + action.slice(1);
-
-    setSuccessMessage(`${label} successful.`);
-    setFailedTxCount(0);
-    setTimeout(() => setSuccessMessage(""), 4000);
-  } catch (e) {
-    console.error(e);
-    setFailedTxCount((prev) => prev + 1);
-    setSuccessMessage("Transaction failed.");
-    setTimeout(() => setSuccessMessage(""), 4000);
-  } finally {
-    setIsProcessing(false);
-
-    const reload = async () => {
-      const tokenKey = key;
-      const abi = abis[tokenKey];
-      const contractAddress = tokens.find(t => t.key === tokenKey)?.address as `0x${string}`;
-      const fn = getFunctionNames(tokenKey);
-
-      try {
-        const dynamic = await readContract(config, {
-          abi,
-          address: contractAddress,
-          functionName: fn.sporesDegree,
-          args: [address],
-        }) as Seed;
-
-        if (dynamic.seed && dynamic.seed !== 0n) {
-          const svg = await readContract(config, {
-            abi,
-            address: contractAddress,
-            functionName: "getSvg",
-            args: [dynamic],
-          }) as string;
-
-          const latest: Inscription = {
-            id: `${tokenKey}-dynamic`,
-            svg,
-            seed: dynamic.seed.toString(),
-            type: "Growing",
-          };
-
-          const prevSvg = selectedInscription?.svg ?? null;
-          const isNew = latest.svg !== prevSvg;
-
-          if (isNew) {
-            setShowRollingGif(tokenKey);
-            setTimeout(() => {
-              setSelectedInscription(latest);
-              setShowRollingGif(null);
-            }, 2580);
+            if (isNew) {
+              setShowRollingGif(tokenKey);
+              setTimeout(() => {
+                setSelectedInscription(latest);
+                setShowRollingGif(null);
+              }, 2580);
+            }
+            
+            
           }
+        } catch {
+          setSelectedInscription(null);
         }
-      } catch {
-        setSelectedInscription(null);
-      }
-    };
+      };
 
-    if (action !== "combine") reload();
+      if (action !== "combine") reload();
+    }
+
+
   }
-}
-
   
 function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fungi" | "pepi" | "jelli", seedStr: string): string[] {
   const traits: { label: string; value: string }[] = [];
@@ -528,7 +534,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
   onClick={() => {
     setCombineMode(false);
     setCombineList([]);
-    setConfirmedCombineList(null); // ensure full list repopulates on reopen
+    setConfirmedCombineList(null); 
   }}
   className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
 >
