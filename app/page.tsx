@@ -61,6 +61,7 @@ const [fadeOutIndex, setFadeOutIndex] = useState<number | null>(null);
 const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] | null>(null);
 const [failedTxCount, setFailedTxCount] = useState(0);
 const [showError, setShowError] = useState(false);
+const [showWalletWarning, setShowWalletWarning] = useState(false);
 
 useEffect(() => {
   if (typeof window !== "undefined") {
@@ -71,6 +72,18 @@ useEffect(() => {
     if (isMobile && isWarpcast) {
       const timeout = setTimeout(() => setShowError(true), 9000);
       return () => clearTimeout(timeout);
+    }
+  }
+}, []);
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    const isMobile = window.innerWidth < 768;
+    const ua = navigator.userAgent.toLowerCase();
+    const isWarpcast = ua.includes("warpcast");
+    const isCoinbase = ua.includes("coinbase");
+
+    if (isMobile && !isWarpcast && !isCoinbase) {
+      setShowWalletWarning(true);
     }
   }
 }, []);
@@ -121,11 +134,25 @@ useEffect(() => {
 
 useEffect(() => {
   if (!address) return;
-  const timeout = setTimeout(() => {
-    setShowVideo(false);
-  }, 1000);
-  return () => clearTimeout(timeout);
-}, [address, showVideo]);
+
+  const userAgent = navigator.userAgent || "";
+  const isWarpcast = userAgent.includes("warpcast");
+
+  if (isWarpcast) {
+    setShowVideo(false); // skip video immediately
+    setShowMiniKit(true);
+    setShowDescription(true);
+    setShowTokens(true);
+    setShowBanners(true);
+    setShowTokenSwap(true);
+  } else {
+    const timeout = setTimeout(() => {
+      setShowVideo(false);
+    }, 1000);
+    return () => clearTimeout(timeout);
+  }
+}, [address]);
+
 
   useEffect(() => {
     if (!address) return;
@@ -276,7 +303,10 @@ const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].
         setSelectedInscription(null);
       }
       
-      if (action === "destabilize") await destabilizeInscription(user, value);
+        if (action === "destabilize") {
+        await destabilizeInscription(user, value);
+        setSelectedInscription(null); // ← This is the only missing part
+      }
 
       if (action === "combine") {
         const seeds = combineList.map(i => BigInt(i.seed));
@@ -657,39 +687,62 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
       Your browser does not support the video tag.
     </video>
 <div className="relative z-10 text-white text-center px-6">
-  <div
-    className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
-    onClick={() => connect({ connector: connectors[0] })}
-  >
-    {(() => {
-      if (typeof window !== "undefined") {
-        const isMobile = window.innerWidth < 768;
-        const userAgent = navigator.userAgent || "";
-        const isWarpcast = userAgent.includes("warpcast");
+<div className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
+     onClick={() => connect({ connector: connectors[0] })}>
+  {showWalletWarning ? (
+    <>
+      <p className="text-lg font-semibold mb-2 text-yellow-500">No Wallet Detected</p>
+      <p className="text-sm text-yellow-400">
+        Please open in{" "}
+        <a
+          href="https://go.cb-w.com/dapp?cb_url=https%3A%2F%2Fmini-20i.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-purple-300 hover:text-blue-300"
+        >
+          Coinbase Wallet
+        </a>{" "}
+        or{" "}
+        <a
+          href="https://warpcast.com/miniapps/CL_gnv6CCuBy/mini-20i"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-purple-300 hover:text-blue-300"
+        >
+          Warpcast
+        </a>{" "}
+        browser to continue.
+      </p>
+    </>
+  ) : (() => {
+    if (typeof window !== "undefined") {
+      const isMobile = window.innerWidth < 768;
+      const userAgent = navigator.userAgent || "";
+      const isWarpcast = userAgent.includes("warpcast");
 
-        if (isMobile && isWarpcast) {
-          return (
-            <>
-              <p className="text-lg font-semibold mb-2">Warpcaster Detected</p>
-              <p className="text-sm">Initializing connection. . .</p>
-              {showError && (
-                <p className="text-sm text-red-400 mt-4">
-                  Something went wrong. Please refresh the application to connect.
-                </p>
-              )}
-            </>
-          );
-        }
+      if (isMobile && isWarpcast) {
+        return (
+          <>
+            <p className="text-lg font-semibold mb-2">Warpcast Detected</p>
+            <p className="text-sm">Initializing connection. . .</p>
+            {showError && (
+              <p className="text-sm text-red-400 mt-4">
+                Something went wrong. Please refresh the application to connect.
+              </p>
+            )}
+          </>
+        );
       }
+    }
 
-      return (
-        <>
-          <p className="text-lg font-semibold mb-2">Wallet Required</p>
-          <p className="text-sm">Click here to connect your wallet.</p>
-        </>
-      );
-    })()}
-  </div>
+    return (
+      <>
+        <p className="text-lg font-semibold mb-2">Wallet Required</p>
+        <p className="text-sm">Click here to connect your wallet.</p>
+      </>
+    );
+  })()}
+</div>
 </div>
 
   </div>
@@ -1062,11 +1115,13 @@ onClick={() => {
         <button
           className="px-4 py-2 text-sm bg-white text-black rounded"
           onClick={() => {
-            handleClick(
-              confirmUnstash.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli",
-              "destabilize",
-              confirmUnstash.seed
-            );
+            const key = confirmUnstash.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli";
+            const dynamic = inscriptions[key]?.find(i => i.type === "Growing");
+            if (!dynamic) return;
+
+            setCombineMode(true);
+            setCombineList([dynamic, confirmUnstash]);
+            setSelectedInscription(null);
             setConfirmUnstash(null);
           }}
         >
@@ -1083,6 +1138,7 @@ onClick={() => {
   </div>
 )}
 
+
 {["froggi", "pepi", "jelli"].some((k) => selectedInscription.id.startsWith(k)) && selectedInscription.type === "Growing" && (
 
   <button
@@ -1098,20 +1154,26 @@ onClick={() => {
     Stash
   </button>
 )}
+{(inscriptions[selectedInscription.id.split("-")[0]]?.length ?? 0) >= 2 && (
+  <button
+    onClick={() => {
+      const key = selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli";
+      const growing = inscriptions[key]?.find(i => i.type === "Growing");
 
-  {(inscriptions[selectedInscription.id.split("-")[0]]?.filter(i => i.type === "Safe").length ?? 0) > 1 && (
-    <button
-      onClick={() => {
-        setCombineMode(true);
+      if (growing && growing.id !== selectedInscription.id) {
+        setCombineList([growing, selectedInscription]);
+      } else {
         setCombineList([selectedInscription]);
-        setSelectedInscription(null);
-      }}
-      className="px-2 py-2 text-sm bg-blue-100 text-blue-700 rounded"
-    >
-      Combine
-    </button>
-  )}
+      }
 
+      setSelectedInscription(null);
+      setCombineMode(true); // ← move this after combineList is set
+    }}
+    className="px-2 py-2 text-sm bg-blue-100 text-blue-700 rounded"
+  >
+    Combine
+  </button>
+)}
 
 
 
