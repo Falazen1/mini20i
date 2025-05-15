@@ -277,7 +277,10 @@ const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].
         setSelectedInscription(null);
       }
       
-      if (action === "destabilize") await destabilizeInscription(user, value);
+        if (action === "destabilize") {
+        await destabilizeInscription(user, value);
+        setSelectedInscription(null); // ← This is the only missing part
+      }
 
       if (action === "combine") {
         const seeds = combineList.map(i => BigInt(i.seed));
@@ -1100,11 +1103,13 @@ onClick={() => {
         <button
           className="px-4 py-2 text-sm bg-white text-black rounded"
           onClick={() => {
-            handleClick(
-              confirmUnstash.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli",
-              "destabilize",
-              confirmUnstash.seed
-            );
+            const key = confirmUnstash.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli";
+            const dynamic = inscriptions[key]?.find(i => i.type === "Growing");
+            if (!dynamic) return;
+
+            setCombineMode(true);
+            setCombineList([dynamic, confirmUnstash]);
+            setSelectedInscription(null);
             setConfirmUnstash(null);
           }}
         >
@@ -1120,6 +1125,7 @@ onClick={() => {
     </div>
   </div>
 )}
+
 
 {["froggi", "pepi", "jelli"].some((k) => selectedInscription.id.startsWith(k)) && selectedInscription.type === "Growing" && (
 
@@ -1137,18 +1143,18 @@ onClick={() => {
   </button>
 )}
 
-  {(inscriptions[selectedInscription.id.split("-")[0]]?.filter(i => i.type === "Safe").length ?? 0) > 1 && (
-    <button
-      onClick={() => {
-        setCombineMode(true);
-        setCombineList([selectedInscription]);
-        setSelectedInscription(null);
-      }}
-      className="px-2 py-2 text-sm bg-blue-100 text-blue-700 rounded"
-    >
-      Combine
-    </button>
-  )}
+{(inscriptions[selectedInscription.id.split("-")[0]]?.length ?? 0) >= 2 && (
+  <button
+    onClick={() => {
+      setCombineMode(true);
+      setCombineList([selectedInscription]);
+      setSelectedInscription(null);
+    }}
+    className="px-2 py-2 text-sm bg-blue-100 text-blue-700 rounded"
+  >
+    Combine
+  </button>
+)}
 
 
 
