@@ -710,7 +710,7 @@ const isInjected = typeof window !== "undefined" && !!(window as Window & { ethe
     if (isMobile && isWarpcast) {
       return (
         <>
-          <p className="text-lg font-semibold mb-2">Experience Rendering</p>
+          <p className="text-lg font-semibold mb-2">Welcome to Mini20i</p>
           <p className="text-sm">Initializing connection. . .</p>
           {showError && (
             <p className="text-sm text-red-400 mt-4">
