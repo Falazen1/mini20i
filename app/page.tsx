@@ -62,6 +62,9 @@ const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] |
 const [failedTxCount, setFailedTxCount] = useState(0);
 const [showError, setShowError] = useState(false);
 const [showWalletWarning, setShowWalletWarning] = useState(false);
+type MiniKitContext = {
+  walletAddress?: `0x${string}`;
+};
 
 useEffect(() => {
   if (typeof window !== "undefined") {
@@ -655,13 +658,13 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
       );
     })}
 
-{(!address && showVideo) ? (
-
+{mounted && ((typeof window !== "undefined" && !(context as MiniKitContext)?.walletAddress && !wagmiAddress) || showVideo) ? (
   <div
     className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ${
       address ? "opacity-0 pointer-events-none" : "opacity-100"
     }`}
   >
+
     <video
       autoPlay
       loop
