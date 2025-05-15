@@ -710,7 +710,7 @@ const isInjected = typeof window !== "undefined" && !!(window as Window & { ethe
     if (isMobile && isWarpcast) {
       return (
         <>
-          <p className="text-lg font-semibold mb-2">Warpcast Detected</p>
+          <p className="text-lg font-semibold mb-2">Experience Rendering</p>
           <p className="text-sm">Initializing connection. . .</p>
           {showError && (
             <p className="text-sm text-red-400 mt-4">
@@ -1142,20 +1142,26 @@ onClick={() => {
     Stash
   </button>
 )}
-
 {(inscriptions[selectedInscription.id.split("-")[0]]?.length ?? 0) >= 2 && (
   <button
     onClick={() => {
-      setCombineMode(true);
-      setCombineList([selectedInscription]);
+      const key = selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli";
+      const growing = inscriptions[key]?.find(i => i.type === "Growing");
+
+      if (growing && growing.id !== selectedInscription.id) {
+        setCombineList([growing, selectedInscription]);
+      } else {
+        setCombineList([selectedInscription]);
+      }
+
       setSelectedInscription(null);
+      setCombineMode(true); // ← move this after combineList is set
     }}
     className="px-2 py-2 text-sm bg-blue-100 text-blue-700 rounded"
   >
     Combine
   </button>
 )}
-
 
 
 
