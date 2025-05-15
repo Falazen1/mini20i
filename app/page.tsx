@@ -557,7 +557,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
 )}
 
 <div className={`transition-opacity duration-700 ${showMiniKit ? "opacity-100" : "opacity-0"}`}>
-  <Topnav address={address} isWarpcast={isWarpcast} />
+  <Topnav />
 </div>
 
       <div className="px-4 max-w-6xl mx-auto mb-28">
