@@ -34,6 +34,7 @@ type Inscription = {
 
 export default function Page() {
   const context = useMiniKit();
+  const { setFrameReady, isFrameReady } = useMiniKit();
   const wagmiAddress = useAccount().address;
   const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
   const { connect, connectors } = useConnect();
@@ -56,25 +57,14 @@ const [showDescription, setShowDescription] = useState(false);
 const [showBanners, setShowBanners] = useState(false);
 const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
-const { setFrameReady, isFrameReady } = useMiniKit();
 const [fadeOutIndex, setFadeOutIndex] = useState<number | null>(null);
 const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] | null>(null);
 const [failedTxCount, setFailedTxCount] = useState(0);
-const [showError, setShowError] = useState(false);
 const [showWalletWarning, setShowWalletWarning] = useState(false);
-
 useEffect(() => {
-  if (typeof window !== "undefined") {
-    const isMobile = window.innerWidth < 768;
-    const userAgent = navigator.userAgent || "";
-    const isWarpcast = userAgent.includes("warpcast");
+  if (!isFrameReady) setFrameReady();
+}, [isFrameReady, setFrameReady]);
 
-    if (isMobile && isWarpcast) {
-      const timeout = setTimeout(() => setShowError(true), 9000);
-      return () => clearTimeout(timeout);
-    }
-  }
-}, []);
 useEffect(() => {
   if (typeof window !== "undefined") {
     const isMobile = window.innerWidth < 768;
@@ -96,30 +86,6 @@ const LOADING_GIFS: Record<"froggi" | "fungi" | "pepi" | "jelli", string> = {
 };
 const [showRollingGif, setShowRollingGif] = useState<null | "froggi" | "fungi" | "pepi" | "jelli">(null);
 const [confirmUnstash, setConfirmUnstash] = useState<null | Inscription>(null);
-
-useEffect(() => {
-  if (!isFrameReady) setFrameReady();
-}, [isFrameReady, setFrameReady]);
-
-useEffect(() => {
-  if (typeof window === "undefined") return;
-
-  const userAgent = navigator.userAgent || "";
-  const isWarpcast = userAgent.includes("warpcast");
-
-  if (!isWarpcast) return;
-
-  const interval = setInterval(() => {
-    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-    if (mini || !wagmiAddress) {
-      clearInterval(interval);
-      window.location.reload();
-    }
-  }, 2500);
-
-  return () => clearInterval(interval);
-}, [context, wagmiAddress]);
-
 
 useEffect(() => {
   if (address) {
@@ -667,25 +633,6 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
             </p>
           </>
         ) : (() => {
-          if (typeof window !== "undefined") {
-            const isMobile = window.innerWidth < 768;
-            const userAgent = navigator.userAgent || "";
-            const isWarpcast = userAgent.includes("warpcast");
-
-            if (isMobile && isWarpcast) {
-              return (
-                <>
-                  <p className="text-lg font-semibold mb-2">Warpcast Detected</p>
-                  <p className="text-sm">Initializing connection. . .</p>
-                  {showError && (
-                    <p className="text-sm text-red-400 mt-4">
-                      Something went wrong. Please refresh the application to connect.
-                    </p>
-                  )}
-                </>
-              );
-            }
-          }
 
           return (
             <>
