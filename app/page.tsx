@@ -880,15 +880,16 @@ const isInjected = typeof window !== "undefined" && !!(window as Window & { ethe
 <div
   key={inscription.id}
   onClick={() => {
-    if (combineMode && inscription.type === "Safe") {
-      setCombineList((prev) =>
-        prev.some((i) => i.id === inscription.id)
-          ? prev.filter((i) => i.id !== inscription.id)
-          : [...prev, inscription]
-      );
-    } else {
-      setSelectedInscription(inscription);
-    }
+if (combineMode) {
+  setCombineList((prev) =>
+    prev.some((i) => i.id === inscription.id)
+      ? prev.filter((i) => i.id !== inscription.id)
+      : [...prev, inscription]
+  );
+} else {
+  setSelectedInscription(inscription);
+}
+
   }}
   className={`bg-[#1c1e24] border border-white/10 rounded-xl shadow-md p-3 cursor-pointer transition hover:scale-[1.02] hover:ring-1 hover:ring-white/20 ${
     isSelected ? "ring-2 ring-purple-400" : ""
