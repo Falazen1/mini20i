@@ -129,108 +129,107 @@ useEffect(() => {
 }, [address, isWarpcast, showVideo]);
 
 
-  useEffect(() => {
-    if (!address) return;
+useEffect(() => {
+  const user = miniAddress || wagmiAddress;
+  if (!user) return;
 
-    async function loadInscriptions() {
-      const results: Record<string, Inscription[]> = {};
+  async function loadInscriptions() {
+    const results: Record<string, Inscription[]> = {};
 
-      for (const token of tokens) {
-if (!["froggi", "fungi", "pepi", "jelli"].includes(token.key)) continue;
+    for (const token of tokens) {
+      if (!["froggi", "fungi", "pepi", "jelli"].includes(token.key)) continue;
 
+      const abi = abis[token.key as "froggi" | "fungi" | "pepi" | "jelli"];
+      const contractAddress = token.address as `0x${string}`;
+      const fn = getFunctionNames(token.key);
+      const list: Inscription[] = [];
 
-        const abi = abis[token.key as "froggi" | "fungi" | "pepi" | "jelli"];
-        const contractAddress = token.address as `0x${string}`;
-        const fn = getFunctionNames(token.key);
-        const list: Inscription[] = [];
+      try {
+        const dynamic = await readContract(config, {
+          abi,
+          address: contractAddress,
+          functionName: fn.sporesDegree,
+          args: [user],
+        }) as Seed;
 
-        try {
-          const dynamic = await readContract(config, {
-            abi,
-            address: contractAddress,
-            functionName: fn.sporesDegree,
-            args: [address],
-          }) as Seed;
+        if (dynamic.seed && dynamic.seed !== 0n) {
+          const [svg, meta] = await Promise.all([
+            readContract(config, {
+              abi,
+              address: contractAddress,
+              functionName: "getSvg",
+              args: [dynamic],
+            }) as Promise<string>,
+            readContract(config, {
+              abi,
+              address: contractAddress,
+              functionName: "getMeta",
+              args: [dynamic],
+            }) as Promise<string>,
+          ]);
 
-          if (dynamic.seed && dynamic.seed !== 0n) {
-const [svg, meta] = await Promise.all([
-  readContract(config, {
-    abi,
-    address: contractAddress,
-    functionName: "getSvg",
-    args: [dynamic],
-  }) as Promise<string>,
-  readContract(config, {
-    abi,
-    address: contractAddress,
-    functionName: "getMeta",
-    args: [dynamic],
-  }) as Promise<string>,
-]);
+          list.push({
+            id: `${token.key}-dynamic`,
+            svg,
+            seed: dynamic.seed.toString(),
+            type: "Growing",
+            meta: JSON.parse(meta),
+          });
+        }
+      } catch {}
 
-list.push({
-  id: `${token.key}-dynamic`,
-  svg,
-  seed: dynamic.seed.toString(),
-  type: "Growing",
-  meta: JSON.parse(meta),
-});
+      try {
+        const count = await readContract(config, {
+          abi,
+          address: contractAddress,
+          functionName: fn.mushroomCount,
+          args: [user],
+        }) as bigint;
 
-          }
-        } catch {}
+        for (let i = 0n; i < count; i++) {
+          try {
+            const seed = await readContract(config, {
+              abi,
+              address: contractAddress,
+              functionName: fn.mushroomOfOwnerByIndex,
+              args: [user, i],
+            }) as Seed;
 
-        try {
-          const count = await readContract(config, {
-            abi,
-            address: contractAddress,
-            functionName: fn.mushroomCount,
-            args: [address],
-          }) as bigint;
-
-          for (let i = 0n; i < count; i++) {
-            try {
-              const seed = await readContract(config, {
+            const [svg, meta] = await Promise.all([
+              readContract(config, {
                 abi,
                 address: contractAddress,
-                functionName: fn.mushroomOfOwnerByIndex,
-                args: [address, i],
-              }) as Seed;
+                functionName: "getSvg",
+                args: [seed],
+              }) as Promise<string>,
+              readContract(config, {
+                abi,
+                address: contractAddress,
+                functionName: "getMeta",
+                args: [seed],
+              }) as Promise<string>,
+            ]);
 
-const [svg, meta] = await Promise.all([
-  readContract(config, {
-    abi,
-    address: contractAddress,
-    functionName: "getSvg",
-    args: [seed],
-  }) as Promise<string>,
-  readContract(config, {
-    abi,
-    address: contractAddress,
-    functionName: "getMeta",
-    args: [seed],
-  }) as Promise<string>,
-]);
+            list.push({
+              id: `${token.key}-stable-${i}`,
+              svg,
+              seed: seed.seed.toString(),
+              type: "Safe",
+              meta: JSON.parse(meta),
+            });
+          } catch {}
+        }
+      } catch {}
 
-list.push({
-  id: `${token.key}-stable-${i}`,
-  svg,
-  seed: seed.seed.toString(),
-  type: "Safe",
-  meta: JSON.parse(meta),
-});
-
-            } catch {}
-          }
-        } catch {}
-
-        results[token.key] = list;
-      }
-
-      setInscriptions(results);
+      results[token.key] = list;
     }
 
-    loadInscriptions();
-  }, [address, successMessage]);
+    setInscriptions(results);
+  }
+
+  loadInscriptions();
+}, [miniAddress, wagmiAddress, successMessage]);
+
 
 
   useEffect(() => {
