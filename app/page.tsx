@@ -102,18 +102,20 @@ useEffect(() => {
 
 
 useEffect(() => {
-  if (!showVideo) {
+  const shouldReveal = !showVideo || isWarpcast;
+
+  if (shouldReveal) {
     setTimeout(() => setShowMiniKit(true), 100);
     setTimeout(() => setShowDescription(true), 700);
     setTimeout(() => setShowTokens(true), 1400);
     setTimeout(() => setShowBanners(true), 1400);
     setTimeout(() => setShowTokenSwap(true), 2000);
   }
-}, [showVideo]);
+}, [showVideo, isWarpcast]);
 
 
 useEffect(() => {
-  if (!address && !isWarpcast) return; // ← only show splash for disconnected non-Warpcast users
+  if (!address && !isWarpcast) return; 
 
   const timeout = setTimeout(() => {
     setShowVideo(false);
