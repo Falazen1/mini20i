@@ -40,6 +40,9 @@ export default function Page() {
 
   const wagmiAddress = useAccount().address;
   const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
+  console.log("MiniKit address:", context);
+console.log("Wagmi address:", wagmiAddress);
+
 useEffect(() => {
   if (typeof window === "undefined") return;
 
@@ -586,9 +589,9 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
 
 
 )}
-
-<div className={`transition-opacity duration-700 ${showMiniKit ? "opacity-100" : "opacity-0"}`}>
   <Topnav />
+<div className={`transition-opacity duration-700 ${showMiniKit ? "opacity-100" : "opacity-0"}`}>
+
 </div>
 
       <div className="px-4 max-w-6xl mx-auto mb-28">
