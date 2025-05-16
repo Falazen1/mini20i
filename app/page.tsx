@@ -39,13 +39,17 @@ export default function Page() {
 
 const wagmiAddress = useAccount().address;
 const miniAddress = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+
+
   const [mounted, setMounted] = useState(false);
-const address = miniAddress || wagmiAddress || null;
+const [address, setAddress] = useState<`0x${string}` | null>(null);
 useEffect(() => {
-  if (miniAddress && !wagmiAddress && !mounted) {
-    setMounted(true);
+  if (miniAddress) {
+    setAddress(miniAddress);
+  } else if (wagmiAddress) {
+    setAddress(wagmiAddress);
   }
-}, [miniAddress, wagmiAddress, mounted]);
+}, [miniAddress, wagmiAddress]);
 
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
