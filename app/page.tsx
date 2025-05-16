@@ -86,38 +86,37 @@ const [showRollingGif, setShowRollingGif] = useState<null | "froggi" | "fungi" |
 const [confirmUnstash, setConfirmUnstash] = useState<null | Inscription>(null);
 
 useEffect(() => {
-  if (address && !isFrameReady) setFrameReady();
-}, [address, isFrameReady, setFrameReady]);
-
+  if (!isFrameReady) setFrameReady();
+}, [isFrameReady, setFrameReady]);
 
 useEffect(() => {
   if (typeof window === "undefined") return;
 
   const userAgent = navigator.userAgent || "";
   const isWarpcast = userAgent.includes("warpcast");
+
   if (!isWarpcast) return;
 
-  let didReload = false;
-  const timeout = setTimeout(() => {
-    if (!address && !didReload) {
-      didReload = true;
+  const interval = setInterval(() => {
+    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+    if (mini || !wagmiAddress) {
+      clearInterval(interval);
       window.location.reload();
     }
-  }, 4500);
+  }, 2500);
 
-  return () => clearTimeout(timeout);
-}, [address]);
-
+  return () => clearInterval(interval);
+}, [context, wagmiAddress]);
 
 
 useEffect(() => {
-  if (!address) return;
-
-  setTimeout(() => setShowMiniKit(true), 300); 
-  setTimeout(() => setShowDescription(true), 700); 
-  setTimeout(() => setShowTokens(true), 1400); 
-  setTimeout(() => setShowBanners(true), 1400); 
-  setTimeout(() => setShowTokenSwap(true), 2000); 
+  if (address) {
+    setTimeout(() => setShowMiniKit(true), 300); 
+    setTimeout(() => setShowDescription(true), 700); 
+    setTimeout(() => setShowTokens(true), 1400); 
+    setTimeout(() => setShowBanners(true), 1400); 
+    setTimeout(() => setShowTokenSwap(true), 2000); 
+  }
 }, [address]);
 
 
@@ -711,8 +710,8 @@ const isInjected = typeof window !== "undefined" && !!(window as Window & { ethe
     if (isMobile && isWarpcast) {
       return (
         <>
-          <p className="text-lg font-semibold mb-2">Mini 20i</p>
-          <p className="text-sm">Attempting connection. . .</p>
+          <p className="text-lg font-semibold mb-2">Warpcast Detected</p>
+          <p className="text-sm">Initializing connection. . .</p>
           {showError && (
             <p className="text-sm text-red-400 mt-4">
               Something went wrong. Please refresh the application to connect.
