@@ -29,28 +29,13 @@ type Inscription = {
   svg: string;
   seed: string;
   type: "Growing" | "Safe";
-  meta?: Record<string, unknown>;
+  meta?: Record<string, unknown>; 
 };
 
 export default function Page() {
   const context = useMiniKit();
-  useEffect(() => {
-}, [context]);
-
-const wagmiAddress = useAccount().address;
-const miniAddress = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-
-
-  const [mounted, setMounted] = useState(false);
-const [address, setAddress] = useState<`0x${string}` | null>(null);
-useEffect(() => {
-  if (miniAddress) {
-    setAddress(miniAddress);
-  } else if (wagmiAddress) {
-    setAddress(wagmiAddress);
-  }
-}, [miniAddress, wagmiAddress]);
-
+  const wagmiAddress = useAccount().address;
+  const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
@@ -75,19 +60,22 @@ const { setFrameReady, isFrameReady } = useMiniKit();
 const [fadeOutIndex, setFadeOutIndex] = useState<number | null>(null);
 const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] | null>(null);
 const [failedTxCount, setFailedTxCount] = useState(0);
+const [showError, setShowError] = useState(false);
 const [showWalletWarning, setShowWalletWarning] = useState(false);
-const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].includes(t.key));
-  const activeToken = visibleTokens.find((t) => t.key === activeFilter);
 
-const [isWarpcast, setIsWarpcast] = useState(false);
 useEffect(() => {
-  if (typeof navigator !== "undefined") {
-    const ua = navigator.userAgent || "";
-    if (ua.includes("warpcast")) {
-      setIsWarpcast(true);
+  if (typeof window !== "undefined") {
+    const isMobile = window.innerWidth < 768;
+    const userAgent = navigator.userAgent || "";
+    const isWarpcast = userAgent.includes("warpcast");
+
+    if (isMobile && isWarpcast) {
+      const timeout = setTimeout(() => setShowError(true), 9000);
+      return () => clearTimeout(timeout);
     }
   }
 }, []);
+
 const LOADING_GIFS: Record<"froggi" | "fungi" | "pepi" | "jelli", string> = {
   froggi: "/frog_rolling_long.gif",
   fungi: "/fungi_rolling_long.gif",
@@ -98,140 +86,159 @@ const [showRollingGif, setShowRollingGif] = useState<null | "froggi" | "fungi" |
 const [confirmUnstash, setConfirmUnstash] = useState<null | Inscription>(null);
 
 useEffect(() => {
-  if (!isFrameReady) setFrameReady();
-}, [isFrameReady, setFrameReady]);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  if (address && !isFrameReady) setFrameReady();
+}, [address, isFrameReady, setFrameReady]);
 
 
 useEffect(() => {
-  const shouldReveal = !showVideo || isWarpcast;
+  if (typeof window === "undefined") return;
 
-  if (shouldReveal) {
-    setTimeout(() => setShowMiniKit(true), 100);
-    setTimeout(() => setShowDescription(true), 700);
-    setTimeout(() => setShowTokens(true), 1400);
-    setTimeout(() => setShowBanners(true), 1400);
-    setTimeout(() => setShowTokenSwap(true), 2000);
-  }
-}, [showVideo, isWarpcast]);
+  const userAgent = navigator.userAgent || "";
+  const isWarpcast = userAgent.includes("warpcast");
+  if (!isWarpcast) return;
+
+  let didReload = false;
+  const timeout = setTimeout(() => {
+    if (!address && !didReload) {
+      didReload = true;
+      window.location.reload();
+    }
+  }, 4500);
+
+  return () => clearTimeout(timeout);
+}, [address]);
+
 
 
 useEffect(() => {
-  if (!address && !isWarpcast) return; 
+  if (!address) return;
 
+  setTimeout(() => setShowMiniKit(true), 300); 
+  setTimeout(() => setShowDescription(true), 700); 
+  setTimeout(() => setShowTokens(true), 1400); 
+  setTimeout(() => setShowBanners(true), 1400); 
+  setTimeout(() => setShowTokenSwap(true), 2000); 
+}, [address]);
+
+
+useEffect(() => {
+  if (!address) return;
   const timeout = setTimeout(() => {
     setShowVideo(false);
   }, 1000);
-
   return () => clearTimeout(timeout);
-}, [address, isWarpcast, showVideo]);
+}, [address, showVideo]);
+
+  useEffect(() => {
+    if (!address) return;
+
+    async function loadInscriptions() {
+      const results: Record<string, Inscription[]> = {};
+
+      for (const token of tokens) {
+if (!["froggi", "fungi", "pepi", "jelli"].includes(token.key)) continue;
 
 
-useEffect(() => {
-  const targetAddress = address || (isWarpcast ? miniAddress : null);
-  if (!targetAddress) return;
+        const abi = abis[token.key as "froggi" | "fungi" | "pepi" | "jelli"];
+        const contractAddress = token.address as `0x${string}`;
+        const fn = getFunctionNames(token.key);
+        const list: Inscription[] = [];
 
-  async function loadInscriptions() {
-    const results: Record<string, Inscription[]> = {};
+        try {
+          const dynamic = await readContract(config, {
+            abi,
+            address: contractAddress,
+            functionName: fn.sporesDegree,
+            args: [address],
+          }) as Seed;
 
-    for (const token of tokens) {
-      if (!["froggi", "fungi", "pepi", "jelli"].includes(token.key)) continue;
+          if (dynamic.seed && dynamic.seed !== 0n) {
+const [svg, meta] = await Promise.all([
+  readContract(config, {
+    abi,
+    address: contractAddress,
+    functionName: "getSvg",
+    args: [dynamic],
+  }) as Promise<string>,
+  readContract(config, {
+    abi,
+    address: contractAddress,
+    functionName: "getMeta",
+    args: [dynamic],
+  }) as Promise<string>,
+]);
 
-      const abi = abis[token.key as "froggi" | "fungi" | "pepi" | "jelli"];
-      const contractAddress = token.address as `0x${string}`;
-      const fn = getFunctionNames(token.key);
-      const list: Inscription[] = [];
+list.push({
+  id: `${token.key}-dynamic`,
+  svg,
+  seed: dynamic.seed.toString(),
+  type: "Growing",
+  meta: JSON.parse(meta),
+});
 
-      try {
-        const dynamic = await readContract(config, {
-          abi,
-          address: contractAddress,
-          functionName: fn.sporesDegree,
-          args: [targetAddress],
-        }) as Seed;
+          }
+        } catch {}
 
-        if (dynamic.seed && dynamic.seed !== 0n) {
-          const [svg, meta] = await Promise.all([
-            readContract(config, {
-              abi,
-              address: contractAddress,
-              functionName: "getSvg",
-              args: [dynamic],
-            }) as Promise<string>,
-            readContract(config, {
-              abi,
-              address: contractAddress,
-              functionName: "getMeta",
-              args: [dynamic],
-            }) as Promise<string>,
-          ]);
+        try {
+          const count = await readContract(config, {
+            abi,
+            address: contractAddress,
+            functionName: fn.mushroomCount,
+            args: [address],
+          }) as bigint;
 
-          list.push({
-            id: `${token.key}-dynamic`,
-            svg,
-            seed: dynamic.seed.toString(),
-            type: "Growing",
-            meta: JSON.parse(meta),
-          });
-        }
-      } catch {}
-
-      try {
-        const count = await readContract(config, {
-          abi,
-          address: contractAddress,
-          functionName: fn.mushroomCount,
-          args: [targetAddress],
-        }) as bigint;
-
-        for (let i = 0n; i < count; i++) {
-          try {
-            const seed = await readContract(config, {
-              abi,
-              address: contractAddress,
-              functionName: fn.mushroomOfOwnerByIndex,
-              args: [targetAddress, i],
-            }) as Seed;
-
-            const [svg, meta] = await Promise.all([
-              readContract(config, {
+          for (let i = 0n; i < count; i++) {
+            try {
+              const seed = await readContract(config, {
                 abi,
                 address: contractAddress,
-                functionName: "getSvg",
-                args: [seed],
-              }) as Promise<string>,
-              readContract(config, {
-                abi,
-                address: contractAddress,
-                functionName: "getMeta",
-                args: [seed],
-              }) as Promise<string>,
-            ]);
+                functionName: fn.mushroomOfOwnerByIndex,
+                args: [address, i],
+              }) as Seed;
 
-            list.push({
-              id: `${token.key}-stable-${i}`,
-              svg,
-              seed: seed.seed.toString(),
-              type: "Safe",
-              meta: JSON.parse(meta),
-            });
-          } catch {}
-        }
-      } catch {}
+const [svg, meta] = await Promise.all([
+  readContract(config, {
+    abi,
+    address: contractAddress,
+    functionName: "getSvg",
+    args: [seed],
+  }) as Promise<string>,
+  readContract(config, {
+    abi,
+    address: contractAddress,
+    functionName: "getMeta",
+    args: [seed],
+  }) as Promise<string>,
+]);
 
-      results[token.key] = list;
+list.push({
+  id: `${token.key}-stable-${i}`,
+  svg,
+  seed: seed.seed.toString(),
+  type: "Safe",
+  meta: JSON.parse(meta),
+});
+
+            } catch {}
+          }
+        } catch {}
+
+        results[token.key] = list;
+      }
+
+      setInscriptions(results);
     }
 
-    setInscriptions(results);
-  }
+    loadInscriptions();
+  }, [address, successMessage]);
 
-  loadInscriptions();
-}, [address, miniAddress, isWarpcast, successMessage]);
+const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].includes(t.key));
+  const activeToken = visibleTokens.find((t) => t.key === activeFilter);
+  const [mounted, setMounted] = useState(false);
 
-
-
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   useEffect(() => {
     const vid = document.getElementById("glitch-video") as HTMLVideoElement | null;
     if (!vid) return;
@@ -273,7 +280,7 @@ useEffect(() => {
       
         if (action === "destabilize") {
         await destabilizeInscription(user, value);
-        setSelectedInscription(null); 
+        setSelectedInscription(null);
       }
 
       if (action === "combine") {
@@ -291,7 +298,7 @@ useEffect(() => {
           if (i >= combineList.length) {
             clearInterval(interval);
             setTimeout(() => {
-              setConfirmedCombineList(null);
+              setConfirmedCombineList(null); 
               setCombineList([]);
               setCombineMode(false);
               setFadeOutIndex(null);
@@ -574,9 +581,9 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
 
 
 )}
-  <Topnav />
-<div className={`transition-opacity duration-700 ${showMiniKit ? "opacity-100" : "opacity-0"}`}>
 
+<div className={`transition-opacity duration-700 ${showMiniKit ? "opacity-100" : "opacity-0"}`}>
+  <Topnav />
 </div>
 
       <div className="px-4 max-w-6xl mx-auto mb-28">
@@ -637,7 +644,7 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
       );
     })}
 
- {mounted && !isWarpcast && (!address || showVideo) ? (
+{(!(context as { walletAddress?: `0x${string}` })?.walletAddress && !wagmiAddress) || showVideo ? (
 
   <div
     className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ${
@@ -697,6 +704,25 @@ const isInjected = typeof window !== "undefined" && !!(window as Window & { ethe
     </p>
   </>
 ) : (() => {
+  if (typeof window !== "undefined") {
+    const isMobile = window.innerWidth < 768;
+    const isWarpcast = navigator.userAgent.includes("warpcast");
+
+    if (isMobile && isWarpcast) {
+      return (
+        <>
+          <p className="text-lg font-semibold mb-2">Mini 20i</p>
+          <p className="text-sm">Attempting connection. . .</p>
+          {showError && (
+            <p className="text-sm text-red-400 mt-4">
+              Something went wrong. Please refresh the application to connect.
+            </p>
+          )}
+        </>
+      );
+    }
+  }
+
   return (
     <>
       <p className="text-lg font-semibold mb-2">Wallet Required</p>
@@ -1121,9 +1147,17 @@ onClick={() => {
 {(inscriptions[selectedInscription.id.split("-")[0]]?.length ?? 0) >= 2 && (
   <button
     onClick={() => {
-      setCombineMode(true);
-      setCombineList([selectedInscription]);
+      const key = selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli";
+      const growing = inscriptions[key]?.find(i => i.type === "Growing");
+
+      if (growing && growing.id !== selectedInscription.id) {
+        setCombineList([growing, selectedInscription]);
+      } else {
+        setCombineList([selectedInscription]);
+      }
+
       setSelectedInscription(null);
+      setCombineMode(true); 
     }}
     className="px-2 py-2 text-sm bg-blue-100 text-blue-700 rounded"
   >
