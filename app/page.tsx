@@ -35,7 +35,6 @@ type Inscription = {
 export default function Page() {
   const context = useMiniKit();
   useEffect(() => {
-  console.log("MiniKit context:", context);
 }, [context]);
 
 const wagmiAddress = useAccount().address;
@@ -48,9 +47,6 @@ useEffect(() => {
   }
 }, [miniAddress, wagmiAddress, mounted]);
 
-
-  console.log("MiniKit address:", context);
-console.log("Wagmi address:", wagmiAddress);
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
@@ -106,14 +102,14 @@ useEffect(() => {
 
 
 useEffect(() => {
-  if (address || isWarpcast) {
-    setTimeout(() => setShowMiniKit(true), 100); 
-    setTimeout(() => setShowDescription(true), 700); 
-    setTimeout(() => setShowTokens(true), 1400); 
-    setTimeout(() => setShowBanners(true), 1400); 
-    setTimeout(() => setShowTokenSwap(true), 2000); 
+  if (!showVideo) {
+    setTimeout(() => setShowMiniKit(true), 100);
+    setTimeout(() => setShowDescription(true), 700);
+    setTimeout(() => setShowTokens(true), 1400);
+    setTimeout(() => setShowBanners(true), 1400);
+    setTimeout(() => setShowTokenSwap(true), 2000);
   }
-}, [address, isWarpcast]);
+}, [showVideo]);
 
 
 useEffect(() => {
