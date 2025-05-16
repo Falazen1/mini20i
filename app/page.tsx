@@ -130,8 +130,8 @@ useEffect(() => {
 
 
 useEffect(() => {
-  const user = miniAddress || wagmiAddress;
-  if (!user) return;
+  const targetAddress = address || (isWarpcast ? miniAddress : null);
+  if (!targetAddress) return;
 
   async function loadInscriptions() {
     const results: Record<string, Inscription[]> = {};
@@ -149,7 +149,7 @@ useEffect(() => {
           abi,
           address: contractAddress,
           functionName: fn.sporesDegree,
-          args: [user],
+          args: [targetAddress],
         }) as Seed;
 
         if (dynamic.seed && dynamic.seed !== 0n) {
@@ -183,7 +183,7 @@ useEffect(() => {
           abi,
           address: contractAddress,
           functionName: fn.mushroomCount,
-          args: [user],
+          args: [targetAddress],
         }) as bigint;
 
         for (let i = 0n; i < count; i++) {
@@ -192,7 +192,7 @@ useEffect(() => {
               abi,
               address: contractAddress,
               functionName: fn.mushroomOfOwnerByIndex,
-              args: [user, i],
+              args: [targetAddress, i],
             }) as Seed;
 
             const [svg, meta] = await Promise.all([
@@ -228,7 +228,7 @@ useEffect(() => {
   }
 
   loadInscriptions();
-}, [miniAddress, wagmiAddress, successMessage]);
+}, [address, miniAddress, isWarpcast, successMessage]);
 
 
 
