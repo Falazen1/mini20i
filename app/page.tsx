@@ -46,14 +46,22 @@ useEffect(() => {
   const isWarpcast = navigator.userAgent.includes("warpcast");
   if (!isWarpcast) return;
 
+  let attempts = 0;
+
   const interval = setInterval(() => {
     const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+    const hydrated = !!address;
 
-    // Warpcast fix: MiniKit address is defined, but `address` isn't hydrated yet
-    if (mini && !address) {
+    // Reload if MiniKit injected wallet exists, but wagmi still hasn't hydrated
+    if (mini && !hydrated) {
+      console.log("Reloading due to MiniKit hydration lag");
+      clearInterval(interval);
       window.location.reload();
     }
-  }, 2500);
+
+    attempts++;
+    if (attempts > 10) clearInterval(interval); // stop after ~8 seconds
+  }, 800);
 
   return () => clearInterval(interval);
 }, [context, address]);
