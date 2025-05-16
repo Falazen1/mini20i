@@ -110,23 +110,23 @@ useEffect(() => {
 
 
 useEffect(() => {
-  if (address) {
+  if (address || context) {
     setTimeout(() => setShowMiniKit(true), 300); 
     setTimeout(() => setShowDescription(true), 700); 
     setTimeout(() => setShowTokens(true), 1400); 
     setTimeout(() => setShowBanners(true), 1400); 
     setTimeout(() => setShowTokenSwap(true), 2000); 
   }
-}, [address]);
+}, [address, context]);
 
 
 useEffect(() => {
-  if (!address) return;
+  if (!address && !context) return;
   const timeout = setTimeout(() => {
     setShowVideo(false);
   }, 1000);
   return () => clearTimeout(timeout);
-}, [address, showVideo]);
+}, [address, context, showVideo]);
 
   useEffect(() => {
     if (!address) return;
