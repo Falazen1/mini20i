@@ -58,7 +58,6 @@ const [showTokens, setShowTokens] = useState(false);
 const [showTokenSwap, setShowTokenSwap] = useState(false);
 const { setFrameReady, isFrameReady } = useMiniKit();
 const [fadeOutIndex, setFadeOutIndex] = useState<number | null>(null);
-const [confirmedCombineList, setConfirmedCombineList] = useState<Inscription[] | null>(null);
 const [failedTxCount, setFailedTxCount] = useState(0);
 const [showError, setShowError] = useState(false);
 const [showWalletWarning, setShowWalletWarning] = useState(false);
@@ -284,7 +283,6 @@ const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].
 
       if (action === "combine") {
         const seeds = combineList.map(i => BigInt(i.seed));
-        setConfirmedCombineList([...combineList]); 
       
         await combineInscriptions(user, seeds);
       
@@ -297,7 +295,6 @@ const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].
           if (i >= combineList.length) {
             clearInterval(interval);
             setTimeout(() => {
-              setConfirmedCombineList(null); 
               setCombineList([]);
               setCombineMode(false);
               setFadeOutIndex(null);
@@ -480,53 +477,54 @@ function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fu
   <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 overflow-auto">
   <div className="bg-[#1c1e24] border border-white/10 rounded-xl shadow-xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto text-white">
       <h2 className="text-lg font-semibold mb-4">Select Inscriptions to Combine</h2>
-      <p className="text-sm mb-2">Select at least 2 stable inscriptions to enable combination.</p>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        {visibleTokens
-          .flatMap((token) => inscriptions[token.key] || [])
-          .filter((i) =>
-            confirmedCombineList
-              ? confirmedCombineList.some((sel) => sel.id === i.id)
-              : combineList.length > 0 &&
-                i.id.startsWith(combineList[0].id.split("-")[0])
-          )
-          
-          
-.map((insc, idx) => {
-  const isSelected = combineList.some((i) => i.id === insc.id);
-  const hasFadedOut =
-    fadeOutIndex !== null && idx <= fadeOutIndex;
+      <p className="text-sm mb-2">Select at least 2 inscriptions to enable combination.</p>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+  {(() => {
+    // Find which token project we're combining
+    const tokenKey = combineList[0]?.id.split("-")[0];
+    const all = (inscriptions[tokenKey] || []);
+    const growing = all.find(i => i.type === "Growing");
+    const stableList = all.filter(i => i.type !== "Growing");
+    // Dynamic always shown first if present
+    const combineGrid = growing ? [growing, ...stableList] : stableList;
+    return combineGrid.map((insc, idx) => {
+      const isDynamic = insc.type === "Growing";
+      const isSelected = combineList.some((i) => i.id === insc.id);
+      const hasFadedOut = fadeOutIndex !== null && idx <= fadeOutIndex;
 
-  return (
-    <div
-      key={insc.id}
-      onClick={() =>
-        setCombineList((prev) =>
-          isSelected
-            ? prev.filter((i) => i.id !== insc.id)
-            : [...prev, insc]
-        )
-      }
-      className={`border rounded shadow p-2 bg-white cursor-pointer transition-transform duration-500 ease-in-out
-${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
+      return (
+        <div
+          key={insc.id}
+          onClick={() => {
+            // Dynamic inscription is always included, not toggleable
+            if (combineMode && isDynamic) return;
+            setCombineList((prev) =>
+              prev.some((i) => i.id === insc.id)
+                ? prev.filter((i) => i.id !== insc.id)
+                : [...prev, insc]
+            );
+          }}
+          className={`border rounded shadow p-2 bg-white cursor-pointer transition-transform duration-500 ease-in-out
+            ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
+            ${isDynamic ? "opacity-80 ring-2 ring-green-400 border-green-300 cursor-not-allowed" : ""}
+            ${fadeOutIndex !== null && combineList[fadeOutIndex]?.id === insc.id ? "animate-shake-fade" : ""}
+            ${hasFadedOut ? "opacity-0 pointer-events-none" : ""}
+          `}
+        >
+          <div
+            className="aspect-square w-full mb-1"
+            dangerouslySetInnerHTML={{ __html: insc.svg }}
+          />
+          <div className="text-xs text-gray-400">Tokens: {insc.seed}</div>
+          {isDynamic && (
+            <div className="text-xs text-green-600 font-bold mt-1">Dynamic inscription (always included)</div>
+          )}
+        </div>
+      );
+    });
+  })()}
+</div>
 
-        ${fadeOutIndex !== null && combineList[fadeOutIndex]?.id === insc.id
-          ? "animate-shake-fade"
-          : ""
-        }
-        ${hasFadedOut ? "opacity-0 pointer-events-none" : ""}
-      `}
-    >
-      <div
-        className="aspect-square w-full mb-1"
-        dangerouslySetInnerHTML={{ __html: insc.svg }}
-      />
-      <div className="text-xs text-gray-400">Tokens: {insc.seed}</div>
-    </div>
-  );
-})}
-
-      </div>
 
       {combineList.length < 2 && (
         <p className="text-sm text-red-600 mb-4">You must select at least 2 inscriptions.</p>
@@ -536,7 +534,6 @@ ${isSelected ? "ring-4 ring-yellow-400 border-blue-300" : "border-white/10"}
   onClick={() => {
     setCombineMode(false);
     setCombineList([]);
-    setConfirmedCombineList(null); 
   }}
   className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
 >
@@ -1146,19 +1143,19 @@ onClick={() => {
 
 {(inscriptions[selectedInscription.id.split("-")[0]]?.length ?? 0) >= 2 && (
   <button
-    onClick={() => {
-      const key = selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli";
-      const growing = inscriptions[key]?.find(i => i.type === "Growing");
+onClick={() => {
+  const key = selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli";
+  const growing = inscriptions[key]?.find(i => i.type === "Growing");
+  let list = [selectedInscription];
+  if (growing && growing.id !== selectedInscription.id) {
+    // Always include the dynamic inscription first in the list if it's not already the selected one
+    list = [growing, selectedInscription];
+  }
+  setCombineList(list);
+  setSelectedInscription(null);
+  setCombineMode(true);
+}}
 
-      if (growing && growing.id !== selectedInscription.id) {
-        setCombineList([growing, selectedInscription]);
-      } else {
-        setCombineList([selectedInscription]);
-      }
-
-      setSelectedInscription(null);
-      setCombineMode(true); 
-    }}
     className="px-2 py-2 text-sm bg-blue-100 text-blue-700 rounded"
   >
     Combine
