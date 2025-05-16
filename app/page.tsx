@@ -113,12 +113,15 @@ useEffect(() => {
 
 
 useEffect(() => {
-  if (!address) return;
+  if (!address && !isWarpcast) return; // ← only show splash for disconnected non-Warpcast users
+
   const timeout = setTimeout(() => {
     setShowVideo(false);
   }, 1000);
+
   return () => clearTimeout(timeout);
-}, [address, showVideo]);
+}, [address, isWarpcast, showVideo]);
+
 
   useEffect(() => {
     if (!address) return;
