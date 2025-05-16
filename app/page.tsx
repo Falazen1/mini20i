@@ -38,38 +38,19 @@ export default function Page() {
   console.log("MiniKit context:", context);
 }, [context]);
 
-  const wagmiAddress = useAccount().address;
-  const address = (context as { walletAddress?: `0x${string}` })?.walletAddress ?? wagmiAddress;
+const wagmiAddress = useAccount().address;
+const miniAddress = (context as { walletAddress?: `0x${string}` })?.walletAddress;
+  const [mounted, setMounted] = useState(false);
+const address = miniAddress || wagmiAddress || null;
+useEffect(() => {
+  if (miniAddress && !wagmiAddress && !mounted) {
+    setMounted(true);
+  }
+}, [miniAddress, wagmiAddress, mounted]);
+
+
   console.log("MiniKit address:", context);
 console.log("Wagmi address:", wagmiAddress);
-
-useEffect(() => {
-  if (typeof window === "undefined") return;
-
-  const isWarpcast = navigator.userAgent.includes("warpcast");
-  if (!isWarpcast) return;
-
-  let attempts = 0;
-
-  const interval = setInterval(() => {
-    const mini = (context as { walletAddress?: `0x${string}` })?.walletAddress;
-    const hydrated = !!address;
-
-    // Reload if MiniKit injected wallet exists, but wagmi still hasn't hydrated
-    if (mini && !hydrated) {
-      console.log("Reloading due to MiniKit hydration lag");
-      clearInterval(interval);
-      window.location.reload();
-    }
-
-    attempts++;
-    if (attempts > 10) clearInterval(interval); // stop after ~8 seconds
-  }, 800);
-
-  return () => clearInterval(interval);
-}, [context, address]);
-
-
   const { connect, connectors } = useConnect();
   const [inscriptions, setInscriptions] = useState<Record<string, Inscription[]>>({});
   const [activeFilter, setActiveFilter] = useState<string>("all");
@@ -97,7 +78,7 @@ const [failedTxCount, setFailedTxCount] = useState(0);
 const [showWalletWarning, setShowWalletWarning] = useState(false);
 const visibleTokens = tokens.filter((t) => ["froggi", "fungi", "pepi", "jelli"].includes(t.key));
   const activeToken = visibleTokens.find((t) => t.key === activeFilter);
-  const [mounted, setMounted] = useState(false);
+
 const [isWarpcast, setIsWarpcast] = useState(false);
 useEffect(() => {
   if (typeof navigator !== "undefined") {
