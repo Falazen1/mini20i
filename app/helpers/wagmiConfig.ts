@@ -17,13 +17,13 @@ export const config = createConfig({
       metadata: {
         name: 'mini20i',
         description: 'Swap and manage mini20i tokens',
-        url: 'https://mini20i.vercel.app',
-        icons: ['https://mini20i.vercel.app/logo.png'], 
+        url: 'https://mini-20i.app',
+        icons: ['https://mini-20i.app/logo.png'], 
       },
     }),
     coinbaseWallet({
       appName: 'mini20i',
-      appLogoUrl: 'https://mini20i.vercel.app/logo.png',
+      appLogoUrl: 'https://mini-20i.app/logo.png',
       chainId: base.id,
     }),
   ],
@@ -40,9 +40,9 @@ if (typeof window !== 'undefined') {
       wagmiConfig: config,
       projectId: WC_PROJECT_ID,
       connectorImages: {
-        injected: 'https://mini20i.vercel.app/logo.png', 
-        coinbaseWallet: 'https://mini20i.vercel.app/logo.png', 
-        walletConnect: 'https://mini20i.vercel.app/logo.png', 
+        injected: 'https://mini-20i.app/logo.png', 
+        coinbaseWallet: 'https://mini-20i.app/logo.png', 
+        walletConnect: 'https://mini-20i.app/logo.png', 
       },
     });
   });

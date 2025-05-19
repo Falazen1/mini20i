@@ -60,7 +60,8 @@ const { setFrameReady, isFrameReady } = useMiniKit();
 const [fadeOutIndex, setFadeOutIndex] = useState<number | null>(null);
 const [failedTxCount, setFailedTxCount] = useState(0);
 const [showError, setShowError] = useState(false);
-const [showWalletWarning, setShowWalletWarning] = useState(false);
+const [showWalletWarning, setShowWalletWarning] = useState<false | "mobile" | "desktop">(false);
+
 
 useEffect(() => {
   if (typeof window !== "undefined") {
@@ -660,21 +661,23 @@ function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fu
 <div className="relative z-10 text-white text-center px-6">
   <div
     className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
-    onClick={() => {
+onClick={() => {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-const isInjected = typeof window !== "undefined" && !!(window as Window & { ethereum?: unknown }).ethereum;
+  const isInjected = typeof window !== "undefined" && !!(window as Window & { ethereum?: unknown }).ethereum;
 
-
-  if (isMobile && !isInjected) {
-    setShowWalletWarning(true);
+  if (!isInjected) {
+    if (isMobile) {
+      setShowWalletWarning("mobile");
+    } else {
+      setShowWalletWarning("desktop");
+    }
     return;
   }
 
   connect({ connector: connectors[0] });
 }}
-
-  >
- {showWalletWarning ? (
+>
+{showWalletWarning === "mobile" ? (
   <>
     <p className="text-lg font-semibold mb-2 text-yellow-500">No Wallet Detected</p>
     <p className="text-sm text-yellow-400">
@@ -697,6 +700,31 @@ const isInjected = typeof window !== "undefined" && !!(window as Window & { ethe
         Warpcast
       </a>{" "}
       browser to continue.
+    </p>
+  </>
+) : showWalletWarning === "desktop" ? (
+  <>
+    <p className="text-lg font-semibold mb-2 text-yellow-500">No Wallet Extension</p>
+    <p className="text-sm text-yellow-400">
+      Please install{" "}
+      <a
+        href="https://metamask.io/download/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline text-purple-300 hover:text-blue-300"
+      >
+        MetaMask
+      </a>{" "}
+      or{" "}
+      <a
+        href="https://www.coinbase.com/wallet"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline text-purple-300 hover:text-blue-300"
+      >
+        Coinbase Wallet Extension
+      </a>{" "}
+      to continue on desktop.
     </p>
   </>
 ) : (() => {
@@ -876,18 +904,36 @@ const isInjected = typeof window !== "undefined" && !!(window as Window & { ethe
     return (
 <div
   key={inscription.id}
-  onClick={() => {
-if (combineMode) {
-  setCombineList((prev) =>
-    prev.some((i) => i.id === inscription.id)
-      ? prev.filter((i) => i.id !== inscription.id)
-      : [...prev, inscription]
-  );
-} else {
-  setSelectedInscription(inscription);
-}
+ onClick={async () => {
+  if (combineMode) {
+    setCombineList((prev) =>
+      prev.some((i) => i.id === inscription.id)
+        ? prev.filter((i) => i.id !== inscription.id)
+        : [...prev, inscription]
+    );
+    return;
+  }
 
-  }}
+  const eth = window.ethereum as { request: (args: { method: string; params?: unknown[] }) => Promise<unknown> } | undefined;
+  const BASE_CHAIN_ID_HEX = "0x2105";
+
+  if (eth?.request) {
+    try {
+      const chainId = (await eth.request({ method: "eth_chainId" })) as string;
+      if (chainId !== BASE_CHAIN_ID_HEX) {
+        await eth.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: BASE_CHAIN_ID_HEX }],
+        });
+      }
+    } catch (err) {
+      console.error("Chain switch failed:", err);
+    }
+  }
+
+  setSelectedInscription(inscription);
+}}
+
   className={`bg-[#1c1e24] border border-white/10 rounded-xl shadow-md p-3 cursor-pointer transition hover:scale-[1.02] hover:ring-1 hover:ring-white/20 ${
     isSelected ? "ring-2 ring-purple-400" : ""
   }`}
