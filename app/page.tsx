@@ -67,7 +67,7 @@ useEffect(() => {
   if (typeof window !== "undefined") {
     const isMobile = window.innerWidth < 768;
     const userAgent = navigator.userAgent || "";
-    const isWarpcast = userAgent.includes("warpcast");
+    const isWarpcast = /warpcast|farcaster/i.test(userAgent);
 
     if (isMobile && isWarpcast) {
       const timeout = setTimeout(() => setShowError(true), 9000);
@@ -93,7 +93,7 @@ useEffect(() => {
   if (typeof window === "undefined") return;
 
   const userAgent = navigator.userAgent || "";
-  const isWarpcast = userAgent.includes("warpcast");
+  const isWarpcast = /warpcast|farcaster/i.test(userAgent);
 
   if (!isWarpcast) return;
 
@@ -697,7 +697,7 @@ onClick={() => {
         rel="noopener noreferrer"
         className="underline text-purple-300 hover:text-blue-300"
       >
-        Warpcast
+        Farcaster
       </a>{" "}
       browser to continue.
     </p>
@@ -735,7 +735,7 @@ onClick={() => {
     if (isMobile && isWarpcast) {
       return (
         <>
-          <p className="text-lg font-semibold mb-2">Warpcast Detected</p>
+          <p className="text-lg font-semibold mb-2">Farcaster Detected</p>
           <p className="text-sm">Initializing connection. . .</p>
           {showError && (
             <p className="text-sm text-red-400 mt-4">
