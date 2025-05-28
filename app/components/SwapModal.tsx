@@ -335,10 +335,24 @@ export default function SwapModal({
                         <div className="absolute inset-[-6px] rounded-lg border-4 border-yellow-300 animate-glow-fade z-[99] pointer-events-none" />
                       )}
 
-                      {/* The minted SVG */}
-                      <div className="w-full aspect-square mb-0 relative bg-black rounded overflow-hidden"
-                        dangerouslySetInnerHTML={{ __html: newInscription }}
-                      />
+                        <div
+                          className="w-full aspect-square mb-0 relative bg-black rounded overflow-hidden"
+                          dangerouslySetInnerHTML={{
+                            __html: (() => {
+                              const needsFix = ["fungi", "jelli"].includes(tokenKey);
+                              const isPepi = tokenKey === "pepi";
+                              return newInscription.replace(
+                                /<svg([^>]+?)>/,
+                                needsFix
+                                  ? `<svg$1 width="720" height="720" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
+                                  : isPepi
+                                  ? `<svg$1 width="800" height="800" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
+                                  : `<svg$1>`
+                              );
+                            })(),
+                          }}
+                        />
+
                     </div>
                   </>
                 )}
