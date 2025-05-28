@@ -127,23 +127,22 @@ function extractTopTraits(meta: Record<string, unknown>, project:
   const seen = new Set<string>();
   return traits.filter((t) => !seen.has(t.label) && seen.add(t.label)).slice(0, 6).map(t => `${t.label}: ${t.value}`);
 }
-
 export default function SwapModal({
   tokenKey,
   onClose,
   onSuccess,
   inscriptionList,
 }: {
-  tokenKey: "froggi" | "fungi" | "pepi" |"jelli";
+  tokenKey: "froggi" | "fungi" | "pepi" | "jelli";
   onClose: () => void;
   onSuccess: () => void;
   inscriptionList: {
-  id: string;
-  svg: string;
-  seed: string;
-  type: "Growing" | "Safe";
-  meta?: Record<string, unknown>;
-}[];
+    id: string;
+    svg: string;
+    seed: string;
+    type: "Growing" | "Safe";
+    meta?: Record<string, unknown>;
+  }[];
 }) {
   const { address } = useAccount();
   const token = TOKENS[tokenKey];
@@ -159,35 +158,38 @@ export default function SwapModal({
   const tokenStore = useTokenStore();
   const { stabilizeInscription } = useTransaction();
   const [showFinalMessage, setShowFinalMessage] = useState(false);
-function getLevel(
-  tokenKey: "froggi" | "fungi" | "pepi" | "jelli",
-  amount: number
-): number {
-  const thresholds: Record<typeof tokenKey, number[]> = {
-    froggi: [0, 1000, 3000, 10000, 30000, 60000, 120000],
-    fungi: [0, 21000, 525000, 1050000, 1575000, 2100000],
-    pepi: [0, 11, 22, 33, 44, 56],
-    jelli: [0, 1000, 21000, 105000, 420000, 1050000],
-  };
-  const levels = thresholds[tokenKey];
-  for (let i = levels.length - 1; i >= 0; i--) {
-    if (amount >= levels[i]) return i;
+
+  function getLevel(
+    k: "froggi" | "fungi" | "pepi" | "jelli",
+    amount: number
+  ): number {
+    // same thresholds
+    const thresholds: Record<typeof k, number[]> = {
+      froggi: [0, 1000, 3000, 10000, 30000, 60000, 120000],
+      fungi: [0, 21000, 525000, 1050000, 1575000, 2100000],
+      pepi: [0, 11, 22, 33, 44, 56],
+      jelli: [0, 1000, 21000, 105000, 420000, 1050000],
+    };
+    const levels = thresholds[k];
+    for (let i = levels.length - 1; i >= 0; i--) {
+      if (amount >= levels[i]) return i;
+    }
+    return 0;
   }
-  return 0;
-}
 
-
+  // Debounce same as you had
   useEffect(() => {
     const timer = setTimeout(() => setDebounced(true), 500);
     return () => {
-      setDebounced(false);
       clearTimeout(timer);
+      setDebounced(false);
     };
   }, [tokenKey]);
 
+  // Keep track of pre-swap vs. post-swap
   useEffect(() => {
     if (!swapDone) {
-      const before = inscriptionList.find(i => i.type === "Growing");
+      const before = inscriptionList.find((i) => i.type === "Growing");
       prevSvgRef.current = before?.svg ?? null;
       if (before) {
         prevLevelRef.current = getLevel(tokenKey, Number(before.seed));
@@ -195,35 +197,38 @@ function getLevel(
     }
   }, [swapDone, inscriptionList, tokenKey]);
 
+  // After swap completes, see if the newly minted inscription changed
   useEffect(() => {
     if (!swapDone) return;
-    const latest = inscriptionList.find(i => i.type === "Growing");
-    const isNew = latest && latest.svg !== prevSvgRef.current;
+    const latest = inscriptionList.find((i) => i.type === "Growing");
+    if (!latest) return;
 
-    if (isNew) {
-      const delay = setTimeout(() => {
-        setNewInscription(latest.svg);
-        setInscriptionId(latest.id);
+    const isNew = latest.svg !== prevSvgRef.current;
+    if (!isNew) return;
 
-        const newSeed = Number(latest.seed);
-        const newLevel = getLevel(tokenKey, newSeed);
+    const delay = setTimeout(() => {
+      setNewInscription(latest.svg);
+      setInscriptionId(latest.id);
 
-        if (prevLevelRef.current !== null && newLevel > prevLevelRef.current) {
-          setJustLeveledUp(true);
-          setShowFinalMessage(false);
-          setTimeout(() => {
-            setShowFinalMessage(true);
-          }, 2500);
-        } else {
-          setShowFinalMessage(true); // keep for fallback on LEVELUP
-        }
-        
+      const newSeed = Number(latest.seed);
+      const newLevel = getLevel(tokenKey, newSeed);
 
-        prevLevelRef.current = newLevel;
-      }, 500);
+      if (
+        prevLevelRef.current !== null &&
+        newLevel > prevLevelRef.current
+      ) {
+        setJustLeveledUp(true);
+        setShowFinalMessage(false);
+        setTimeout(() => {
+          setShowFinalMessage(true);
+        }, 2500);
+      } else {
+        setShowFinalMessage(true);
+      }
+      prevLevelRef.current = newLevel;
+    }, 500);
 
-      return () => clearTimeout(delay);
-    }
+    return () => clearTimeout(delay);
   }, [swapDone, inscriptionList, tokenKey]);
 
   useEffect(() => {
@@ -237,187 +242,189 @@ function getLevel(
     onSuccess();
   };
 
-const handleStabilize = async () => {
-  if (inscriptionId && address) {
+  const handleStabilize = async () => {
+    if (!inscriptionId || !address) return;
     await tokenStore.setTokenByKey(tokenKey);
-    const seed = BigInt(inscriptionList.find(i => i.id === inscriptionId)?.seed || "0");
+    const seed = BigInt(
+      inscriptionList.find((i) => i.id === inscriptionId)?.seed || "0"
+    );
     await stabilizeInscription(address, seed);
     onSuccess();
-    onClose(); 
-  }
-};
+    onClose();
+  };
 
-
-
-  const seedValue = inscriptionList.find(i => i.id === inscriptionId)?.seed;
-
+  const seedValue = inscriptionList.find((i) => i.id === inscriptionId)?.seed;
   if (!address || !token || !debounced) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black bg-opacity-70 flex items-center justify-center">
+    <div className="fixed inset-0 z-[30] bg-black bg-opacity-70 flex items-center justify-center">
       <div className="relative bg-[#1c1e24] rounded-xl shadow-2xl p-6 w-full max-w-md text-white border border-white/10">
+        {/* Close button up top */}
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-white text-xl hover:text-red-400"
         >
           ✕
         </button>
-{/*
-{swapDone && (
-  <div className="mt-4">
-    <button
-      onClick={() => {
-        setJustLeveledUp(true);
-        setTimeout(() => setJustLeveledUp(false), 2500);
-      }}
-      className="px-4 py-2 text-sm bg-purple-100 text-purple-900 rounded hover:bg-purple-200"
-    >
-      Test Level Up
-    </button>
-  </div>
-)}
-*/}
 
+        <h2
+          className={`text-2xl font-bold mb-6 text-center transition-opacity duration-700 ${
+            showFinalMessage ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          {justLeveledUp
+            ? tokenKey === "froggi"
+              ? "Your Froggi has evolved!"
+              : tokenKey === "fungi"
+              ? "Your Fungi leveled up!"
+              : tokenKey === "jelli"
+              ? "Your Jelli has ascended!"
+              : "Your Pepi leveled up!"
+            : newInscription
+            ? prevSvgRef.current === null
+              ? "You got a new inscription!"
+              : tokenKey === "froggi"
+              ? "Your Froggi has evolved!"
+              : tokenKey === "fungi"
+              ? "Your Fungi has grown!"
+              : tokenKey === "jelli"
+              ? "Your Jelli has morphed!"
+              : "Your Pepi has transformed!"
+            : `Swap ETH → ${token.symbol}`}
+        </h2>
 
-<h2 className={`text-2xl font-bold mb-6 text-center transition-opacity duration-700 ${showFinalMessage ? 'opacity-100' : 'opacity-0'}`}>
-  {justLeveledUp
-    ? tokenKey === "froggi"
-      ? "Your Froggi has evolved!"
-      : tokenKey === "fungi"
-      ? "Your Fungi leveled up!"
-      : tokenKey === "jelli"
-      ? "Your Jelli has ascended!"
-      : "Your Pepi leveled up!"
-    : newInscription
-    ? prevSvgRef.current === null
-      ? "You got a new inscription!"
-      : tokenKey === "froggi"
-      ? "Your Froggi has evolved!"
-      : tokenKey === "fungi"
-      ? "Your Fungi has grown!"
-      : tokenKey === "jelli"
-      ? "Your Jelli has morphed!"
-      : "Your Pepi has transformed!"
-    : `Swap ETH → ${token.symbol}`}
-</h2>
-
-{swapDone ? (
-  <>
-    {!newInscription && (
-      <div className="mb-4 text-center text-sm">
-        {tokenKey === "froggi"
-          ? "Your Froggi is evolving..."
-          : tokenKey === "fungi"
-          ? "Your Fungi is growing..."
-          : tokenKey === "jelli"
-          ? "Your Jelli is materializing..."
-          : "Your Pepi is transforming..."}
-      </div>
-    )}
-
-            <div className="w-full aspect-square rounded bg-[#0f1014] flex items-center justify-center relative mb-2">
-              {!newInscription ? (
-                <div className="absolute inset-0 overflow-hidden">
-                  <Image
-                    src={loadingGif}
-                    alt="loading gif"
-                    className="w-full h-full object-contain translate-y-[3px]"
-                    fill
-                    unoptimized
-                  />
-                </div>
-              ) : (
-                <>
-<div className="w-full h-full relative flex items-center justify-center">
-
-
-  {justLeveledUp && (
-    <div className="absolute inset-20 flex justify-center items-start pt-10 z-30">
-      <div className="text-4xl sm:text-5xl font-bold text-yellow-300 drop-shadow-[0_0_10px_rgba(255,255,0,0.8)] animate-levelup-text">
-        Level Up!
-      </div>
-    </div>
-  )}
-
-{justLeveledUp && (
-  <div className="absolute inset-[-6px] rounded-lg border-4 border-yellow-300 animate-glow-fade z-30 pointer-events-none" />
-)}
-
-
-  {/* SVG */}
-  <div
-    className="w-full h-full animate-fade-in2 z-20"
-    dangerouslySetInnerHTML={{ __html: newInscription }}
-  />
-</div>
-
-
-                </>
-              )}
-            </div>
-
-            {seedValue && (
-              <div className="text-sm text-white text-left mb-3 space-y-1">
-                <div><span className="font-semibold">Tokens:</span> {seedValue}</div>
-                <div><span className="font-semibold">Mode:</span> Growing</div>
+        {swapDone ? (
+          <>
+            {/* if no newInscription yet, show "is evolving..." */}
+            {!newInscription && (
+              <div className="mb-4 text-center text-sm">
+                {tokenKey === "froggi"
+                  ? "Your Froggi is evolving..."
+                  : tokenKey === "fungi"
+                  ? "Your Fungi is growing..."
+                  : tokenKey === "jelli"
+                  ? "Your Jelli is materializing..."
+                  : "Your Pepi is transforming..."}
               </div>
             )}
-{(() => {
-  const meta = inscriptionList.find(i => i.id === inscriptionId)?.meta;
-  if (!meta) return null;
-  const traits = extractTopTraits(meta, tokenKey, seedValue ?? "0");
-  return (
-    <div className="grid grid-cols-3 gap-1 mt-2 text-xs text-white/80">
-      {traits.map((trait, i) => (
-        <div
-          key={`trait-${i}`}
-          className="px-1 py-0.5 bg-white/10 rounded shadow text-center"
-        >
-          {trait}
-        </div>
-      ))}
-    </div>
-  );
-})()}
 
-<div className="flex flex-row justify-between items-end mt-4 gap-3">
-  <div className={`flex gap-3 flex-wrap ${fadeInButtons ? 'animate-fade-in2' : 'opacity-0'}`}>
-    {["froggi", "pepi", "jelli"].includes(tokenKey) && (
-      <button
-        onClick={handleStabilize}
-        className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded"
-      >
-        Stash
-      </button>
-    )}
-    <button
-      onClick={() => {
-        setSwapDone(false);
-        setNewInscription(null);
-        setInscriptionId(null);
-        setFadeInButtons(false);
-      }}
-      className="px-1 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
-    >
-      Add more
-    </button>
-  </div>
+            <div id="share-capture">
+              <div className="w-full aspect-square mb-4 relative bg-black rounded overflow-hidden">
+                {!newInscription ? (
+                  <div className="absolute inset-0 overflow-hidden">
+                    <Image
+                      src={loadingGif}
+                      alt="loading gif"
+                      className="w-full h-full object-contain translate-y-[3px]"
+                      fill
+                      unoptimized
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <div className="w-full h-full relative flex items-center justify-center">
+                      {justLeveledUp && (
+                        <div className="absolute inset-20 flex justify-center items-start pt-10 z-[99]">
+                          <div className="text-4xl sm:text-5xl font-bold text-yellow-300 drop-shadow-[0_0_10px_rgba(255,255,0,0.8)] animate-levelup-text">
+                            Level Up!
+                          </div>
+                        </div>
+                      )}
 
-  <div className={`flex flex-col gap-2 ${fadeInButtons ? 'animate-fade-in2' : 'opacity-0'}`}>
-    <ShareButton
-      seed={seedValue!}
-      project={tokenKey}
-      svg={newInscription!}
-    />
-    <button
-      onClick={onClose}
-      className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
-    >
-      Close
-    </button>
-  </div>
-</div>
+                      {justLeveledUp && (
+                        <div className="absolute inset-[-6px] rounded-lg border-4 border-yellow-300 animate-glow-fade z-[99] pointer-events-none" />
+                      )}
 
+                      {/* The minted SVG */}
+                      <div className="w-full aspect-square mb-0 relative bg-black rounded overflow-hidden"
+                        dangerouslySetInnerHTML={{ __html: newInscription }}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {seedValue && (
+                <div className="text-sm text-white text-left mb-3 space-y-1">
+                  <div>
+                    <span className="font-semibold">Tokens:</span> {seedValue}
+                    <span className="font-semibold pl-6">Type:</span> Growing
+                  </div>
+                </div>
+              )}
+
+              {(() => {
+                const meta = inscriptionList.find((i) => i.id === inscriptionId)?.meta;
+                if (!meta) return null;
+                const traits = extractTopTraits(meta, tokenKey, seedValue ?? "0");
+                return (
+                  <div className="grid grid-cols-3 gap-1 mt-2 text-xs text-white/80">
+                    {traits.map((trait, i) => (
+                      <div
+                        key={`trait-${i}`}
+                        className="px-1 py-0.5 bg-white/10 rounded shadow text-center"
+                      >
+                        {trait}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+
+            <div className="flex flex-row justify-between items-end mt-4 gap-3" id="share-controls">
+              <div
+                className={`flex gap-3 flex-wrap ${
+                  fadeInButtons ? "animate-fade-in2" : "opacity-0"
+                }`}
+              >
+                {["froggi", "pepi", "jelli"].includes(tokenKey) && (
+                  <button
+                    onClick={handleStabilize}
+                    className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded"
+                  >
+                    Stash
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    setSwapDone(false);
+                    setNewInscription(null);
+                    setInscriptionId(null);
+                    setFadeInButtons(false);
+                  }}
+                  className="px-1 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
+                >
+                  Add more
+                </button>
+              </div>
+
+              <div
+                className={`flex flex-col gap-2 ${
+                  fadeInButtons ? "animate-fade-in2" : "opacity-0"
+                }`}
+              >
+<ShareButton
+  seed={seedValue!}
+  project={tokenKey}
+  svg={newInscription!}
+  traits={
+    (() => {
+      const meta = inscriptionList.find(i => i.id === inscriptionId)?.meta;
+      return meta
+        ? extractTopTraits(meta, tokenKey, seedValue!)
+        : [];
+    })()
+  }
+/>
+                <button
+                  onClick={onClose}
+                  className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           </>
         ) : (
           <OnchainKitProvider

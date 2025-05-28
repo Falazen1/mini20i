@@ -10,9 +10,6 @@ export default function Topnav() {
         <div className="navbar-start">
           <Link href="/" className="flex items-center gap-1">
             <button className="text-xl">Mini 20i</button>
-            <span className="text-xs leading-none opacity-80 pt-1">
-            &nbsp;by Froggi
-            </span>
           </Link>
         </div>
 
