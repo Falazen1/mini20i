@@ -197,7 +197,7 @@ const handleShare = async () => {
       const patternTrait = formatted.find((t) =>
         t.includes("Egg")
       )?.replace(" Egg", "") ?? "";
-      message = `Check out my ${patternTrait} Froggi Egg! mini-20i.app`;
+      message = `Check out my ${patternTrait} Froggi Egg!\nmini-20i.app`;
     } else {
       let traitText = "!";
       if (formatted.length === 1) {
@@ -205,7 +205,7 @@ const handleShare = async () => {
       } else if (formatted.length >= 2) {
         traitText = ` with ${formatted[0]} and ${formatted[1]}!`;
       }
-      message = `Check out my $${project}${traitText} mini-20i.app`;
+      message = `Check out my $${project}${traitText}\nmini-20i.app`;
     }
 
     if (canShare) {
@@ -213,7 +213,7 @@ const handleShare = async () => {
         title: message,
         body: message,
         image: fullImageUrl,
-        url: "mini-20i.app",
+        url: "https://mini-20i.app",
       });
     } else {
       openUrl(
