@@ -213,7 +213,7 @@ const handleShare = async () => {
         title: message,
         body: message,
         image: fullImageUrl,
-        url: "https://mini-20i.app",
+        url: "mini-20i.app",
       });
     } else {
       openUrl(
