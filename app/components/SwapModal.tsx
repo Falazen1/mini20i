@@ -309,7 +309,7 @@ export default function SwapModal({
             )}
 
             <div id="share-capture">
-              <div className="w-full aspect-square mb-4 relative bg-black rounded overflow-hidden">
+              <div className="w-full aspect-square mb-4 relative bg-black">
                 {!newInscription ? (
                   <div className="absolute inset-0 overflow-hidden">
                     <Image
