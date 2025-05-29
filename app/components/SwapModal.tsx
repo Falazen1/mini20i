@@ -16,8 +16,7 @@ import { useTransaction } from "../helpers/useTransaction";
 import { useTokenStore } from "../helpers/useTokenStore";
 import Image from "next/image";
 import { FROGGI_HATS, FROGGI_EYEWEAR, FROGGI_CLOTHES } from "../helpers/froggi";
-import { FUNGUS_COLOR_NAMES } from "../helpers/colors";
-import { PEPI_COLOR_NAMES } from "../helpers/colors";
+import { FUNGUS_COLOR_NAMES, PEPI_COLOR_NAMES, JELLI_COLOR_NAMES } from "../helpers/colors";
 import ShareButton from "./ShareButton";
 
 const ethBase: Token = {
@@ -77,7 +76,7 @@ const TOKENS: Record<
 };
 
 function extractTopTraits(meta: Record<string, unknown>, project: 
-"froggi" | "fungi" | "pepi" | "jelli"
+"froggi" | "fungi" | "pepi" |"jelli"
 , seedStr: string): string[] {
   const traits: { label: string; value: string }[] = [];
 
@@ -123,7 +122,16 @@ function extractTopTraits(meta: Record<string, unknown>, project:
     if (meta.bodyColor) traits.push({ label: "Color", value: resolve(meta.bodyColor as string) });
     if (meta.background) traits.push({ label: "BGR", value: resolve(meta.background as string) });
   }
+  if (project === "jelli") {
+    const resolve = (hex: string) => JELLI_COLOR_NAMES[hex.toLowerCase()] || hex;
+    if (meta.bellColor) traits.push({ label: "Color", value: resolve(meta.bellColor as string) });
+    if (meta.tentacleColor) traits.push({ label: "Tentacle", value: resolve(meta.tentacleColor as string) });
+    if (meta.background) traits.push({ label: "Sky", value: resolve(meta.background as string) });
+    if (meta.hasGround === "true" && meta.groundColor) traits.push({ label: "Ground", value: resolve(meta.groundColor as string) });
+    if (meta.hasBubble === "true" && meta.bubbleColor) traits.push({ label: "Bubble", value: resolve(meta.bubbleColor as string) });
+    if (meta.hasWeed === "true" && meta.weedColor) traits.push({ label: "Weed", value: resolve(meta.weedColor as string) });
 
+  }
   const seen = new Set<string>();
   return traits.filter((t) => !seen.has(t.label) && seen.add(t.label)).slice(0, 6).map(t => `${t.label}: ${t.value}`);
 }
@@ -317,17 +325,15 @@ export default function SwapModal({
       )}
 
       <div id="share-capture">
-        <div className="w-full aspect-square relative bg-black rounded overflow-hidden">
-          {!newInscription ? (
-            <div className="absolute inset-0 overflow-hidden">
-              <Image
-                src={loadingGif}
-                alt="loading gif"
-                className="w-full h-full object-contain translate-y-[3px]"
-                fill
-                unoptimized
-              />
-            </div>
+<div className="w-full aspect-square relative bg-black rounded overflow-hidden flex items-center justify-center">
+  {!newInscription ? (
+    <Image
+      src={loadingGif}
+      alt="loading gif"
+      className="object-contain w-full h-full"
+      fill
+      unoptimized
+    />
           ) : (
             <>
               <div className="w-full h-full relative flex items-center justify-center">
@@ -343,24 +349,11 @@ export default function SwapModal({
                   <div className="absolute inset-[-6px] rounded-lg border-4 border-yellow-300 animate-glow-fade z-[99] pointer-events-none" />
                 )}
 
-                <div
-                  className="w-full aspect-square relative bg-black rounded overflow-hidden"
-                  dangerouslySetInnerHTML={{
-                    __html: (() => {
-                      const needsFix = ["fungi"].includes(tokenKey);
-                      const isPepi = tokenKey === "pepi";
-                      return newInscription.replace(
-                        /<svg([^>]+?)>/,
-                        needsFix
-                          ? `<svg$1 width="720" height="720" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
-                          : isPepi
-                          ? `<svg$1 width="800" height="800" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
-                          : `<svg$1>`
-                      );
-                    })(),
-                  }}
-                />
-              </div>
+  <div
+    className="w-full h-full animate-fade-in2 z-20"
+    dangerouslySetInnerHTML={{ __html: newInscription }}
+  />
+</div>
             </>
           )}
         </div>

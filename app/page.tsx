@@ -584,8 +584,8 @@ function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fu
 </div>
 
       <div className="px-4 max-w-6xl mx-auto mb-28">
-      <div className="relative w-full flex justify-center px-4 mt-10 mb-6">
-    <div className="absolute inset-0 top-[-20px] bottom-[-170px] w-full z-0 overflow-hidden rounded-xl shadow-[0_0_80px_rgba(0,0,0,0.6)] backdrop-blur-md ring-1 ring-white/10">
+      <div className="relative w-full flex justify-center px-4 mt-10 mb-8">
+    <div className="absolute inset-0 top-[-20px] bottom-[-165px] w-full z-0 overflow-hidden rounded-xl shadow-[0_0_80px_rgba(0,0,0,0.6)] backdrop-blur-md ring-1 ring-white/10">
   {activeFilter === "all" ? (
     <video
       id="glitch-video"
@@ -593,7 +593,7 @@ function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fu
       loop
       muted
       playsInline
-      className="absolute inset-0 w-full h-full object-cover opacity-70"
+      className="absolute inset-0 w-full h-full object-cover opacity-70 overflow-hidden"
     >
       <source src="/aidos_head.mp4" type="video/mp4" />
     </video>
