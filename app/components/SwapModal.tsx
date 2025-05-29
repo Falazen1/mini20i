@@ -48,7 +48,7 @@ const TOKENS: Record<
     symbol: "FROGGI",
     decimals: 9,
     chainId: 8453,
-    image: "https://d38ulo0p1ibxtf.cloudfront.net/fit-in/2560x1600/companies/4616/websites/images/original_image_34477546-d02c-4110-915a-26ab6914bcc3.png",
+    image: "/froggi_logo.png",
   },
   fungi: {
     name: "Fungi",
@@ -56,7 +56,7 @@ const TOKENS: Record<
     symbol: "FUNGI",
     decimals: 9,
     chainId: 8453,
-    image: "https://www.dextools.io/resources/tokens/logos/base/0x7d9ce55d54ff3feddb611fc63ff63ec01f26d15f.png?1711917415936",
+    image: "/fungi_logo.png",
   },
   pepi: {
     name: "Pepi",
@@ -64,7 +64,7 @@ const TOKENS: Record<
     symbol: "PEPI",
     decimals: 9,
     chainId: 8453,
-    image: "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/pepi_logo.jpg",
+    image: "/pepi_logo.jpg",
   },
   jelli: {
     name: "Jelli",
@@ -72,7 +72,7 @@ const TOKENS: Record<
     symbol: "JELLI",
     decimals: 9,
     chainId: 8453,
-    image: "https://jelli.blue/images/fungi/logo.png",
+    image: "/jelli_logo.png",
   },
 };
 
@@ -257,214 +257,221 @@ export default function SwapModal({
   if (!address || !token || !debounced) return null;
 
   return (
-    <div className="fixed inset-0 z-[30] bg-black bg-opacity-70 flex items-center justify-center">
-      <div className="relative bg-[#1c1e24] rounded-xl shadow-2xl p-6 w-full max-w-md text-white border border-white/10">
-        {/* Close button up top */}
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-white text-xl hover:text-red-400"
-        >
-          ✕
-        </button>
+      <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-30 w-[100%] h-[100%] ">
+<div className="bg-[#1c1e24] border border-white/10 rounded-xl shadow-xl p-6 max-w-lg mx-auto text-white relative">
+  <button
+    onClick={onClose}
+    className="absolute top-1 right-3 text-white/10 text-lg hover:text-red-400 z-10"
+    type="button"
+    aria-label="Close"
+  >
+    ✕
+  </button>
+  <button
+    onClick={onClose}
+    className="absolute top-1 left-3 text-white/10 text-lg hover:text-red-400 z-10"
+    type="button"
+    aria-label="Close"
+  >
+    ✕
+  </button>
+  <h2
+    className={`text-xl font-bold mb-2 mr-6 ml-6 text-center transition-opacity duration-700 ${
+      showFinalMessage ? "opacity-100" : "opacity-0"
+    }`}
+  >
+    {justLeveledUp
+      ? tokenKey === "froggi"
+        ? "Your Froggi has evolved!"
+        : tokenKey === "fungi"
+        ? "Your Fungi leveled up!"
+        : tokenKey === "jelli"
+        ? "Your Jelli has ascended!"
+        : "Your Pepi leveled up!"
+      : newInscription
+      ? prevSvgRef.current === null
+        ? "You got a new inscription!"
+        : tokenKey === "froggi"
+        ? "Your Froggi has evolved!"
+        : tokenKey === "fungi"
+        ? "Your Fungi has grown!"
+        : tokenKey === "jelli"
+        ? "Your Jelli has morphed!"
+        : "Your Pepi has transformed!"
+      : `Swap ETH → ${token.symbol}`}
+  </h2>
 
-        <h2
-          className={`text-2xl font-bold mb-6 text-center transition-opacity duration-700 ${
-            showFinalMessage ? "opacity-100" : "opacity-0"
+  {swapDone ? (
+    <>
+      {/* if no newInscription yet, show "is evolving..." */}
+      {!newInscription && (
+        <div className="mb-4 text-center text-sm">
+          {tokenKey === "froggi"
+            ? "Your Froggi is evolving..."
+            : tokenKey === "fungi"
+            ? "Your Fungi is growing..."
+            : tokenKey === "jelli"
+            ? "Your Jelli is materializing..."
+            : "Your Pepi is transforming..."}
+        </div>
+      )}
+
+      <div id="share-capture">
+        <div className="w-full aspect-square relative bg-black rounded overflow-hidden">
+          {!newInscription ? (
+            <div className="absolute inset-0 overflow-hidden">
+              <Image
+                src={loadingGif}
+                alt="loading gif"
+                className="w-full h-full object-contain translate-y-[3px]"
+                fill
+                unoptimized
+              />
+            </div>
+          ) : (
+            <>
+              <div className="w-full h-full relative flex items-center justify-center">
+                {justLeveledUp && (
+                  <div className="absolute inset-20 flex justify-center items-start pt-10 z-[99]">
+                    <div className="text-4xl sm:text-5xl font-bold text-yellow-300 drop-shadow-[0_0_10px_rgba(255,255,0,0.8)] animate-levelup-text">
+                      Level Up!
+                    </div>
+                  </div>
+                )}
+
+                {justLeveledUp && (
+                  <div className="absolute inset-[-6px] rounded-lg border-4 border-yellow-300 animate-glow-fade z-[99] pointer-events-none" />
+                )}
+
+                <div
+                  className="w-full aspect-square relative bg-black rounded overflow-hidden"
+                  dangerouslySetInnerHTML={{
+                    __html: (() => {
+                      const needsFix = ["fungi"].includes(tokenKey);
+                      const isPepi = tokenKey === "pepi";
+                      return newInscription.replace(
+                        /<svg([^>]+?)>/,
+                        needsFix
+                          ? `<svg$1 width="720" height="720" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
+                          : isPepi
+                          ? `<svg$1 width="800" height="800" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
+                          : `<svg$1>`
+                      );
+                    })(),
+                  }}
+                />
+              </div>
+            </>
+          )}
+        </div>
+
+        {seedValue && (
+          <div className="text-xs text-white text-left mb-4 mt-2">
+            <div>
+              <span className="font-semibold">Tokens:</span> {seedValue}
+              <span className="font-semibold pl-6">Type:</span> Growing
+            </div>
+          </div>
+        )}
+
+        {(() => {
+          const meta = inscriptionList.find((i) => i.id === inscriptionId)?.meta;
+          if (!meta) return null;
+          const traits = extractTopTraits(meta, tokenKey, seedValue ?? "0");
+          return (
+            <div className="grid grid-cols-3 gap-1 text-xs text-white/80">
+              {traits.map((trait, i) => (
+<div
+  key={`trait-${i}`}
+  className="px-1 py-0.5 bg-white/10 rounded shadow text-center"
+>
+    <span data-trait-text>{trait}</span>
+</div>
+              ))}
+            </div>
+          );
+        })()}
+      </div>
+
+<div className="flex flex-row justify-between items-end mt-4 gap-3" id="share-controls">
+        <div
+          className={`flex gap-2 flex-wrap ${
+            fadeInButtons ? "animate-fade-in2" : "opacity-0"
           }`}
         >
-          {justLeveledUp
-            ? tokenKey === "froggi"
-              ? "Your Froggi has evolved!"
-              : tokenKey === "fungi"
-              ? "Your Fungi leveled up!"
-              : tokenKey === "jelli"
-              ? "Your Jelli has ascended!"
-              : "Your Pepi leveled up!"
-            : newInscription
-            ? prevSvgRef.current === null
-              ? "You got a new inscription!"
-              : tokenKey === "froggi"
-              ? "Your Froggi has evolved!"
-              : tokenKey === "fungi"
-              ? "Your Fungi has grown!"
-              : tokenKey === "jelli"
-              ? "Your Jelli has morphed!"
-              : "Your Pepi has transformed!"
-            : `Swap ETH → ${token.symbol}`}
-        </h2>
-
-        {swapDone ? (
-          <>
-            {/* if no newInscription yet, show "is evolving..." */}
-            {!newInscription && (
-              <div className="mb-4 text-center text-sm">
-                {tokenKey === "froggi"
-                  ? "Your Froggi is evolving..."
-                  : tokenKey === "fungi"
-                  ? "Your Fungi is growing..."
-                  : tokenKey === "jelli"
-                  ? "Your Jelli is materializing..."
-                  : "Your Pepi is transforming..."}
-              </div>
-            )}
-
-            <div id="share-capture">
-              <div className="w-full aspect-square mb-4 relative bg-black rounded overflow-hidden">
-                {!newInscription ? (
-                  <div className="absolute inset-0 overflow-hidden">
-                    <Image
-                      src={loadingGif}
-                      alt="loading gif"
-                      className="w-full h-full object-contain translate-y-[3px]"
-                      fill
-                      unoptimized
-                    />
-                  </div>
-                ) : (
-                  <>
-                    <div className="w-full h-full relative flex items-center justify-center">
-                      {justLeveledUp && (
-                        <div className="absolute inset-20 flex justify-center items-start pt-10 z-[99]">
-                          <div className="text-4xl sm:text-5xl font-bold text-yellow-300 drop-shadow-[0_0_10px_rgba(255,255,0,0.8)] animate-levelup-text">
-                            Level Up!
-                          </div>
-                        </div>
-                      )}
-
-                      {justLeveledUp && (
-                        <div className="absolute inset-[-6px] rounded-lg border-4 border-yellow-300 animate-glow-fade z-[99] pointer-events-none" />
-                      )}
-
-                        <div
-                          className="w-full aspect-square mb-0 relative bg-black rounded overflow-hidden"
-                          dangerouslySetInnerHTML={{
-                            __html: (() => {
-                              const needsFix = ["fungi"].includes(tokenKey);
-                              const isPepi = tokenKey === "pepi";
-                              return newInscription.replace(
-                                /<svg([^>]+?)>/,
-                                needsFix
-                                  ? `<svg$1 width="720" height="720" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
-                                  : isPepi
-                                  ? `<svg$1 width="800" height="800" shape-rendering="crispEdges" image-rendering="pixelated" preserveAspectRatio="xMidYMid meet">`
-                                  : `<svg$1>`
-                              );
-                            })(),
-                          }}
-                        />
-
-                    </div>
-                  </>
-                )}
-              </div>
-
-              {seedValue && (
-                <div className="text-sm text-white text-left mb-3 space-y-1">
-                  <div>
-                    <span className="font-semibold">Tokens:</span> {seedValue}
-                    <span className="font-semibold pl-6">Type:</span> Growing
-                  </div>
-                </div>
-              )}
-
-              {(() => {
-                const meta = inscriptionList.find((i) => i.id === inscriptionId)?.meta;
-                if (!meta) return null;
-                const traits = extractTopTraits(meta, tokenKey, seedValue ?? "0");
-                return (
-                  <div className="grid grid-cols-3 gap-1 mt-2 text-xs text-white/80">
-                    {traits.map((trait, i) => (
-                      <div
-                        key={`trait-${i}`}
-                        className="px-1 py-0.5 bg-white/10 rounded shadow text-center"
-                      >
-                        {trait}
-                      </div>
-                    ))}
-                  </div>
-                );
-              })()}
-            </div>
-
-            <div className="flex flex-row justify-between items-end mt-4 gap-3" id="share-controls">
-              <div
-                className={`flex gap-3 flex-wrap ${
-                  fadeInButtons ? "animate-fade-in2" : "opacity-0"
-                }`}
-              >
-                {["froggi", "pepi", "jelli"].includes(tokenKey) && (
-                  <button
-                    onClick={handleStabilize}
-                    className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded"
-                  >
-                    Stash
-                  </button>
-                )}
-                <button
-                  onClick={() => {
-                    setSwapDone(false);
-                    setNewInscription(null);
-                    setInscriptionId(null);
-                    setFadeInButtons(false);
-                  }}
-                  className="px-1 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
-                >
-                  Add more
-                </button>
-              </div>
-
-              <div
-                className={`flex flex-col gap-2 ${
-                  fadeInButtons ? "animate-fade-in2" : "opacity-0"
-                }`}
-              >
-<ShareButton
-  seed={seedValue!}
-  project={tokenKey}
-  svg={newInscription!}
-  traits={
-    (() => {
-      const meta = inscriptionList.find(i => i.id === inscriptionId)?.meta;
-      return meta
-        ? extractTopTraits(meta, tokenKey, seedValue!)
-        : [];
-    })()
-  }
-/>
-                <button
-                  onClick={onClose}
-                  className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </>
-        ) : (
-          <OnchainKitProvider
-            apiKey="3KA49gYhtfR0hrw5L7L0nPVYlO1z4tyE"
-            chain={base}
-            config={{
-              appearance: {
-                mode: "dark",
-                theme: "default",
-                name: "mini20i",
-                logo: `https://mini-20i.app/logo.png`,
-              },
+          {["froggi", "pepi", "jelli"].includes(tokenKey) && (
+            <button
+              onClick={handleStabilize}
+              className="px-2 py-1 text-sm bg-green-100 text-green-700 rounded"
+            >
+              Stash
+            </button>
+          )}
+          <button
+            onClick={() => {
+              setSwapDone(false);
+              setNewInscription(null);
+              setInscriptionId(null);
+              setFadeInButtons(false);
             }}
+            className="px-2 py-1 text-sm bg-yellow-100 text-yellow-800 rounded"
           >
-            <Swap onSuccess={handleSuccess}>
-              <div className="space-y-4">
-                <SwapAmountInput label="From" token={ethBase} type="from" />
-                <SwapAmountInput label="To" token={token} type="to" />
-                <SwapButton />
-                <SwapMessage />
-                <SwapToast />
-              </div>
-            </Swap>
-          </OnchainKitProvider>
-        )}
+            Add more
+          </button>
+        </div>
+
+        <div
+          className={`flex flex-col gap-2 ${
+            fadeInButtons ? "animate-fade-in2" : "opacity-0"
+          }`}
+        >
+          <ShareButton
+            seed={seedValue!}
+            project={tokenKey}
+            svg={newInscription!}
+            traits={
+              (() => {
+                const meta = inscriptionList.find(i => i.id === inscriptionId)?.meta;
+                return meta
+                  ? extractTopTraits(meta, tokenKey, seedValue!)
+                  : [];
+              })()
+            }
+          />
+          <button
+            onClick={onClose}
+            className="px-2 py-1 text-sm bg-gray-200 text-gray-800 rounded"
+          >
+            Close
+          </button>
+        </div>
       </div>
+    </>
+  ) : (
+    <OnchainKitProvider
+      apiKey="3KA49gYhtfR0hrw5L7L0nPVYlO1z4tyE"
+      chain={base}
+      config={{
+        appearance: {
+          mode: "dark",
+          theme: "default",
+          name: "mini20i",
+          logo: `https://mini-20i.app/logo.png`,
+        },
+      }}
+    >
+      <Swap onSuccess={handleSuccess}>
+        <div className="space-y-4">
+          <SwapAmountInput label="From" token={ethBase} type="from" />
+          <SwapAmountInput label="To" token={token} type="to" />
+          <SwapButton />
+          <SwapMessage />
+          <SwapToast />
+        </div>
+      </Swap>
+    </OnchainKitProvider>
+  )}
+</div>
     </div>
   );
 }

@@ -232,7 +232,7 @@ const handleShare = async () => {
   return (
     <button
       onClick={handleShare}
-      className="px-4 py-2 text-sm bg-purple-100 text-purple-800 rounded hover:bg-purple-200 transition"
+      className="px-2 py-1 text-sm bg-purple-100 text-purple-800 rounded hover:bg-purple-200 transition"
     >
       Share
     </button>

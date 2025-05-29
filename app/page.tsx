@@ -22,8 +22,8 @@ import { FUNGUS_COLOR_NAMES } from "./helpers/colors";
 import { PEPI_COLOR_NAMES } from "./helpers/colors";
 import { FROGGI_HATS, FROGGI_EYEWEAR, FROGGI_CLOTHES } from "./helpers/froggi";
 import { JELLI_COLOR_NAMES } from "./helpers/colors";
-
 import ModalSend from "./components/ModalSend";
+
 type Inscription = {
   id: string;
   svg: string;
@@ -60,7 +60,7 @@ const { setFrameReady, isFrameReady } = useMiniKit();
 const [fadeOutIndex, setFadeOutIndex] = useState<number | null>(null);
 const [failedTxCount, setFailedTxCount] = useState(0);
 const [showError, setShowError] = useState(false);
-const [showWalletWarning, setShowWalletWarning] = useState<false | "mobile" | "desktop">(false);
+const [showWalletWarning, setShowWalletWarning] = useState(false);
 
 
 useEffect(() => {
@@ -464,16 +464,16 @@ function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fu
 
 
       {isProcessing && (
-        <div className="fixed inset-0 z-[9999] bg-black bg-opacity-70 flex items-center justify-center">
+        <div className="fixed inset-0 z-[99] bg-black bg-opacity-70 flex items-center justify-center">
           <div className="bg-white px-6 py-4 rounded shadow text-center text-lg text-black">Preparing transaction...</div>
         </div>
       )}
       {successMessage && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] bg-green-100 text-green-800 px-4 py-2 rounded shadow">
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[99] bg-green-100 text-green-800 px-4 py-2 rounded shadow">
           {successMessage}
         </div>
       )}
-      
+   
 {combineMode && (
   <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 overflow-auto">
   <div className="bg-[#1c1e24] border border-white/10 rounded-xl shadow-xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto text-white">
@@ -584,9 +584,9 @@ function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fu
 </div>
 
       <div className="px-4 max-w-6xl mx-auto mb-28">
-      <div className="relative w-full flex justify-center px-4 mt-10 mb-4">
-      <div className="absolute inset-0 top-[-20px] bottom-[-170px] w-full z-0 overflow-hidden rounded-xl shadow-[0_0_80px_rgba(0,0,0,0.6)] backdrop-blur-md ring-1 ring-white/10">
-
+      <div className="relative w-full flex justify-center px-4 mt-10 mb-6">
+    <div className="absolute inset-0 top-[-20px] bottom-[-170px] w-full z-0 overflow-hidden rounded-xl shadow-[0_0_80px_rgba(0,0,0,0.6)] backdrop-blur-md ring-1 ring-white/10">
+  {activeFilter === "all" ? (
     <video
       id="glitch-video"
       autoPlay
@@ -597,8 +597,17 @@ function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fu
     >
       <source src="/aidos_head.mp4" type="video/mp4" />
     </video>
-    <div className="absolute inset-0 bg-gradient-to-b from-[#1c1e24]/80 via-[#15171c]/70 to-transparent shadow-[inset_0_20px_40px_rgba(0,0,0,0.5)]" />
-  </div>
+  ) : (
+    <Image
+      src={activeToken?.banner ?? "/aidos_head.mp4"}
+      alt={`${activeToken?.name ?? "Project"} banner`}
+      fill
+      className="absolute inset-0 w-full h-full object-contain"
+    />
+  )}
+  <div className="absolute inset-0 bg-gradient-to-b from-[#1c1e24]/80 via-[#15171c]/70 to-transparent shadow-[inset_0_20px_40px_rgba(0,0,0,0.5)]" />
+</div>
+
   <div className={`text-center z-10 transition-opacity duration-700 ${showDescription ? "opacity-100" : "opacity-0"}`}>
     <h1 className="text-4xl font-semibold">Mini 20i</h1>
     <p className="text-xs text-white-600 mt-1">View and swap ERC20i inscriptions</p>
@@ -615,36 +624,41 @@ function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fu
 <div className="relative w-full flex justify-center gap-2 [&_img]:h-11 [&_img]:w-11 min-[320px]:gap-4 min-[440px]:[&_img]:h-16 min-[440px]:[&_img]:w-16">
 
 
+<Image
+  onClick={() => setActiveFilter("all")}
+  src="/ERC20i ecosystem.jpg"
+  alt="All Projects"
+  width={56}
+  height={56}
+  className={`h-14 w-14 rounded-full border cursor-pointer transition-transform duration-150 ${
+    activeFilter === "all"
+      ? "ring-2 ring-offset-2 ring-offset-gray-900 ring-blue-400 shadow-lg shadow-blue-500/50 scale-105"
+      : ""
+  }`}
+/>
+{visibleTokens.map((t) => {
+  const logo = t.key === "pepi" ? "/pepi_logo.jpg" : t.logo;
+  return (
     <Image
-      onClick={() => setActiveFilter("all")}
-      src="https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/ERC20i%20ecosystem.jpg"
-      alt="All Projects"
+      key={t.key}
+      onClick={() => setActiveFilter(t.key)}
+      src={logo}
+      alt={t.name}
       width={56}
       height={56}
-      className={`h-14 w-14 rounded-full border cursor-pointer hover:opacity-80 ${activeFilter === "all" ? "ring-2 ring-black" : ""}`}
+      className={`h-14 w-14 rounded-full border cursor-pointer transition-transform duration-150 ${
+        activeFilter === t.key
+          ? "ring-2 ring-offset-2 ring-offset-gray-900 ring-blue-400 shadow-lg shadow-blue-500/50 scale-105"
+          : ""
+      }`}
     />
-    {visibleTokens.map((t) => {
-      const logo = t.key === "pepi"
-        ? "https://raw.githubusercontent.com/Falazen1/Inscription_Viewer/refs/heads/main/pepi_logo.jpg"
-        : t.logo;
-
-      return (
-        <Image
-          key={t.key}
-          onClick={() => setActiveFilter(t.key)}
-          src={logo}
-          alt={t.name}
-          width={56}
-          height={56}
-          className={`h-14 w-14 rounded-full border cursor-pointer hover:opacity-80 ${activeFilter === t.key ? "ring-2 ring-black" : ""}`}
-        />
-      );
-    })}
+  );
+})}
 
 {(!(context as { walletAddress?: `0x${string}` })?.walletAddress && !wagmiAddress) || showVideo ? (
 
   <div
-    className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ${
+    className={`fixed inset-0 z-[99] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ${
       address ? "opacity-0 pointer-events-none" : "opacity-100"
     }`}
   >
@@ -661,23 +675,21 @@ function extractTopTraits(meta: Record<string, unknown>, project: "froggi" | "fu
 <div className="relative z-10 text-white text-center px-6">
   <div
     className="bg-white text-black px-6 py-4 rounded shadow-lg cursor-pointer hover:shadow-xl transition inline-block"
-onClick={() => {
+    onClick={() => {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-  const isInjected = typeof window !== "undefined" && !!(window as Window & { ethereum?: unknown }).ethereum;
+const isInjected = typeof window !== "undefined" && !!(window as Window & { ethereum?: unknown }).ethereum;
 
-  if (!isInjected) {
-    if (isMobile) {
-      setShowWalletWarning("mobile");
-    } else {
-      setShowWalletWarning("desktop");
-    }
+
+  if (isMobile && !isInjected) {
+    setShowWalletWarning(true);
     return;
   }
 
   connect({ connector: connectors[0] });
 }}
->
-{showWalletWarning === "mobile" ? (
+
+  >
+ {showWalletWarning ? (
   <>
     <p className="text-lg font-semibold mb-2 text-yellow-500">No Wallet Detected</p>
     <p className="text-sm text-yellow-400">
@@ -700,31 +712,6 @@ onClick={() => {
         Farcaster
       </a>{" "}
       browser to continue.
-    </p>
-  </>
-) : showWalletWarning === "desktop" ? (
-  <>
-    <p className="text-lg font-semibold mb-2 text-yellow-500">No Wallet Extension</p>
-    <p className="text-sm text-yellow-400">
-      Please install{" "}
-      <a
-        href="https://metamask.io/download/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="underline text-purple-300 hover:text-blue-300"
-      >
-        MetaMask
-      </a>{" "}
-      or{" "}
-      <a
-        href="https://www.coinbase.com/wallet"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="underline text-purple-300 hover:text-blue-300"
-      >
-        Coinbase Wallet Extension
-      </a>{" "}
-      to continue on desktop.
     </p>
   </>
 ) : (() => {
@@ -777,21 +764,26 @@ onClick={() => {
               .map((token) => (
                 <div key={token.key}>
 <div className="relative w-screen left-1/2 right-1/2 -mx-[50vw] px-4 sm:px-8 pb-2">
-<div className="absolute inset-0 bottom-[-70px] top-[-12px] bg-gradient-to-b from-[#1c1e24]/80 via-[#15171c]/10 to-transparent shadow-[inset_0_20px_40px_rgba(0,0,0,0.5)]" />
+  <div className="absolute inset-0 bottom-[-65px] top-[-12px] bg-gradient-to-b from-[#1c1e24]/80 via-[#15171c]/10 to-transparent shadow-[inset_0_20px_40px_rgba(0,0,0,0.5)] mx-2 rounded-xl ring-1 ring-white/10 mb-1" />
+
+  <div className="relative z-20 max-w-6xl mx-auto right-auto">
+    <h3 className="text-xl font-semibold mb-1 px-2">{token.name}</h3>
+  </div>
 
   <div className="relative z-10">
-    {activeFilter === "all" && (
-      <h3 className="text-xl font-semibold mt-6">{token.name}</h3>
-    )}
-    <div className={`transition-opacity duration-700 ${showBanners ? "opacity-100" : "opacity-0"}`}>
-      <Image
-        src={token.banner}
-        alt={`${token.name} banner`}
-        width={1024}
-        height={360}
-        className="w-full max-h-[420px] md:max-h-[360px] object-contain rounded shadow mt-3 cursor-pointer"
-      />
-    </div>
+
+  {activeFilter === "all" && (
+  <div className={`transition-opacity duration-700 ${showBanners ? "opacity-100" : "opacity-0"}`}>
+    <Image
+      src={token.banner}
+      alt={`${token.name} banner`}
+      width={1024}
+      height={360}
+      className="w-full max-h-[420px] md:max-h-[360px] object-contain rounded shadow mt-3 cursor-pointer"
+    />
+  </div>
+)}
+
   </div>
 </div>
 
@@ -904,36 +896,18 @@ onClick={() => {
     return (
 <div
   key={inscription.id}
- onClick={async () => {
-  if (combineMode) {
-    setCombineList((prev) =>
-      prev.some((i) => i.id === inscription.id)
-        ? prev.filter((i) => i.id !== inscription.id)
-        : [...prev, inscription]
-    );
-    return;
-  }
-
-  const eth = window.ethereum as { request: (args: { method: string; params?: unknown[] }) => Promise<unknown> } | undefined;
-  const BASE_CHAIN_ID_HEX = "0x2105";
-
-  if (eth?.request) {
-    try {
-      const chainId = (await eth.request({ method: "eth_chainId" })) as string;
-      if (chainId !== BASE_CHAIN_ID_HEX) {
-        await eth.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: BASE_CHAIN_ID_HEX }],
-        });
-      }
-    } catch (err) {
-      console.error("Chain switch failed:", err);
-    }
-  }
-
+  onClick={() => {
+if (combineMode) {
+  setCombineList((prev) =>
+    prev.some((i) => i.id === inscription.id)
+      ? prev.filter((i) => i.id !== inscription.id)
+      : [...prev, inscription]
+  );
+} else {
   setSelectedInscription(inscription);
-}}
+}
 
+  }}
   className={`bg-[#1c1e24] border border-white/10 rounded-xl shadow-md p-3 cursor-pointer transition hover:scale-[1.02] hover:ring-1 hover:ring-white/20 ${
     isSelected ? "ring-2 ring-purple-400" : ""
   }`}
@@ -965,7 +939,7 @@ dangerouslySetInnerHTML={{
 
 
 <div className="text-center text-white/80 text-xs">
-  <div className="flex flex-wrap justify-center gap-x-10 mb-1">
+  <div className="flex flex-wrap justify-center gap-x-10 mb-2">
     <span>Type: {inscription.type}</span>
     <span>Tokens: {inscription.seed}</span>
   </div>
@@ -1032,13 +1006,10 @@ dangerouslySetInnerHTML={{
         )}
 
     {selectedInscription && (
-      <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-<div
-  id="share-capture"
-  className="bg-[#1c1e24] border border-white/10 rounded-xl shadow-xl p-6 max-w-lg w-full text-white"
->
+      <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 w-[100%] h-[100%] ">
+<div id="share-capture" className="bg-[#1c1e24] border border-white/10 rounded-xl shadow-xl p-5 max-w-lg mx-auto text-white relative">
 
-<div className="flex flex-col items-center justify-center mb-4 relative text-white/90">
+<div className="flex flex-col items-center justify-center mb-2 relative text-white/90">
   <div className="flex gap-6 text-lg">
     <div>
       <span className="font-semibold">Type: </span> {selectedInscription.type}
@@ -1049,13 +1020,13 @@ dangerouslySetInnerHTML={{
   </div>
   <button
     onClick={() => setSelectedInscription(null)}
-    className="absolute top-0 right-0 text-white/80 hover:text-white"
+    className="absolute top-0 right-0 text-white/10 hover:text-white"
   >
     ✕
   </button>
 </div>
 
-          <div className="w-full aspect-square mb-4 relative bg-black rounded overflow-hidden">
+  <div className="w-full aspect-square mb-2 relative bg-black rounded overflow-hidden">
 <div
   className={`absolute inset-0 z-10 transition-opacity duration-[500ms] ${
     showRollingGif ? 'opacity-0 delay-[100ms]' : 'opacity-100'
@@ -1063,7 +1034,7 @@ dangerouslySetInnerHTML={{
   dangerouslySetInnerHTML={{
     __html: (() => {
       const svg = selectedInscription?.svg ?? "";
-const needsFix = selectedInscription?.id?.startsWith("fungi") || selectedInscription?.id?.startsWith("jelli");
+const needsFix = selectedInscription?.id?.startsWith("fungi");
 const isPepi = selectedInscription?.id?.startsWith("pepi");
 return svg.replace(
   /<svg([^>]+?)>/,
@@ -1094,7 +1065,7 @@ return svg.replace(
 </div>
 
 {selectedInscription.meta && (
-  <div className="grid grid-cols-3 gap-1 mt-4 text-xs text-white/80">
+  <div className="grid grid-cols-3 gap-1 text-xs text-white/80">
     {extractTopTraits(
       selectedInscription.meta,
       selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli",
@@ -1113,7 +1084,7 @@ return svg.replace(
 
 
 <div className="flex flex-row justify-between items-end mt-4 gap-3" id="share-controls">
-  <div className="flex gap-3 flex-wrap">
+  <div className="flex gap-2 flex-wrap">
 
 {["froggi", "pepi", "jelli"].some((k) => selectedInscription.id.startsWith(k)) && selectedInscription.type === "Safe" && (
 
@@ -1130,7 +1101,7 @@ onClick={() => {
 }}
 
 
-    className="px-4 py-2 text-sm bg-amber-100 text-amber-700 rounded"
+    className="px-2 py-1 text-sm bg-amber-100 text-amber-700 rounded"
   >
     Unstash
   </button>
@@ -1181,7 +1152,7 @@ onClick={() => {
         selectedInscription.seed
       )
     }
-    className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded"
+    className="px-2 py-1 text-sm bg-green-100 text-green-700 rounded"
   >
     Stash
   </button>
@@ -1202,7 +1173,7 @@ onClick={() => {
   setCombineMode(true);
 }}
 
-    className="px-2 py-2 text-sm bg-blue-100 text-blue-700 rounded"
+    className="px-2 py-1 text-sm bg-blue-100 text-blue-700 rounded"
   >
     Combine
   </button>
@@ -1219,7 +1190,7 @@ onClick={() => {
         setSwapTokenKey(selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli");
         setIsSwapOpen(true);
       }}
-      className="px-3 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
+      className="px-2 py-1 text-sm bg-yellow-100 text-yellow-800 rounded"
     >
     Start New
     </button>
@@ -1231,7 +1202,7 @@ onClick={() => {
       setSwapTokenKey(selectedInscription.id.split("-")[0] as "froggi" | "fungi" | "pepi" | "jelli");
       setIsSwapOpen(true);
     }}
-    className="px-1 py-2 text-sm bg-yellow-100 text-yellow-800 rounded"
+    className="px-2 py-1 text-sm bg-yellow-100 text-yellow-800 rounded"
   >
     Add more
   </button>
@@ -1244,7 +1215,7 @@ onClick={() => {
       setShowSendModal("pepi");
       setSelectedInscription(null);
     }}
-    className="px-4 py-2 text-sm bg-purple-100 text-purple-800 rounded"
+    className="px-2 py-1 text-sm bg-purple-100 text-purple-800 rounded"
   >
     Unstick
   </button>
@@ -1273,7 +1244,7 @@ onClick={() => {
 
   <button
     onClick={() => setSelectedInscription(null)}
-    className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded"
+    className="px-2 py-1 text-sm bg-gray-200 text-gray-800 rounded"
   >
     Close
   </button>
@@ -1306,7 +1277,6 @@ onClick={() => {
     }
   }}
 />
-
     </>
     
   );
